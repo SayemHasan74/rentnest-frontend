@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { api } from "@/lib/api";
@@ -32,6 +32,7 @@ const getInitialRegisterValues = (): RegisterPayload => ({
 
 export function AuthForm({ mode }: { mode: AuthMode }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const isRegister = mode === "register";
   const [values, setValues] = useState(getInitialRegisterValues);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -69,9 +70,14 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
   const loginAndRedirect = async (email: string, password: string) => {
     const auth = await api.auth.login({ email, password });
+    const from = searchParams.get("from");
+    const nextPath =
+      from && from.startsWith("/") && !from.startsWith("//")
+        ? from
+        : getRoleDashboardPath(auth.user.role);
 
     persistAuthSession(auth);
-    router.push(getRoleDashboardPath(auth.user.role));
+    router.push(nextPath);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {

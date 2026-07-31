@@ -5,20 +5,23 @@ Tenants can browse properties, submit rental requests, pay after landlord
 approval, and leave reviews. Landlords can manage property listings and rental
 requests. Admins can manage users, listings, rentals, and categories.
 
-## Tech Stack
-
-- Next.js App Router
-- TypeScript
-- Tailwind CSS
-- RentNest REST API
-
-## Backend API
+## Live Backend
 
 ```text
 https://rentnest-server.onrender.com/api
 ```
 
-Copy `.env.example` to `.env.local` for local development:
+## Tech Stack
+
+- Next.js App Router
+- TypeScript
+- Tailwind CSS
+- lucide-react icons
+- RentNest REST API
+
+## Environment
+
+Copy `.env.example` to `.env.local` for local development.
 
 ```env
 NEXT_PUBLIC_API_BASE_URL=https://rentnest-server.onrender.com/api
@@ -39,16 +42,112 @@ Tenant Password: tenant123
 
 ## Local Development
 
-Install dependencies:
-
 ```bash
 npm install
-```
-
-Start the development server:
-
-```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## Verification
+
+```bash
+npm run lint
+npm run build
+```
+
+## Routes
+
+```text
+/                         Public home page with featured listings
+/properties               Public property browse and filters
+/properties/[id]          Property details, gallery, reviews, rental request
+/auth/login               Login with demo account shortcuts
+/auth/register            Tenant/landlord registration
+/dashboard                Role redirect
+/dashboard/tenant         Tenant rental requests, payments, reviews
+/dashboard/landlord       Landlord listings, requests, property creation
+/dashboard/admin          Admin users, properties, rentals, categories
+/unauthorized             Role access fallback
+```
+
+## Role Features
+
+Tenant:
+- Browse and filter public properties.
+- Submit rental requests from property details.
+- Track rental status in the tenant dashboard.
+- Pay approved rentals through Stripe checkout.
+- Review completed rentals.
+
+Landlord:
+- View owned properties.
+- Add new property listings.
+- Toggle property availability.
+- Review rental requests.
+- Approve or reject pending requests.
+- Complete active paid rentals.
+
+Admin:
+- View and filter users by role, status, and search.
+- Ban or activate user accounts.
+- Monitor all properties.
+- Monitor rental activity and payment status.
+- Create, edit, and delete categories.
+
+## API Integration
+
+The frontend uses `src/lib/api.ts` as the single API client. It sends bearer
+tokens for protected routes and unwraps the backend response format.
+
+Integrated endpoints:
+
+```text
+POST /api/auth/register
+POST /api/auth/login
+GET  /api/auth/me
+
+GET  /api/properties
+GET  /api/properties/:id
+GET  /api/categories
+
+POST /api/rentals
+GET  /api/rentals
+GET  /api/rentals/:id
+
+POST /api/payments/create
+POST /api/payments/confirm
+GET  /api/payments
+GET  /api/payments/:id
+
+POST /api/reviews
+
+GET    /api/landlord/properties
+POST   /api/landlord/properties
+PUT    /api/landlord/properties/:id
+PATCH  /api/landlord/properties/:id/availability
+DELETE /api/landlord/properties/:id
+GET    /api/landlord/requests
+PATCH  /api/landlord/requests/:id
+PATCH  /api/landlord/requests/:id/complete
+
+GET   /api/admin/users
+PATCH /api/admin/users/:id
+GET   /api/admin/properties
+GET   /api/admin/rentals
+POST  /api/categories
+PATCH /api/categories/:id
+DELETE /api/categories/:id
+```
+
+## Authentication
+
+Auth state is stored in `localStorage` for client API calls and in cookies for
+Next.js route protection. The middleware proxy protects dashboard routes and
+redirects users to their role dashboard.
+
+```text
+TENANT   -> /dashboard/tenant
+LANDLORD -> /dashboard/landlord
+ADMIN    -> /dashboard/admin
+```

@@ -1,6 +1,7 @@
 export {
   canAccessRole,
   clearAuthSession,
+  AUTH_SESSION_EVENT,
   getRoleDashboardPath,
   getStoredRole,
   getStoredToken,

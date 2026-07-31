@@ -1,11 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Building2, LayoutDashboard, LogIn, Menu, Search, UserPlus, X } from "lucide-react";
-import { useState } from "react";
-import { buttonClasses } from "@/components/ui/button";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  Building2,
+  LayoutDashboard,
+  LogIn,
+  LogOut,
+  Menu,
+  Search,
+  UserPlus,
+  X,
+} from "lucide-react";
+import { useState, useSyncExternalStore } from "react";
+import { Button, buttonClasses } from "@/components/ui/button";
+import {
+  AUTH_SESSION_EVENT,
+  clearAuthSession,
+  getStoredUser,
+  roleLabels,
+} from "@/lib/auth-session";
 import { cn } from "@/lib/utils";
+import type { User } from "@/types/rentnest";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -13,9 +29,69 @@ const navLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 ];
 
+const subscribeToAuthSession = (callback: () => void) => {
+  window.addEventListener("storage", callback);
+  window.addEventListener(AUTH_SESSION_EVENT, callback);
+
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener(AUTH_SESSION_EVENT, callback);
+  };
+};
+
+const getAuthSnapshot = () => JSON.stringify(getStoredUser());
+
+const getServerAuthSnapshot = () => JSON.stringify(null);
+
 export function SiteHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const userSnapshot = useSyncExternalStore(
+    subscribeToAuthSession,
+    getAuthSnapshot,
+    getServerAuthSnapshot,
+  );
+  const user = JSON.parse(userSnapshot) as User | null;
+
+  const handleLogout = () => {
+    clearAuthSession();
+    setIsOpen(false);
+    router.push("/");
+  };
+
+  const authActions = user ? (
+    <>
+      <Link
+        className={buttonClasses({ variant: "ghost" })}
+        href="/dashboard"
+      >
+        <LayoutDashboard size={16} aria-hidden="true" />
+        {roleLabels[user.role]}
+      </Link>
+      <Button onClick={handleLogout} variant="outline">
+        <LogOut size={16} aria-hidden="true" />
+        Logout
+      </Button>
+    </>
+  ) : (
+    <>
+      <Link
+        className={buttonClasses({ variant: "ghost" })}
+        href="/auth/login"
+      >
+        <LogIn size={16} aria-hidden="true" />
+        Login
+      </Link>
+      <Link
+        className={buttonClasses({ variant: "primary" })}
+        href="/auth/register"
+      >
+        <UserPlus size={16} aria-hidden="true" />
+        Register
+      </Link>
+    </>
+  );
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -49,22 +125,7 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
-          <Link
-            className={buttonClasses({ variant: "ghost" })}
-            href="/auth/login"
-          >
-            <LogIn size={16} aria-hidden="true" />
-            Login
-          </Link>
-          <Link
-            className={buttonClasses({ variant: "primary" })}
-            href="/auth/register"
-          >
-            <UserPlus size={16} aria-hidden="true" />
-            Register
-          </Link>
-        </div>
+        <div className="hidden items-center gap-2 md:flex">{authActions}</div>
 
         <button
           aria-expanded={isOpen}
@@ -97,22 +158,41 @@ export function SiteHeader() {
             })}
           </nav>
           <div className="mt-4 grid gap-2">
-            <Link
-              className={buttonClasses({ variant: "outline" })}
-              href="/auth/login"
-              onClick={() => setIsOpen(false)}
-            >
-              <LogIn size={16} aria-hidden="true" />
-              Login
-            </Link>
-            <Link
-              className={buttonClasses({ variant: "primary" })}
-              href="/auth/register"
-              onClick={() => setIsOpen(false)}
-            >
-              <UserPlus size={16} aria-hidden="true" />
-              Register
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  className={buttonClasses({ variant: "outline" })}
+                  href="/dashboard"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <LayoutDashboard size={16} aria-hidden="true" />
+                  {roleLabels[user.role]} dashboard
+                </Link>
+                <Button onClick={handleLogout} variant="outline">
+                  <LogOut size={16} aria-hidden="true" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link
+                  className={buttonClasses({ variant: "outline" })}
+                  href="/auth/login"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <LogIn size={16} aria-hidden="true" />
+                  Login
+                </Link>
+                <Link
+                  className={buttonClasses({ variant: "primary" })}
+                  href="/auth/register"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <UserPlus size={16} aria-hidden="true" />
+                  Register
+                </Link>
+              </>
+            )}
           </div>
         </div>
       ) : null}

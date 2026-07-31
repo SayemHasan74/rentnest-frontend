@@ -3,6 +3,7 @@ import { AUTH_ROLE_COOKIE, AUTH_TOKEN_COOKIE } from "@/lib/auth-constants";
 
 export const AUTH_TOKEN_KEY = "rentnest_access_token";
 export const AUTH_USER_KEY = "rentnest_user";
+export const AUTH_SESSION_EVENT = "rentnest-auth-session";
 
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 
@@ -50,6 +51,7 @@ export const persistAuthSession = ({ accessToken, user }: AuthPayload) => {
   window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
   setCookie(AUTH_TOKEN_COOKIE, accessToken);
   setCookie(AUTH_ROLE_COOKIE, user.role);
+  window.dispatchEvent(new Event(AUTH_SESSION_EVENT));
 };
 
 export const clearAuthSession = () => {
@@ -61,6 +63,7 @@ export const clearAuthSession = () => {
   window.localStorage.removeItem(AUTH_USER_KEY);
   deleteCookie(AUTH_TOKEN_COOKIE);
   deleteCookie(AUTH_ROLE_COOKIE);
+  window.dispatchEvent(new Event(AUTH_SESSION_EVENT));
 };
 
 export const getStoredToken = () => {
