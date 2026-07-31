@@ -3,8 +3,11 @@
 import { FormEvent, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import {
   AlertCircle,
+  Building2,
   CheckCircle2,
+  ClipboardList,
   Loader2,
+  MapPin,
   Search,
   Shield,
   ShieldOff,
@@ -17,7 +20,18 @@ import { Input, Label } from "@/components/ui/input";
 import { api } from "@/lib/api";
 import { getStoredToken, getStoredUser } from "@/lib/auth-session";
 import { getErrorMessage } from "@/lib/errors";
-import type { AdminUserQuery, User, UserRole, UserStatus } from "@/types/rentnest";
+import { formatCurrency } from "@/lib/format";
+import type {
+  AdminUserQuery,
+  PaymentStatus,
+  Property,
+  PropertyStatus,
+  RentalRequest,
+  RentalStatus,
+  User,
+  UserRole,
+  UserStatus,
+} from "@/types/rentnest";
 
 type AuthSnapshot = {
   token: string | null;
@@ -39,6 +53,28 @@ const roleTone: Record<UserRole, "emerald" | "blue" | "purple"> = {
 const statusTone: Record<UserStatus, "emerald" | "red"> = {
   ACTIVE: "emerald",
   BANNED: "red",
+};
+
+const propertyStatusTone: Record<PropertyStatus, "emerald" | "slate"> = {
+  AVAILABLE: "emerald",
+  UNAVAILABLE: "slate",
+};
+
+const rentalStatusTone: Record<RentalStatus, "slate" | "emerald" | "blue" | "amber" | "red" | "purple"> = {
+  PENDING: "amber",
+  APPROVED: "blue",
+  REJECTED: "red",
+  ACTIVE: "emerald",
+  COMPLETED: "purple",
+  CANCELLED: "slate",
+};
+
+const paymentStatusTone: Record<PaymentStatus, "slate" | "emerald" | "blue" | "amber" | "red"> = {
+  PENDING: "amber",
+  COMPLETED: "emerald",
+  FAILED: "red",
+  CANCELLED: "slate",
+  REFUNDED: "blue",
 };
 
 const subscribeToAuthStorage = (callback: () => void) => {
@@ -63,6 +99,9 @@ const formatDate = (value: string) =>
   new Intl.DateTimeFormat("en-BD", {
     dateStyle: "medium",
   }).format(new Date(value));
+
+const getRequestTotal = (request: RentalRequest) =>
+  Number(request.property?.rentAmount ?? 0) * request.rentalMonths;
 
 const toQuery = (filters: UserFilters): AdminUserQuery => ({
   role: filters.role || undefined,
@@ -156,6 +195,121 @@ function AdminUserCard({
   );
 }
 
+function AdminPropertyCard({ property }: { property: Property }) {
+  return (
+    <article className="rounded-md border border-slate-200 p-4">
+      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge tone={propertyStatusTone[property.status]}>{property.status}</Badge>
+            <Badge tone="blue">{property.category?.name ?? "Rental"}</Badge>
+          </div>
+          <h2 className="mt-3 text-lg font-semibold text-slate-950">
+            {property.title}
+          </h2>
+          <p className="mt-2 flex items-center gap-2 text-sm text-slate-600">
+            <MapPin size={15} aria-hidden="true" />
+            {property.address || property.location}
+          </p>
+        </div>
+        <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+          <p className="font-semibold text-slate-950">
+            {property.landlord?.name ?? "Landlord"}
+          </p>
+          <p className="text-slate-600">{property.landlord?.email}</p>
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-medium uppercase text-slate-500">Rent</p>
+          <p className="mt-1 font-semibold text-slate-950">
+            {formatCurrency(property.rentAmount)}
+          </p>
+        </div>
+        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-medium uppercase text-slate-500">Beds</p>
+          <p className="mt-1 font-semibold text-slate-950">{property.bedrooms}</p>
+        </div>
+        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-medium uppercase text-slate-500">Requests</p>
+          <p className="mt-1 font-semibold text-slate-950">
+            {property._count?.rentalRequests ?? 0}
+          </p>
+        </div>
+        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-medium uppercase text-slate-500">Reviews</p>
+          <p className="mt-1 font-semibold text-slate-950">
+            {property._count?.reviews ?? 0}
+          </p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function AdminRentalCard({ request }: { request: RentalRequest }) {
+  const latestPayment = request.payments?.[0];
+
+  return (
+    <article className="rounded-md border border-slate-200 p-4">
+      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge tone={rentalStatusTone[request.status]}>{request.status}</Badge>
+            {latestPayment ? (
+              <Badge tone={paymentStatusTone[latestPayment.status]}>
+                {latestPayment.status}
+              </Badge>
+            ) : null}
+            <span className="text-xs font-medium text-slate-500">
+              Requested {formatDate(request.createdAt)}
+            </span>
+          </div>
+          <h2 className="mt-3 text-lg font-semibold text-slate-950">
+            {request.property?.title ?? "Rental property"}
+          </h2>
+          <p className="mt-2 flex items-center gap-2 text-sm text-slate-600">
+            <MapPin size={15} aria-hidden="true" />
+            {request.property?.location ?? "Location unavailable"}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-medium uppercase text-slate-500">Tenant</p>
+          <p className="mt-1 font-semibold text-slate-950">
+            {request.tenant?.name ?? "Tenant"}
+          </p>
+          <p className="mt-1 text-xs text-slate-500">{request.tenant?.email}</p>
+        </div>
+        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-medium uppercase text-slate-500">Landlord</p>
+          <p className="mt-1 font-semibold text-slate-950">
+            {request.property?.landlord?.name ?? "Landlord"}
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            {request.property?.landlord?.email}
+          </p>
+        </div>
+        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-medium uppercase text-slate-500">Move-in</p>
+          <p className="mt-1 font-semibold text-slate-950">
+            {formatDate(request.moveInDate)}
+          </p>
+        </div>
+        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-medium uppercase text-slate-500">Total</p>
+          <p className="mt-1 font-semibold text-slate-950">
+            {formatCurrency(getRequestTotal(request))}
+          </p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export function AdminUsersDashboard() {
   const authSnapshot = useSyncExternalStore(
     subscribeToAuthStorage,
@@ -164,6 +318,8 @@ export function AdminUsersDashboard() {
   );
   const { token, user } = JSON.parse(authSnapshot) as AuthSnapshot;
   const [users, setUsers] = useState<User[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [rentals, setRentals] = useState<RentalRequest[]>([]);
   const [filters, setFilters] = useState<UserFilters>({
     role: "",
     status: "",
@@ -207,10 +363,16 @@ export function AdminUsersDashboard() {
       setError("");
 
       try {
-        const data = await api.admin.users(token);
+        const [userData, propertyData, rentalData] = await Promise.all([
+          api.admin.users(token),
+          api.admin.properties(token),
+          api.admin.rentals(token),
+        ]);
 
         if (isActive) {
-          setUsers(data);
+          setUsers(userData);
+          setProperties(propertyData);
+          setRentals(rentalData);
         }
       } catch (fetchError) {
         if (isActive) {
@@ -231,19 +393,25 @@ export function AdminUsersDashboard() {
   }, [token]);
 
   const visibleUsers = useMemo(() => (token ? users : []), [token, users]);
+  const visibleProperties = useMemo(
+    () => (token ? properties : []),
+    [properties, token],
+  );
+  const visibleRentals = useMemo(() => (token ? rentals : []), [rentals, token]);
 
   const stats = useMemo(() => {
     const tenants = visibleUsers.filter((item) => item.role === "TENANT").length;
-    const landlords = visibleUsers.filter((item) => item.role === "LANDLORD").length;
-    const banned = visibleUsers.filter((item) => item.status === "BANNED").length;
+    const activeRentals = visibleRentals.filter(
+      (item) => item.status === "ACTIVE",
+    ).length;
 
     return [
       { label: "Total users", value: visibleUsers.length },
       { label: "Tenants", value: tenants },
-      { label: "Landlords", value: landlords },
-      { label: "Banned", value: banned },
+      { label: "Properties", value: visibleProperties.length },
+      { label: "Active rentals", value: activeRentals },
     ];
-  }, [visibleUsers]);
+  }, [visibleProperties, visibleRentals, visibleUsers]);
 
   const handleFilterSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -454,6 +622,75 @@ export function AdminUsersDashboard() {
                     updatingUserId={updatingUserId}
                     user={item}
                   />
+                ))}
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Properties</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex min-h-40 items-center justify-center gap-2 text-sm font-semibold text-slate-600">
+                <Loader2 className="animate-spin" size={18} aria-hidden="true" />
+                Loading properties
+              </div>
+            ) : null}
+
+            {!isLoading && !error && visibleProperties.length === 0 ? (
+              <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                <Building2 className="mx-auto text-slate-400" size={34} aria-hidden="true" />
+                <h2 className="mt-4 text-lg font-semibold text-slate-950">
+                  No properties found
+                </h2>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
+                  Landlord listings will appear here for admin review.
+                </p>
+              </div>
+            ) : null}
+
+            {!isLoading && !error && visibleProperties.length > 0 ? (
+              <div className="grid gap-4">
+                {visibleProperties.map((property) => (
+                  <AdminPropertyCard key={property.id} property={property} />
+                ))}
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Rental activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex min-h-40 items-center justify-center gap-2 text-sm font-semibold text-slate-600">
+                <Loader2 className="animate-spin" size={18} aria-hidden="true" />
+                Loading rentals
+              </div>
+            ) : null}
+
+            {!isLoading && !error && visibleRentals.length === 0 ? (
+              <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                <ClipboardList className="mx-auto text-slate-400" size={34} aria-hidden="true" />
+                <h2 className="mt-4 text-lg font-semibold text-slate-950">
+                  No rental activity
+                </h2>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
+                  Tenant requests, approvals, payments, and completed rentals will
+                  appear here.
+                </p>
+              </div>
+            ) : null}
+
+            {!isLoading && !error && visibleRentals.length > 0 ? (
+              <div className="grid gap-4">
+                {visibleRentals.map((request) => (
+                  <AdminRentalCard key={request.id} request={request} />
                 ))}
               </div>
             ) : null}
