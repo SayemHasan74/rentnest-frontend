@@ -14,8 +14,8 @@ import {
   UserRound,
 } from "lucide-react";
 import { PropertyGallery } from "@/components/properties/property-gallery";
+import { RentalRequestPanel } from "@/components/properties/rental-request-panel";
 import { Badge } from "@/components/ui/badge";
-import { buttonClasses } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ApiError, api } from "@/lib/api";
 import { formatCurrency } from "@/lib/format";
@@ -213,16 +213,7 @@ export default async function PropertyDetailsPage({
                 <CardTitle>Request this property</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm leading-6 text-slate-600">
-                  Tenants can submit a rental request after logging in. The
-                  landlord must approve it before payment is available.
-                </p>
-                <Link
-                  className={buttonClasses({ className: "mt-5 w-full" })}
-                  href={`/auth/login?from=/properties/${property.id}`}
-                >
-                  Login to request
-                </Link>
+                <RentalRequestPanel propertyId={property.id} />
               </CardContent>
             </Card>
 
