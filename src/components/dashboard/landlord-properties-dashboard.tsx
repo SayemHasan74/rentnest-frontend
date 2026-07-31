@@ -12,6 +12,7 @@ import {
   Eye,
   Loader2,
   MapPin,
+  PlusCircle,
   Power,
   PowerOff,
   XCircle,
@@ -19,14 +20,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label, Textarea } from "@/components/ui/input";
+import { Input, Label, Textarea } from "@/components/ui/input";
 import { api } from "@/lib/api";
 import { getStoredToken, getStoredUser } from "@/lib/auth-session";
 import { getErrorMessage } from "@/lib/errors";
 import { formatCurrency } from "@/lib/format";
 import type {
+  Category,
   PaymentStatus,
   Property,
+  PropertyPayload,
   PropertyStatus,
   RentalRequest,
   RentalStatus,
@@ -37,6 +40,22 @@ type AuthSnapshot = {
   token: string | null;
   user: User | null;
 };
+
+type PropertyFormValues = {
+  title: string;
+  description: string;
+  location: string;
+  address: string;
+  rentAmount: string;
+  bedrooms: string;
+  bathrooms: string;
+  areaSqFt: string;
+  categoryId: string;
+  amenities: string;
+  images: string;
+};
+
+type PropertyFormErrors = Partial<Record<keyof PropertyFormValues, string>>;
 
 const propertyStatusTone: Record<PropertyStatus, "emerald" | "slate"> = {
   AVAILABLE: "emerald",
@@ -182,6 +201,306 @@ function LandlordPropertyCard({
         </div>
       ) : null}
     </article>
+  );
+}
+
+const getDefaultPropertyFormValues = (): PropertyFormValues => ({
+  title: "",
+  description: "",
+  location: "",
+  address: "",
+  rentAmount: "",
+  bedrooms: "1",
+  bathrooms: "1",
+  areaSqFt: "",
+  categoryId: "",
+  amenities: "",
+  images: "",
+});
+
+const splitListInput = (value: string) =>
+  value
+    .split(/[\n,]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+function AddPropertyForm({
+  categories,
+  isSubmitting,
+  onCreateProperty,
+}: {
+  categories: Category[];
+  isSubmitting: boolean;
+  onCreateProperty: (payload: PropertyPayload) => Promise<boolean>;
+}) {
+  const [values, setValues] = useState<PropertyFormValues>(
+    getDefaultPropertyFormValues,
+  );
+  const [fieldErrors, setFieldErrors] = useState<PropertyFormErrors>({});
+
+  const updateValue = (field: keyof PropertyFormValues, value: string) => {
+    setValues((currentValues) => ({
+      ...currentValues,
+      [field]: value,
+    }));
+    setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      [field]: undefined,
+    }));
+  };
+
+  const validate = () => {
+    const errors: PropertyFormErrors = {};
+    const rentAmount = Number(values.rentAmount);
+    const bedrooms = Number(values.bedrooms);
+    const bathrooms = Number(values.bathrooms);
+    const areaSqFt = values.areaSqFt ? Number(values.areaSqFt) : undefined;
+    const images = splitListInput(values.images);
+
+    if (values.title.trim().length < 3) {
+      errors.title = "Title must be at least 3 characters.";
+    }
+
+    if (values.description.trim().length < 10) {
+      errors.description = "Description must be at least 10 characters.";
+    }
+
+    if (values.location.trim().length < 2) {
+      errors.location = "Location is required.";
+    }
+
+    if (!Number.isFinite(rentAmount) || rentAmount <= 0) {
+      errors.rentAmount = "Rent must be a positive number.";
+    }
+
+    if (!Number.isInteger(bedrooms) || bedrooms < 1 || bedrooms > 20) {
+      errors.bedrooms = "Bedrooms must be 1 to 20.";
+    }
+
+    if (!Number.isInteger(bathrooms) || bathrooms < 1 || bathrooms > 20) {
+      errors.bathrooms = "Bathrooms must be 1 to 20.";
+    }
+
+    if (areaSqFt !== undefined && (!Number.isInteger(areaSqFt) || areaSqFt < 1)) {
+      errors.areaSqFt = "Area must be a positive whole number.";
+    }
+
+    if (!values.categoryId) {
+      errors.categoryId = "Choose a category.";
+    }
+
+    const invalidImage = images.find((image) => {
+      try {
+        new URL(image);
+        return false;
+      } catch {
+        return true;
+      }
+    });
+
+    if (invalidImage) {
+      errors.images = "Every image must be a valid URL.";
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!validate()) {
+      return;
+    }
+
+    const created = await onCreateProperty({
+      title: values.title.trim(),
+      description: values.description.trim(),
+      location: values.location.trim(),
+      address: values.address.trim() || undefined,
+      rentAmount: Number(values.rentAmount),
+      bedrooms: Number(values.bedrooms),
+      bathrooms: Number(values.bathrooms),
+      areaSqFt: values.areaSqFt ? Number(values.areaSqFt) : undefined,
+      amenities: splitListInput(values.amenities),
+      images: splitListInput(values.images),
+      status: "AVAILABLE",
+      categoryId: values.categoryId,
+    });
+
+    if (created) {
+      setValues(getDefaultPropertyFormValues());
+      setFieldErrors({});
+    }
+  };
+
+  return (
+    <form className="grid gap-5" onSubmit={handleSubmit}>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-2">
+          <Label htmlFor="property-title">Title</Label>
+          <Input
+            id="property-title"
+            onChange={(event) => updateValue("title", event.target.value)}
+            placeholder="Modern apartment near Gulshan"
+            value={values.title}
+          />
+          {fieldErrors.title ? (
+            <p className="text-xs font-medium text-red-600">{fieldErrors.title}</p>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="property-category">Category</Label>
+          <select
+            className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+            disabled={categories.length === 0}
+            id="property-category"
+            onChange={(event) => updateValue("categoryId", event.target.value)}
+            value={values.categoryId}
+          >
+            <option value="">Select category</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+          {fieldErrors.categoryId ? (
+            <p className="text-xs font-medium text-red-600">{fieldErrors.categoryId}</p>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="property-location">Location</Label>
+          <Input
+            id="property-location"
+            onChange={(event) => updateValue("location", event.target.value)}
+            placeholder="Dhaka"
+            value={values.location}
+          />
+          {fieldErrors.location ? (
+            <p className="text-xs font-medium text-red-600">{fieldErrors.location}</p>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="property-address">Address</Label>
+          <Input
+            id="property-address"
+            onChange={(event) => updateValue("address", event.target.value)}
+            placeholder="House 12, Road 5"
+            value={values.address}
+          />
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="property-rent">Monthly rent</Label>
+          <Input
+            id="property-rent"
+            min="1"
+            onChange={(event) => updateValue("rentAmount", event.target.value)}
+            placeholder="45000"
+            type="number"
+            value={values.rentAmount}
+          />
+          {fieldErrors.rentAmount ? (
+            <p className="text-xs font-medium text-red-600">{fieldErrors.rentAmount}</p>
+          ) : null}
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <div className="grid gap-2">
+            <Label htmlFor="property-bedrooms">Beds</Label>
+            <Input
+              id="property-bedrooms"
+              max="20"
+              min="1"
+              onChange={(event) => updateValue("bedrooms", event.target.value)}
+              type="number"
+              value={values.bedrooms}
+            />
+            {fieldErrors.bedrooms ? (
+              <p className="text-xs font-medium text-red-600">{fieldErrors.bedrooms}</p>
+            ) : null}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="property-bathrooms">Baths</Label>
+            <Input
+              id="property-bathrooms"
+              max="20"
+              min="1"
+              onChange={(event) => updateValue("bathrooms", event.target.value)}
+              type="number"
+              value={values.bathrooms}
+            />
+            {fieldErrors.bathrooms ? (
+              <p className="text-xs font-medium text-red-600">{fieldErrors.bathrooms}</p>
+            ) : null}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="property-area">Sqft</Label>
+            <Input
+              id="property-area"
+              min="1"
+              onChange={(event) => updateValue("areaSqFt", event.target.value)}
+              type="number"
+              value={values.areaSqFt}
+            />
+            {fieldErrors.areaSqFt ? (
+              <p className="text-xs font-medium text-red-600">{fieldErrors.areaSqFt}</p>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="property-description">Description</Label>
+        <Textarea
+          id="property-description"
+          maxLength={2000}
+          onChange={(event) => updateValue("description", event.target.value)}
+          placeholder="Describe the rental property, nearby transport, building features, and tenant requirements."
+          value={values.description}
+        />
+        {fieldErrors.description ? (
+          <p className="text-xs font-medium text-red-600">{fieldErrors.description}</p>
+        ) : null}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-2">
+          <Label htmlFor="property-amenities">Amenities</Label>
+          <Textarea
+            id="property-amenities"
+            onChange={(event) => updateValue("amenities", event.target.value)}
+            placeholder="Parking, WiFi, Elevator"
+            value={values.amenities}
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="property-images">Image URLs</Label>
+          <Textarea
+            id="property-images"
+            onChange={(event) => updateValue("images", event.target.value)}
+            placeholder="https://images.unsplash.com/..."
+            value={values.images}
+          />
+          {fieldErrors.images ? (
+            <p className="text-xs font-medium text-red-600">{fieldErrors.images}</p>
+          ) : null}
+        </div>
+      </div>
+
+      <Button className="w-full sm:w-fit" disabled={isSubmitting} type="submit">
+        {isSubmitting ? (
+          <Loader2 className="animate-spin" size={16} aria-hidden="true" />
+        ) : (
+          <PlusCircle size={16} aria-hidden="true" />
+        )}
+        Add property
+      </Button>
+    </form>
   );
 }
 
@@ -408,9 +727,12 @@ export function LandlordPropertiesDashboard() {
   const { token, user } = JSON.parse(authSnapshot) as AuthSnapshot;
   const [properties, setProperties] = useState<Property[]>([]);
   const [requests, setRequests] = useState<RentalRequest[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState("");
   const [actionError, setActionError] = useState("");
+  const [actionMessage, setActionMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingProperty, setIsCreatingProperty] = useState(false);
   const [updatingPropertyId, setUpdatingPropertyId] = useState<string | null>(null);
   const [updatingRequestId, setUpdatingRequestId] = useState<string | null>(null);
   const [completingRequestId, setCompletingRequestId] = useState<string | null>(null);
@@ -429,14 +751,16 @@ export function LandlordPropertiesDashboard() {
       setError("");
 
       try {
-        const [propertyData, requestData] = await Promise.all([
+        const [propertyData, requestData, categoryData] = await Promise.all([
           api.landlord.properties(token),
           api.landlord.requests(token),
+          api.categories.list(),
         ]);
 
         if (isActive) {
           setProperties(propertyData);
           setRequests(requestData);
+          setCategories(categoryData);
         }
       } catch (fetchError) {
         if (isActive) {
@@ -493,6 +817,7 @@ export function LandlordPropertiesDashboard() {
 
     setUpdatingPropertyId(property.id);
     setActionError("");
+    setActionMessage("");
 
     try {
       const updatedProperty = await api.landlord.updateAvailability(
@@ -513,6 +838,30 @@ export function LandlordPropertiesDashboard() {
     }
   };
 
+  const handleCreateProperty = async (payload: PropertyPayload) => {
+    if (!token) {
+      setActionError("Please login as a landlord before adding properties.");
+      return false;
+    }
+
+    setIsCreatingProperty(true);
+    setActionError("");
+    setActionMessage("");
+
+    try {
+      const createdProperty = await api.landlord.createProperty(token, payload);
+
+      setProperties((currentProperties) => [createdProperty, ...currentProperties]);
+      setActionMessage("Property added successfully.");
+      return true;
+    } catch (createError) {
+      setActionError(getErrorMessage(createError));
+      return false;
+    } finally {
+      setIsCreatingProperty(false);
+    }
+  };
+
   const replaceRequest = (updatedRequest: RentalRequest) => {
     setRequests((currentRequests) =>
       currentRequests.map((request) =>
@@ -529,6 +878,7 @@ export function LandlordPropertiesDashboard() {
 
     setUpdatingRequestId(requestId);
     setActionError("");
+    setActionMessage("");
 
     try {
       const updatedRequest = await api.landlord.updateRequest(token, requestId, {
@@ -551,6 +901,7 @@ export function LandlordPropertiesDashboard() {
 
     setUpdatingRequestId(requestId);
     setActionError("");
+    setActionMessage("");
 
     try {
       const updatedRequest = await api.landlord.updateRequest(token, requestId, {
@@ -574,6 +925,7 @@ export function LandlordPropertiesDashboard() {
 
     setCompletingRequestId(requestId);
     setActionError("");
+    setActionMessage("");
 
     try {
       const updatedRequest = await api.landlord.completeRequest(token, requestId);
@@ -624,6 +976,33 @@ export function LandlordPropertiesDashboard() {
             </Card>
           ))}
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Add property</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!isLoading && actionError ? (
+              <div className="mb-4 flex gap-3 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                <AlertCircle className="mt-0.5 shrink-0" size={17} aria-hidden="true" />
+                <p>{actionError}</p>
+              </div>
+            ) : null}
+
+            {!isLoading && actionMessage ? (
+              <div className="mb-4 flex gap-3 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+                <CheckCircle2 className="mt-0.5 shrink-0" size={17} aria-hidden="true" />
+                <p>{actionMessage}</p>
+              </div>
+            ) : null}
+
+            <AddPropertyForm
+              categories={categories}
+              isSubmitting={isCreatingProperty}
+              onCreateProperty={handleCreateProperty}
+            />
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
