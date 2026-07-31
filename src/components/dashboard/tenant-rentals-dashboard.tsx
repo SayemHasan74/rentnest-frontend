@@ -7,19 +7,22 @@ import {
   CalendarClock,
   CheckCircle2,
   Clock3,
+  CreditCard,
+  ExternalLink,
   Home,
   Loader2,
   MapPin,
+  ReceiptText,
   XCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { buttonClasses } from "@/components/ui/button";
+import { Button, buttonClasses } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { getStoredToken, getStoredUser } from "@/lib/auth-session";
 import { getErrorMessage } from "@/lib/errors";
 import { formatCurrency } from "@/lib/format";
-import type { RentalRequest, RentalStatus, User } from "@/types/rentnest";
+import type { Payment, PaymentStatus, RentalRequest, RentalStatus, User } from "@/types/rentnest";
 
 type AuthSnapshot = {
   token: string | null;
@@ -43,6 +46,14 @@ const statusIcon = {
   COMPLETED: CheckCircle2,
   CANCELLED: XCircle,
 } satisfies Record<RentalStatus, typeof Clock3>;
+
+const paymentTone: Record<PaymentStatus, "slate" | "emerald" | "blue" | "amber" | "red"> = {
+  PENDING: "amber",
+  COMPLETED: "emerald",
+  FAILED: "red",
+  CANCELLED: "slate",
+  REFUNDED: "blue",
+};
 
 const subscribeToAuthStorage = (callback: () => void) => {
   window.addEventListener("storage", callback);
@@ -89,6 +100,145 @@ function RequestStatusBadge({ status }: { status: RentalStatus }) {
   );
 }
 
+function PaymentBadge({ status }: { status: PaymentStatus }) {
+  return (
+    <Badge className="gap-1.5" tone={paymentTone[status]}>
+      <ReceiptText size={14} aria-hidden="true" />
+      {status}
+    </Badge>
+  );
+}
+
+function RentalRequestItem({
+  onPayNow,
+  payments,
+  payingRequestId,
+  request,
+}: {
+  onPayNow: (requestId: string) => void;
+  payments: Payment[];
+  payingRequestId: string | null;
+  request: RentalRequest;
+}) {
+  const completedPayment = payments.find((payment) => payment.status === "COMPLETED");
+  const latestPayment = payments[0];
+  const canPay = request.status === "APPROVED" && !completedPayment;
+  const isPaying = payingRequestId === request.id;
+
+  return (
+    <article className="rounded-md border border-slate-200 p-4">
+      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <RequestStatusBadge status={request.status} />
+            {latestPayment ? <PaymentBadge status={latestPayment.status} /> : null}
+            <span className="text-xs font-medium text-slate-500">
+              Requested {formatDate(request.createdAt)}
+            </span>
+          </div>
+          <h2 className="mt-3 text-lg font-semibold text-slate-950">
+            {request.property?.title ?? "Rental property"}
+          </h2>
+          <p className="mt-2 flex items-center gap-2 text-sm text-slate-600">
+            <MapPin size={15} aria-hidden="true" />
+            {request.property?.location ?? "Location unavailable"}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {request.property?.id ? (
+            <Link
+              className={buttonClasses({ variant: "outline", size: "sm" })}
+              href={`/properties/${request.property.id}`}
+            >
+              View property
+            </Link>
+          ) : null}
+          {canPay ? (
+            <Button
+              disabled={isPaying}
+              onClick={() => onPayNow(request.id)}
+              size="sm"
+              type="button"
+            >
+              {isPaying ? (
+                <Loader2 className="animate-spin" size={15} aria-hidden="true" />
+              ) : (
+                <CreditCard size={15} aria-hidden="true" />
+              )}
+              Pay now
+            </Button>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-medium uppercase text-slate-500">Move-in</p>
+          <p className="mt-1 font-semibold text-slate-950">
+            {formatDate(request.moveInDate)}
+          </p>
+        </div>
+        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-medium uppercase text-slate-500">Duration</p>
+          <p className="mt-1 font-semibold text-slate-950">
+            {request.rentalMonths} months
+          </p>
+        </div>
+        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-medium uppercase text-slate-500">
+            Monthly rent
+          </p>
+          <p className="mt-1 font-semibold text-slate-950">
+            {formatCurrency(request.property?.rentAmount ?? 0)}
+          </p>
+        </div>
+        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-medium uppercase text-slate-500">
+            Estimated total
+          </p>
+          <p className="mt-1 font-semibold text-slate-950">
+            {formatCurrency(getRequestTotal(request))}
+          </p>
+        </div>
+      </div>
+
+      {request.message ? (
+        <p className="mt-4 rounded-md bg-slate-50 p-3 text-sm leading-6 text-slate-600 ring-1 ring-slate-200">
+          {request.message}
+        </p>
+      ) : null}
+
+      {request.rejectionReason ? (
+        <div className="mt-4 flex gap-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <AlertCircle className="mt-0.5 shrink-0" size={16} aria-hidden="true" />
+          <p>{request.rejectionReason}</p>
+        </div>
+      ) : null}
+
+      {completedPayment ? (
+        <div className="mt-4 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
+          <CheckCircle2 size={16} aria-hidden="true" />
+          Paid {formatCurrency(completedPayment.amount)} on {formatDate(completedPayment.paidAt)}
+        </div>
+      ) : null}
+
+      {canPay ? (
+        <div className="mt-4 flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700">
+          <ExternalLink size={16} aria-hidden="true" />
+          Approved for payment. Pay now opens secure Stripe checkout.
+        </div>
+      ) : null}
+
+      {request.status === "PENDING" ? (
+        <div className="mt-4 flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
+          <CalendarClock size={16} aria-hidden="true" />
+          Waiting for landlord approval before payment.
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
 export function TenantRentalsDashboard() {
   const authSnapshot = useSyncExternalStore(
     subscribeToAuthStorage,
@@ -97,8 +247,11 @@ export function TenantRentalsDashboard() {
   );
   const { token, user } = JSON.parse(authSnapshot) as AuthSnapshot;
   const [requests, setRequests] = useState<RentalRequest[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState("");
+  const [payingRequestId, setPayingRequestId] = useState<string | null>(null);
 
   useEffect(() => {
     let isActive = true;
@@ -114,10 +267,14 @@ export function TenantRentalsDashboard() {
       setError("");
 
       try {
-        const data = await api.rentals.listMine(token);
+        const [rentalData, paymentData] = await Promise.all([
+          api.rentals.listMine(token),
+          api.payments.listMine(token),
+        ]);
 
         if (isActive) {
-          setRequests(data);
+          setRequests(rentalData);
+          setPayments(paymentData);
         }
       } catch (fetchError) {
         if (isActive) {
@@ -138,19 +295,59 @@ export function TenantRentalsDashboard() {
   }, [token]);
 
   const visibleRequests = useMemo(() => (token ? requests : []), [requests, token]);
+  const visiblePayments = useMemo(() => (token ? payments : []), [payments, token]);
+  const paymentsByRequestId = useMemo(() => {
+    const grouped = new Map<string, Payment[]>();
+
+    visiblePayments.forEach((payment) => {
+      const existing = grouped.get(payment.rentalRequestId) ?? [];
+
+      grouped.set(payment.rentalRequestId, [...existing, payment]);
+    });
+
+    return grouped;
+  }, [visiblePayments]);
 
   const stats = useMemo(() => {
     const pending = visibleRequests.filter((request) => request.status === "PENDING").length;
     const approved = visibleRequests.filter((request) => request.status === "APPROVED").length;
     const active = visibleRequests.filter((request) => request.status === "ACTIVE").length;
+    const paid = visiblePayments.filter((payment) => payment.status === "COMPLETED").length;
 
     return [
       { label: "Total requests", value: visibleRequests.length },
       { label: "Pending", value: pending },
       { label: "Approved", value: approved },
-      { label: "Active rentals", value: active },
+      { label: "Paid rentals", value: active + paid },
     ];
-  }, [visibleRequests]);
+  }, [visiblePayments, visibleRequests]);
+
+  const handlePayNow = async (requestId: string) => {
+    if (!token) {
+      setPaymentError("Please login as a tenant before starting payment.");
+      return;
+    }
+
+    setPayingRequestId(requestId);
+    setPaymentError("");
+
+    try {
+      const checkout = await api.payments.create(token, {
+        rentalRequestId: requestId,
+      });
+
+      if (!checkout.checkoutSession.url) {
+        setPaymentError("Checkout session was created, but Stripe did not return a payment URL.");
+        return;
+      }
+
+      window.location.href = checkout.checkoutSession.url;
+    } catch (paymentCreateError) {
+      setPaymentError(getErrorMessage(paymentCreateError));
+    } finally {
+      setPayingRequestId(null);
+    }
+  };
 
   return (
     <main className="bg-slate-50">
@@ -208,6 +405,13 @@ export function TenantRentalsDashboard() {
               </div>
             ) : null}
 
+            {!isLoading && !error && paymentError ? (
+              <div className="mb-4 flex gap-3 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                <AlertCircle className="mt-0.5 shrink-0" size={17} aria-hidden="true" />
+                <p>{paymentError}</p>
+              </div>
+            ) : null}
+
             {!isLoading && !error && visibleRequests.length === 0 ? (
               <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
                 <Home className="mx-auto text-slate-400" size={34} aria-hidden="true" />
@@ -230,91 +434,13 @@ export function TenantRentalsDashboard() {
             {!isLoading && !error && visibleRequests.length > 0 ? (
               <div className="grid gap-4">
                 {visibleRequests.map((request) => (
-                  <article
-                    className="rounded-md border border-slate-200 p-4"
+                  <RentalRequestItem
                     key={request.id}
-                  >
-                    <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
-                      <div>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <RequestStatusBadge status={request.status} />
-                          <span className="text-xs font-medium text-slate-500">
-                            Requested {formatDate(request.createdAt)}
-                          </span>
-                        </div>
-                        <h2 className="mt-3 text-lg font-semibold text-slate-950">
-                          {request.property?.title ?? "Rental property"}
-                        </h2>
-                        <p className="mt-2 flex items-center gap-2 text-sm text-slate-600">
-                          <MapPin size={15} aria-hidden="true" />
-                          {request.property?.location ?? "Location unavailable"}
-                        </p>
-                      </div>
-                      {request.property?.id ? (
-                        <Link
-                          className={buttonClasses({ variant: "outline", size: "sm" })}
-                          href={`/properties/${request.property.id}`}
-                        >
-                          View property
-                        </Link>
-                      ) : null}
-                    </div>
-
-                    <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                      <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
-                        <p className="text-xs font-medium uppercase text-slate-500">
-                          Move-in
-                        </p>
-                        <p className="mt-1 font-semibold text-slate-950">
-                          {formatDate(request.moveInDate)}
-                        </p>
-                      </div>
-                      <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
-                        <p className="text-xs font-medium uppercase text-slate-500">
-                          Duration
-                        </p>
-                        <p className="mt-1 font-semibold text-slate-950">
-                          {request.rentalMonths} months
-                        </p>
-                      </div>
-                      <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
-                        <p className="text-xs font-medium uppercase text-slate-500">
-                          Monthly rent
-                        </p>
-                        <p className="mt-1 font-semibold text-slate-950">
-                          {formatCurrency(request.property?.rentAmount ?? 0)}
-                        </p>
-                      </div>
-                      <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
-                        <p className="text-xs font-medium uppercase text-slate-500">
-                          Estimated total
-                        </p>
-                        <p className="mt-1 font-semibold text-slate-950">
-                          {formatCurrency(getRequestTotal(request))}
-                        </p>
-                      </div>
-                    </div>
-
-                    {request.message ? (
-                      <p className="mt-4 rounded-md bg-slate-50 p-3 text-sm leading-6 text-slate-600 ring-1 ring-slate-200">
-                        {request.message}
-                      </p>
-                    ) : null}
-
-                    {request.rejectionReason ? (
-                      <div className="mt-4 flex gap-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-                        <AlertCircle className="mt-0.5 shrink-0" size={16} aria-hidden="true" />
-                        <p>{request.rejectionReason}</p>
-                      </div>
-                    ) : null}
-
-                    {request.status === "APPROVED" ? (
-                      <div className="mt-4 flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700">
-                        <CalendarClock size={16} aria-hidden="true" />
-                        Payment becomes available from the payment step.
-                      </div>
-                    ) : null}
-                  </article>
+                    onPayNow={handlePayNow}
+                    payments={paymentsByRequestId.get(request.id) ?? []}
+                    request={request}
+                    payingRequestId={payingRequestId}
+                  />
                 ))}
               </div>
             ) : null}
