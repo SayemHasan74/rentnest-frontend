@@ -6,11 +6,15 @@ import {
   Building2,
   CheckCircle2,
   ClipboardList,
+  FolderOpen,
   Loader2,
   MapPin,
+  Pencil,
+  PlusCircle,
   Search,
   Shield,
   ShieldOff,
+  Trash2,
   UsersRound,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +27,8 @@ import { getErrorMessage } from "@/lib/errors";
 import { formatCurrency } from "@/lib/format";
 import type {
   AdminUserQuery,
+  Category,
+  CategoryPayload,
   PaymentStatus,
   Property,
   PropertyStatus,
@@ -42,6 +48,11 @@ type UserFilters = {
   role: "" | UserRole;
   status: "" | UserStatus;
   search: string;
+};
+
+type CategoryFormValues = {
+  name: string;
+  description: string;
 };
 
 const roleTone: Record<UserRole, "emerald" | "blue" | "purple"> = {
@@ -310,6 +321,184 @@ function AdminRentalCard({ request }: { request: RentalRequest }) {
   );
 }
 
+function CategoryForm({
+  initialValues = { name: "", description: "" },
+  isSubmitting,
+  onSubmit,
+  submitLabel,
+}: {
+  initialValues?: CategoryFormValues;
+  isSubmitting: boolean;
+  onSubmit: (payload: CategoryPayload) => Promise<boolean>;
+  submitLabel: string;
+}) {
+  const [values, setValues] = useState<CategoryFormValues>(initialValues);
+  const [fieldError, setFieldError] = useState("");
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (values.name.trim().length < 2 || values.name.trim().length > 80) {
+      setFieldError("Category name must be 2 to 80 characters.");
+      return;
+    }
+
+    if (values.description.trim().length > 500) {
+      setFieldError("Description must be 500 characters or fewer.");
+      return;
+    }
+
+    setFieldError("");
+
+    const succeeded = await onSubmit({
+      name: values.name.trim(),
+      description: values.description.trim() || undefined,
+    });
+
+    if (succeeded && !initialValues.name) {
+      setValues({ name: "", description: "" });
+    }
+  };
+
+  return (
+    <form className="grid gap-4" onSubmit={handleSubmit}>
+      <div className="grid gap-4 lg:grid-cols-[1fr_2fr_auto]">
+        <div className="grid gap-2">
+          <Label htmlFor={`category-name-${submitLabel}`}>Name</Label>
+          <Input
+            id={`category-name-${submitLabel}`}
+            maxLength={80}
+            onChange={(event) =>
+              setValues((currentValues) => ({
+                ...currentValues,
+                name: event.target.value,
+              }))
+            }
+            placeholder="Apartment"
+            value={values.name}
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor={`category-description-${submitLabel}`}>Description</Label>
+          <Input
+            id={`category-description-${submitLabel}`}
+            maxLength={500}
+            onChange={(event) =>
+              setValues((currentValues) => ({
+                ...currentValues,
+                description: event.target.value,
+              }))
+            }
+            placeholder="Short category description"
+            value={values.description}
+          />
+        </div>
+        <div className="flex items-end">
+          <Button className="w-full" disabled={isSubmitting} type="submit">
+            {isSubmitting ? (
+              <Loader2 className="animate-spin" size={16} aria-hidden="true" />
+            ) : (
+              <PlusCircle size={16} aria-hidden="true" />
+            )}
+            {submitLabel}
+          </Button>
+        </div>
+      </div>
+      {fieldError ? (
+        <p className="text-xs font-medium text-red-600">{fieldError}</p>
+      ) : null}
+    </form>
+  );
+}
+
+function AdminCategoryCard({
+  category,
+  deletingCategoryId,
+  onDelete,
+  onUpdate,
+  updatingCategoryId,
+}: {
+  category: Category;
+  deletingCategoryId: string | null;
+  onDelete: (category: Category) => void;
+  onUpdate: (category: Category, payload: CategoryPayload) => Promise<boolean>;
+  updatingCategoryId: string | null;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const isUpdating = updatingCategoryId === category.id;
+  const isDeleting = deletingCategoryId === category.id;
+
+  const handleUpdate = async (payload: CategoryPayload) => {
+    const succeeded = await onUpdate(category, payload);
+
+    if (succeeded) {
+      setIsEditing(false);
+    }
+
+    return succeeded;
+  };
+
+  return (
+    <article className="rounded-md border border-slate-200 p-4">
+      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge tone="blue">{category._count?.properties ?? 0} properties</Badge>
+            <span className="text-xs font-medium text-slate-500">
+              Updated {formatDate(category.updatedAt)}
+            </span>
+          </div>
+          <h2 className="mt-3 text-lg font-semibold text-slate-950">
+            {category.name}
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            {category.description || "No description provided."}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            onClick={() => setIsEditing((current) => !current)}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            <Pencil size={15} aria-hidden="true" />
+            {isEditing ? "Cancel" : "Edit"}
+          </Button>
+          <Button
+            disabled={isDeleting}
+            onClick={() => onDelete(category)}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            {isDeleting ? (
+              <Loader2 className="animate-spin" size={15} aria-hidden="true" />
+            ) : (
+              <Trash2 size={15} aria-hidden="true" />
+            )}
+            Delete
+          </Button>
+        </div>
+      </div>
+
+      {isEditing ? (
+        <div className="mt-4 border-t border-slate-200 pt-4">
+          <CategoryForm
+            initialValues={{
+              name: category.name,
+              description: category.description ?? "",
+            }}
+            isSubmitting={isUpdating}
+            onSubmit={handleUpdate}
+            submitLabel="Update category"
+          />
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
 export function AdminUsersDashboard() {
   const authSnapshot = useSyncExternalStore(
     subscribeToAuthStorage,
@@ -320,6 +509,7 @@ export function AdminUsersDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [rentals, setRentals] = useState<RentalRequest[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [filters, setFilters] = useState<UserFilters>({
     role: "",
     status: "",
@@ -327,8 +517,12 @@ export function AdminUsersDashboard() {
   });
   const [error, setError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
+  const [categoryMessage, setCategoryMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [updatingCategoryId, setUpdatingCategoryId] = useState<string | null>(null);
+  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
 
   const loadUsers = async (query: AdminUserQuery = toQuery(filters)) => {
     if (!token) {
@@ -363,16 +557,18 @@ export function AdminUsersDashboard() {
       setError("");
 
       try {
-        const [userData, propertyData, rentalData] = await Promise.all([
+        const [userData, propertyData, rentalData, categoryData] = await Promise.all([
           api.admin.users(token),
           api.admin.properties(token),
           api.admin.rentals(token),
+          api.categories.list(),
         ]);
 
         if (isActive) {
           setUsers(userData);
           setProperties(propertyData);
           setRentals(rentalData);
+          setCategories(categoryData);
         }
       } catch (fetchError) {
         if (isActive) {
@@ -398,20 +594,21 @@ export function AdminUsersDashboard() {
     [properties, token],
   );
   const visibleRentals = useMemo(() => (token ? rentals : []), [rentals, token]);
+  const visibleCategories = useMemo(
+    () => (token ? categories : []),
+    [categories, token],
+  );
 
   const stats = useMemo(() => {
     const tenants = visibleUsers.filter((item) => item.role === "TENANT").length;
-    const activeRentals = visibleRentals.filter(
-      (item) => item.status === "ACTIVE",
-    ).length;
 
     return [
       { label: "Total users", value: visibleUsers.length },
       { label: "Tenants", value: tenants },
       { label: "Properties", value: visibleProperties.length },
-      { label: "Active rentals", value: activeRentals },
+      { label: "Categories", value: visibleCategories.length },
     ];
-  }, [visibleProperties, visibleRentals, visibleUsers]);
+  }, [visibleCategories, visibleProperties, visibleUsers]);
 
   const handleFilterSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -459,6 +656,85 @@ export function AdminUsersDashboard() {
       setError(getErrorMessage(updateError));
     } finally {
       setUpdatingUserId(null);
+    }
+  };
+
+  const handleCreateCategory = async (payload: CategoryPayload) => {
+    if (!token) {
+      setError("Please login as an admin before creating categories.");
+      return false;
+    }
+
+    setIsCreatingCategory(true);
+    setError("");
+    setCategoryMessage("");
+
+    try {
+      const createdCategory = await api.categories.create(token, payload);
+
+      setCategories((currentCategories) => [createdCategory, ...currentCategories]);
+      setCategoryMessage("Category created successfully.");
+      return true;
+    } catch (createError) {
+      setError(getErrorMessage(createError));
+      return false;
+    } finally {
+      setIsCreatingCategory(false);
+    }
+  };
+
+  const handleUpdateCategory = async (
+    category: Category,
+    payload: CategoryPayload,
+  ) => {
+    if (!token) {
+      setError("Please login as an admin before updating categories.");
+      return false;
+    }
+
+    setUpdatingCategoryId(category.id);
+    setError("");
+    setCategoryMessage("");
+
+    try {
+      const updatedCategory = await api.categories.update(token, category.id, payload);
+
+      setCategories((currentCategories) =>
+        currentCategories.map((currentCategory) =>
+          currentCategory.id === updatedCategory.id ? updatedCategory : currentCategory,
+        ),
+      );
+      setCategoryMessage("Category updated successfully.");
+      return true;
+    } catch (updateError) {
+      setError(getErrorMessage(updateError));
+      return false;
+    } finally {
+      setUpdatingCategoryId(null);
+    }
+  };
+
+  const handleDeleteCategory = async (category: Category) => {
+    if (!token) {
+      setError("Please login as an admin before deleting categories.");
+      return;
+    }
+
+    setDeletingCategoryId(category.id);
+    setError("");
+    setCategoryMessage("");
+
+    try {
+      await api.categories.delete(token, category.id);
+
+      setCategories((currentCategories) =>
+        currentCategories.filter((currentCategory) => currentCategory.id !== category.id),
+      );
+      setCategoryMessage("Category deleted successfully.");
+    } catch (deleteError) {
+      setError(getErrorMessage(deleteError));
+    } finally {
+      setDeletingCategoryId(null);
     }
   };
 
@@ -621,6 +897,69 @@ export function AdminUsersDashboard() {
                     onUpdateStatus={handleUpdateStatus}
                     updatingUserId={updatingUserId}
                     user={item}
+                  />
+                ))}
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Categories</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex min-h-40 items-center justify-center gap-2 text-sm font-semibold text-slate-600">
+                <Loader2 className="animate-spin" size={18} aria-hidden="true" />
+                Loading categories
+              </div>
+            ) : null}
+
+            {!isLoading && error ? (
+              <div className="mb-4 flex gap-3 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                <AlertCircle className="mt-0.5 shrink-0" size={17} aria-hidden="true" />
+                <p>{error}</p>
+              </div>
+            ) : null}
+
+            {!isLoading && !error && categoryMessage ? (
+              <div className="mb-4 flex gap-3 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+                <CheckCircle2 className="mt-0.5 shrink-0" size={17} aria-hidden="true" />
+                <p>{categoryMessage}</p>
+              </div>
+            ) : null}
+
+            <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
+              <CategoryForm
+                isSubmitting={isCreatingCategory}
+                onSubmit={handleCreateCategory}
+                submitLabel="Create category"
+              />
+            </div>
+
+            {!isLoading && !error && visibleCategories.length === 0 ? (
+              <div className="mt-4 rounded-md border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                <FolderOpen className="mx-auto text-slate-400" size={34} aria-hidden="true" />
+                <h2 className="mt-4 text-lg font-semibold text-slate-950">
+                  No categories found
+                </h2>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
+                  Create categories so landlords can classify property listings.
+                </p>
+              </div>
+            ) : null}
+
+            {!isLoading && !error && visibleCategories.length > 0 ? (
+              <div className="mt-4 grid gap-4">
+                {visibleCategories.map((category) => (
+                  <AdminCategoryCard
+                    category={category}
+                    deletingCategoryId={deletingCategoryId}
+                    key={category.id}
+                    onDelete={handleDeleteCategory}
+                    onUpdate={handleUpdateCategory}
+                    updatingCategoryId={updatingCategoryId}
                   />
                 ))}
               </div>
