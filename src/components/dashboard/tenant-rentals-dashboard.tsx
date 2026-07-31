@@ -113,23 +113,18 @@ function PaymentBadge({ status }: { status: PaymentStatus }) {
 
 function RentalRequestItem({
   onReviewCreated,
-  onPayNow,
   payments,
-  payingRequestId,
   request,
   token,
 }: {
   onReviewCreated: (requestId: string, review: Review) => void;
-  onPayNow: (requestId: string) => void;
   payments: Payment[];
-  payingRequestId: string | null;
   request: RentalRequest;
   token: string | null;
 }) {
   const completedPayment = payments.find((payment) => payment.status === "COMPLETED");
   const latestPayment = payments[0];
   const canPay = request.status === "APPROVED" && !completedPayment;
-  const isPaying = payingRequestId === request.id;
 
   return (
     <article className="rounded-md border border-slate-200 p-4">
@@ -160,19 +155,13 @@ function RentalRequestItem({
             </Link>
           ) : null}
           {canPay ? (
-            <Button
-              disabled={isPaying}
-              onClick={() => onPayNow(request.id)}
-              size="sm"
-              type="button"
+            <Link
+              className={buttonClasses({ size: "sm" })}
+              href={`/dashboard/tenant/requests/${request.id}/pay`}
             >
-              {isPaying ? (
-                <Loader2 className="animate-spin" size={15} aria-hidden="true" />
-              ) : (
-                <CreditCard size={15} aria-hidden="true" />
-              )}
+              <CreditCard size={15} aria-hidden="true" />
               Pay now
-            </Button>
+            </Link>
           ) : null}
         </div>
       </div>
@@ -394,8 +383,6 @@ export function TenantRentalsDashboard() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentError, setPaymentError] = useState("");
-  const [payingRequestId, setPayingRequestId] = useState<string | null>(null);
 
   useEffect(() => {
     let isActive = true;
@@ -466,33 +453,6 @@ export function TenantRentalsDashboard() {
     ];
   }, [visiblePayments, visibleRequests]);
 
-  const handlePayNow = async (requestId: string) => {
-    if (!token) {
-      setPaymentError("Please login as a tenant before starting payment.");
-      return;
-    }
-
-    setPayingRequestId(requestId);
-    setPaymentError("");
-
-    try {
-      const checkout = await api.payments.create(token, {
-        rentalRequestId: requestId,
-      });
-
-      if (!checkout.checkoutSession.url) {
-        setPaymentError("Checkout session was created, but Stripe did not return a payment URL.");
-        return;
-      }
-
-      window.location.href = checkout.checkoutSession.url;
-    } catch (paymentCreateError) {
-      setPaymentError(getErrorMessage(paymentCreateError));
-    } finally {
-      setPayingRequestId(null);
-    }
-  };
-
   const handleReviewCreated = (requestId: string, review: Review) => {
     setRequests((currentRequests) =>
       currentRequests.map((request) =>
@@ -557,13 +517,6 @@ export function TenantRentalsDashboard() {
               </div>
             ) : null}
 
-            {!isLoading && !error && paymentError ? (
-              <div className="mb-4 flex gap-3 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                <AlertCircle className="mt-0.5 shrink-0" size={17} aria-hidden="true" />
-                <p>{paymentError}</p>
-              </div>
-            ) : null}
-
             {!isLoading && !error && visibleRequests.length === 0 ? (
               <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
                 <Home className="mx-auto text-slate-400" size={34} aria-hidden="true" />
@@ -589,13 +542,72 @@ export function TenantRentalsDashboard() {
                   <RentalRequestItem
                     key={request.id}
                     onReviewCreated={handleReviewCreated}
-                    onPayNow={handlePayNow}
                     payments={paymentsByRequestId.get(request.id) ?? []}
                     request={request}
-                    payingRequestId={payingRequestId}
                     token={token}
                   />
                 ))}
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Payment history</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex min-h-32 items-center justify-center gap-2 text-sm font-semibold text-slate-600">
+                <Loader2 className="animate-spin" size={18} aria-hidden="true" />
+                Loading payments
+              </div>
+            ) : null}
+
+            {!isLoading && !error && visiblePayments.length === 0 ? (
+              <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                <ReceiptText className="mx-auto text-slate-400" size={34} aria-hidden="true" />
+                <h2 className="mt-4 text-lg font-semibold text-slate-950">
+                  No payments yet
+                </h2>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
+                  Approved rental payments will appear here after checkout starts.
+                </p>
+              </div>
+            ) : null}
+
+            {!isLoading && !error && visiblePayments.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[44rem] text-left text-sm">
+                  <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
+                    <tr>
+                      <th className="py-3 pr-4 font-semibold">Property</th>
+                      <th className="py-3 pr-4 font-semibold">Amount</th>
+                      <th className="py-3 pr-4 font-semibold">Provider</th>
+                      <th className="py-3 pr-4 font-semibold">Status</th>
+                      <th className="py-3 pr-4 font-semibold">Paid at</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {visiblePayments.map((payment) => (
+                      <tr key={payment.id}>
+                        <td className="py-3 pr-4 font-medium text-slate-950">
+                          {payment.rentalRequest?.property.title ?? "Rental property"}
+                        </td>
+                        <td className="py-3 pr-4 text-slate-700">
+                          {formatCurrency(payment.amount)}
+                        </td>
+                        <td className="py-3 pr-4 text-slate-700">{payment.provider}</td>
+                        <td className="py-3 pr-4">
+                          <PaymentBadge status={payment.status} />
+                        </td>
+                        <td className="py-3 pr-4 text-slate-700">
+                          {formatDate(payment.paidAt)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             ) : null}
           </CardContent>

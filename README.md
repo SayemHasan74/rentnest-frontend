@@ -66,7 +66,15 @@ npm run build
 /auth/register            Tenant/landlord registration
 /dashboard                Role redirect
 /dashboard/tenant         Tenant rental requests, payments, reviews
+/dashboard/tenant/requests/[id]/pay
+                          Dedicated Stripe checkout initiation page
+/payment/success          Payment success feedback page
+/payment/cancel           Payment cancellation feedback page
 /dashboard/landlord       Landlord listings, requests, property creation
+/dashboard/landlord/properties/new
+                          Landlord property creation route
+/dashboard/landlord/requests
+                          Landlord request management route
 /dashboard/admin          Admin users, properties, rentals, categories
 /unauthorized             Role access fallback
 ```
@@ -77,23 +85,34 @@ Tenant:
 - Browse and filter public properties.
 - Submit rental requests from property details.
 - Track rental status in the tenant dashboard.
+- View payment history.
 - Pay approved rentals through Stripe checkout.
+- See payment success/cancel feedback pages.
 - Review completed rentals.
 
 Landlord:
 - View owned properties.
 - Add new property listings.
+- Edit existing property listings.
+- Delete eligible property listings.
 - Toggle property availability.
 - Review rental requests.
 - Approve or reject pending requests.
 - Complete active paid rentals.
+- View earnings from completed payments.
 
 Admin:
 - View and filter users by role, status, and search.
+- Paginate user management results.
 - Ban or activate user accounts.
 - Monitor all properties.
 - Monitor rental activity and payment status.
 - Create, edit, and delete categories.
+
+Shared UX:
+- Route-level loading skeletons.
+- Route-level error fallback.
+- Toast-style success and failure feedback for dashboard actions.
 
 ## API Integration
 

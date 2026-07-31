@@ -12,15 +12,18 @@ import {
   Eye,
   Loader2,
   MapPin,
+  Pencil,
   PlusCircle,
   Power,
   PowerOff,
+  Trash2,
   XCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input, Label, Textarea } from "@/components/ui/input";
+import { Toast } from "@/components/ui/toast";
 import { api } from "@/lib/api";
 import { getStoredToken, getStoredUser } from "@/lib/auth-session";
 import { getErrorMessage } from "@/lib/errors";
@@ -110,17 +113,40 @@ function PropertyStatusBadge({ status }: { status: PropertyStatus }) {
 }
 
 function LandlordPropertyCard({
+  categories,
+  deletingPropertyId,
+  onDeleteProperty,
+  onUpdateProperty,
   onToggleAvailability,
   property,
+  updatingPropertyDetailsId,
   updatingPropertyId,
 }: {
+  categories: Category[];
+  deletingPropertyId: string | null;
+  onDeleteProperty: (property: Property) => void;
+  onUpdateProperty: (property: Property, payload: PropertyPayload) => Promise<boolean>;
   onToggleAvailability: (property: Property) => void;
   property: Property;
+  updatingPropertyDetailsId: string | null;
   updatingPropertyId: string | null;
 }) {
+  const [isEditing, setIsEditing] = useState(false);
   const nextStatus: PropertyStatus =
     property.status === "AVAILABLE" ? "UNAVAILABLE" : "AVAILABLE";
   const isUpdating = updatingPropertyId === property.id;
+  const isDeleting = deletingPropertyId === property.id;
+  const isUpdatingDetails = updatingPropertyDetailsId === property.id;
+
+  const handleUpdateProperty = async (payload: PropertyPayload) => {
+    const succeeded = await onUpdateProperty(property, payload);
+
+    if (succeeded) {
+      setIsEditing(false);
+    }
+
+    return succeeded;
+  };
 
   return (
     <article className="rounded-md border border-slate-200 p-4">
@@ -147,6 +173,15 @@ function LandlordPropertyCard({
             View
           </Link>
           <Button
+            onClick={() => setIsEditing((current) => !current)}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            <Pencil size={15} aria-hidden="true" />
+            {isEditing ? "Cancel" : "Edit"}
+          </Button>
+          <Button
             disabled={isUpdating}
             onClick={() => onToggleAvailability(property)}
             size="sm"
@@ -161,6 +196,20 @@ function LandlordPropertyCard({
               <PowerOff size={15} aria-hidden="true" />
             )}
             Mark {nextStatus.toLowerCase()}
+          </Button>
+          <Button
+            disabled={isDeleting}
+            onClick={() => onDeleteProperty(property)}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            {isDeleting ? (
+              <Loader2 className="animate-spin" size={15} aria-hidden="true" />
+            ) : (
+              <Trash2 size={15} aria-hidden="true" />
+            )}
+            Delete
           </Button>
         </div>
       </div>
@@ -200,6 +249,19 @@ function LandlordPropertyCard({
           ))}
         </div>
       ) : null}
+
+      {isEditing ? (
+        <div className="mt-5 border-t border-slate-200 pt-5">
+          <AddPropertyForm
+            categories={categories}
+            formId={`edit-${property.id}`}
+            initialValues={propertyToFormValues(property)}
+            isSubmitting={isUpdatingDetails}
+            onSubmitProperty={handleUpdateProperty}
+            submitLabel="Update property"
+          />
+        </div>
+      ) : null}
     </article>
   );
 }
@@ -218,6 +280,20 @@ const getDefaultPropertyFormValues = (): PropertyFormValues => ({
   images: "",
 });
 
+const propertyToFormValues = (property: Property): PropertyFormValues => ({
+  title: property.title,
+  description: property.description,
+  location: property.location,
+  address: property.address ?? "",
+  rentAmount: String(property.rentAmount),
+  bedrooms: String(property.bedrooms),
+  bathrooms: String(property.bathrooms),
+  areaSqFt: property.areaSqFt ? String(property.areaSqFt) : "",
+  categoryId: property.categoryId,
+  amenities: property.amenities.join("\n"),
+  images: property.images.join("\n"),
+});
+
 const splitListInput = (value: string) =>
   value
     .split(/[\n,]/)
@@ -226,15 +302,21 @@ const splitListInput = (value: string) =>
 
 function AddPropertyForm({
   categories,
+  formId = "new-property",
+  initialValues,
   isSubmitting,
-  onCreateProperty,
+  onSubmitProperty,
+  submitLabel = "Add property",
 }: {
   categories: Category[];
+  formId?: string;
+  initialValues?: PropertyFormValues;
   isSubmitting: boolean;
-  onCreateProperty: (payload: PropertyPayload) => Promise<boolean>;
+  onSubmitProperty: (payload: PropertyPayload) => Promise<boolean>;
+  submitLabel?: string;
 }) {
   const [values, setValues] = useState<PropertyFormValues>(
-    getDefaultPropertyFormValues,
+    initialValues ?? getDefaultPropertyFormValues,
   );
   const [fieldErrors, setFieldErrors] = useState<PropertyFormErrors>({});
 
@@ -313,7 +395,7 @@ function AddPropertyForm({
       return;
     }
 
-    const created = await onCreateProperty({
+    const succeeded = await onSubmitProperty({
       title: values.title.trim(),
       description: values.description.trim(),
       location: values.location.trim(),
@@ -328,7 +410,7 @@ function AddPropertyForm({
       categoryId: values.categoryId,
     });
 
-    if (created) {
+    if (succeeded && !initialValues) {
       setValues(getDefaultPropertyFormValues());
       setFieldErrors({});
     }
@@ -338,9 +420,9 @@ function AddPropertyForm({
     <form className="grid gap-5" onSubmit={handleSubmit}>
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="grid gap-2">
-          <Label htmlFor="property-title">Title</Label>
+          <Label htmlFor={`${formId}-title`}>Title</Label>
           <Input
-            id="property-title"
+            id={`${formId}-title`}
             onChange={(event) => updateValue("title", event.target.value)}
             placeholder="Modern apartment near Gulshan"
             value={values.title}
@@ -351,11 +433,11 @@ function AddPropertyForm({
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="property-category">Category</Label>
+          <Label htmlFor={`${formId}-category`}>Category</Label>
           <select
             className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100"
             disabled={categories.length === 0}
-            id="property-category"
+            id={`${formId}-category`}
             onChange={(event) => updateValue("categoryId", event.target.value)}
             value={values.categoryId}
           >
@@ -372,9 +454,9 @@ function AddPropertyForm({
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="property-location">Location</Label>
+          <Label htmlFor={`${formId}-location`}>Location</Label>
           <Input
-            id="property-location"
+            id={`${formId}-location`}
             onChange={(event) => updateValue("location", event.target.value)}
             placeholder="Dhaka"
             value={values.location}
@@ -385,9 +467,9 @@ function AddPropertyForm({
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="property-address">Address</Label>
+          <Label htmlFor={`${formId}-address`}>Address</Label>
           <Input
-            id="property-address"
+            id={`${formId}-address`}
             onChange={(event) => updateValue("address", event.target.value)}
             placeholder="House 12, Road 5"
             value={values.address}
@@ -395,9 +477,9 @@ function AddPropertyForm({
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="property-rent">Monthly rent</Label>
+          <Label htmlFor={`${formId}-rent`}>Monthly rent</Label>
           <Input
-            id="property-rent"
+            id={`${formId}-rent`}
             min="1"
             onChange={(event) => updateValue("rentAmount", event.target.value)}
             placeholder="45000"
@@ -411,9 +493,9 @@ function AddPropertyForm({
 
         <div className="grid grid-cols-3 gap-3">
           <div className="grid gap-2">
-            <Label htmlFor="property-bedrooms">Beds</Label>
+            <Label htmlFor={`${formId}-bedrooms`}>Beds</Label>
             <Input
-              id="property-bedrooms"
+              id={`${formId}-bedrooms`}
               max="20"
               min="1"
               onChange={(event) => updateValue("bedrooms", event.target.value)}
@@ -425,9 +507,9 @@ function AddPropertyForm({
             ) : null}
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="property-bathrooms">Baths</Label>
+            <Label htmlFor={`${formId}-bathrooms`}>Baths</Label>
             <Input
-              id="property-bathrooms"
+              id={`${formId}-bathrooms`}
               max="20"
               min="1"
               onChange={(event) => updateValue("bathrooms", event.target.value)}
@@ -439,9 +521,9 @@ function AddPropertyForm({
             ) : null}
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="property-area">Sqft</Label>
+            <Label htmlFor={`${formId}-area`}>Sqft</Label>
             <Input
-              id="property-area"
+              id={`${formId}-area`}
               min="1"
               onChange={(event) => updateValue("areaSqFt", event.target.value)}
               type="number"
@@ -455,9 +537,9 @@ function AddPropertyForm({
       </div>
 
       <div className="grid gap-2">
-        <Label htmlFor="property-description">Description</Label>
+        <Label htmlFor={`${formId}-description`}>Description</Label>
         <Textarea
-          id="property-description"
+          id={`${formId}-description`}
           maxLength={2000}
           onChange={(event) => updateValue("description", event.target.value)}
           placeholder="Describe the rental property, nearby transport, building features, and tenant requirements."
@@ -470,18 +552,18 @@ function AddPropertyForm({
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="grid gap-2">
-          <Label htmlFor="property-amenities">Amenities</Label>
+          <Label htmlFor={`${formId}-amenities`}>Amenities</Label>
           <Textarea
-            id="property-amenities"
+            id={`${formId}-amenities`}
             onChange={(event) => updateValue("amenities", event.target.value)}
             placeholder="Parking, WiFi, Elevator"
             value={values.amenities}
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="property-images">Image URLs</Label>
+          <Label htmlFor={`${formId}-images`}>Image URLs</Label>
           <Textarea
-            id="property-images"
+            id={`${formId}-images`}
             onChange={(event) => updateValue("images", event.target.value)}
             placeholder="https://images.unsplash.com/..."
             value={values.images}
@@ -498,7 +580,7 @@ function AddPropertyForm({
         ) : (
           <PlusCircle size={16} aria-hidden="true" />
         )}
-        Add property
+        {submitLabel}
       </Button>
     </form>
   );
@@ -734,6 +816,8 @@ export function LandlordPropertiesDashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingProperty, setIsCreatingProperty] = useState(false);
   const [updatingPropertyId, setUpdatingPropertyId] = useState<string | null>(null);
+  const [updatingPropertyDetailsId, setUpdatingPropertyDetailsId] = useState<string | null>(null);
+  const [deletingPropertyId, setDeletingPropertyId] = useState<string | null>(null);
   const [updatingRequestId, setUpdatingRequestId] = useState<string | null>(null);
   const [completingRequestId, setCompletingRequestId] = useState<string | null>(null);
 
@@ -793,16 +877,24 @@ export function LandlordPropertiesDashboard() {
     const available = visibleProperties.filter(
       (property) => property.status === "AVAILABLE",
     ).length;
-    const unavailable = visibleProperties.length - available;
     const pendingRequests = visibleRequests.filter(
       (request) => request.status === "PENDING",
     ).length;
+    const earnings = visibleRequests.reduce(
+      (total, request) =>
+        total +
+        Number(
+          request.payments?.find((payment) => payment.status === "COMPLETED")
+            ?.amount ?? 0,
+        ),
+      0,
+    );
 
     return [
       { label: "Total listings", value: visibleProperties.length },
       { label: "Available", value: available },
-      { label: "Unavailable", value: unavailable },
       { label: "Pending requests", value: pendingRequests },
+      { label: "Earnings", value: formatCurrency(earnings) },
     ];
   }, [visibleProperties, visibleRequests]);
 
@@ -831,6 +923,7 @@ export function LandlordPropertiesDashboard() {
           currentProperty.id === property.id ? updatedProperty : currentProperty,
         ),
       );
+      setActionMessage(`Property marked ${updatedProperty.status.toLowerCase()}.`);
     } catch (updateError) {
       setActionError(getErrorMessage(updateError));
     } finally {
@@ -862,6 +955,62 @@ export function LandlordPropertiesDashboard() {
     }
   };
 
+  const handleUpdateProperty = async (property: Property, payload: PropertyPayload) => {
+    if (!token) {
+      setActionError("Please login as a landlord before updating properties.");
+      return false;
+    }
+
+    setUpdatingPropertyDetailsId(property.id);
+    setActionError("");
+    setActionMessage("");
+
+    try {
+      const updatedProperty = await api.landlord.updateProperty(
+        token,
+        property.id,
+        payload,
+      );
+
+      setProperties((currentProperties) =>
+        currentProperties.map((currentProperty) =>
+          currentProperty.id === updatedProperty.id ? updatedProperty : currentProperty,
+        ),
+      );
+      setActionMessage("Property updated successfully.");
+      return true;
+    } catch (updateError) {
+      setActionError(getErrorMessage(updateError));
+      return false;
+    } finally {
+      setUpdatingPropertyDetailsId(null);
+    }
+  };
+
+  const handleDeleteProperty = async (property: Property) => {
+    if (!token) {
+      setActionError("Please login as a landlord before deleting properties.");
+      return;
+    }
+
+    setDeletingPropertyId(property.id);
+    setActionError("");
+    setActionMessage("");
+
+    try {
+      await api.landlord.deleteProperty(token, property.id);
+
+      setProperties((currentProperties) =>
+        currentProperties.filter((currentProperty) => currentProperty.id !== property.id),
+      );
+      setActionMessage("Property deleted successfully.");
+    } catch (deleteError) {
+      setActionError(getErrorMessage(deleteError));
+    } finally {
+      setDeletingPropertyId(null);
+    }
+  };
+
   const replaceRequest = (updatedRequest: RentalRequest) => {
     setRequests((currentRequests) =>
       currentRequests.map((request) =>
@@ -886,6 +1035,7 @@ export function LandlordPropertiesDashboard() {
       });
 
       replaceRequest(updatedRequest);
+      setActionMessage("Rental request approved.");
     } catch (updateError) {
       setActionError(getErrorMessage(updateError));
     } finally {
@@ -910,6 +1060,7 @@ export function LandlordPropertiesDashboard() {
       });
 
       replaceRequest(updatedRequest);
+      setActionMessage("Rental request rejected.");
     } catch (updateError) {
       setActionError(getErrorMessage(updateError));
     } finally {
@@ -931,6 +1082,7 @@ export function LandlordPropertiesDashboard() {
       const updatedRequest = await api.landlord.completeRequest(token, requestId);
 
       replaceRequest(updatedRequest);
+      setActionMessage("Rental request marked completed.");
     } catch (completeError) {
       setActionError(getErrorMessage(completeError));
     } finally {
@@ -940,6 +1092,8 @@ export function LandlordPropertiesDashboard() {
 
   return (
     <main className="bg-slate-50">
+      <Toast message={actionMessage} tone="success" />
+      <Toast message={actionError} tone="error" />
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <p className="text-sm font-semibold text-emerald-700">
@@ -999,7 +1153,7 @@ export function LandlordPropertiesDashboard() {
             <AddPropertyForm
               categories={categories}
               isSubmitting={isCreatingProperty}
-              onCreateProperty={handleCreateProperty}
+              onSubmitProperty={handleCreateProperty}
             />
           </CardContent>
         </Card>
@@ -1037,8 +1191,8 @@ export function LandlordPropertiesDashboard() {
                   No listings yet
                 </h2>
                 <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
-                  Add-property tools are coming in the next landlord step. Existing
-                  listings from your backend account will appear here.
+                  Use the add-property form above to publish your first rental
+                  listing.
                 </p>
               </div>
             ) : null}
@@ -1047,9 +1201,14 @@ export function LandlordPropertiesDashboard() {
               <div className="grid gap-4">
                 {visibleProperties.map((property) => (
                   <LandlordPropertyCard
+                    categories={categories}
+                    deletingPropertyId={deletingPropertyId}
                     key={property.id}
+                    onDeleteProperty={handleDeleteProperty}
                     onToggleAvailability={handleToggleAvailability}
+                    onUpdateProperty={handleUpdateProperty}
                     property={property}
+                    updatingPropertyDetailsId={updatingPropertyDetailsId}
                     updatingPropertyId={updatingPropertyId}
                   />
                 ))}

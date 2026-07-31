@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input, Label } from "@/components/ui/input";
+import { Toast } from "@/components/ui/toast";
 import { api } from "@/lib/api";
 import { getStoredToken, getStoredUser } from "@/lib/auth-session";
 import { getErrorMessage } from "@/lib/errors";
@@ -523,6 +524,7 @@ export function AdminUsersDashboard() {
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [updatingCategoryId, setUpdatingCategoryId] = useState<string | null>(null);
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
+  const [userPage, setUserPage] = useState(1);
 
   const loadUsers = async (query: AdminUserQuery = toQuery(filters)) => {
     if (!token) {
@@ -610,9 +612,17 @@ export function AdminUsersDashboard() {
     ];
   }, [visibleCategories, visibleProperties, visibleUsers]);
 
+  const usersPerPage = 8;
+  const userTotalPages = Math.max(1, Math.ceil(visibleUsers.length / usersPerPage));
+  const paginatedUsers = visibleUsers.slice(
+    (userPage - 1) * usersPerPage,
+    userPage * usersPerPage,
+  );
+
   const handleFilterSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setActionMessage("");
+    setUserPage(1);
     loadUsers(toQuery(filters));
   };
 
@@ -625,6 +635,7 @@ export function AdminUsersDashboard() {
 
     setFilters(nextFilters);
     setActionMessage("");
+    setUserPage(1);
     loadUsers(toQuery(nextFilters));
   };
 
@@ -740,6 +751,8 @@ export function AdminUsersDashboard() {
 
   return (
     <main className="bg-slate-50">
+      <Toast message={actionMessage || categoryMessage} tone="success" />
+      <Toast message={error} tone="error" />
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <p className="text-sm font-semibold text-emerald-700">Admin dashboard</p>
@@ -889,17 +902,44 @@ export function AdminUsersDashboard() {
             ) : null}
 
             {!isLoading && !error && visibleUsers.length > 0 ? (
-              <div className="grid gap-4">
-                {visibleUsers.map((item) => (
-                  <AdminUserCard
-                    currentAdminId={user?.id ?? null}
-                    key={item.id}
-                    onUpdateStatus={handleUpdateStatus}
-                    updatingUserId={updatingUserId}
-                    user={item}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid gap-4">
+                  {paginatedUsers.map((item) => (
+                    <AdminUserCard
+                      currentAdminId={user?.id ?? null}
+                      key={item.id}
+                      onUpdateStatus={handleUpdateStatus}
+                      updatingUserId={updatingUserId}
+                      user={item}
+                    />
+                  ))}
+                </div>
+                <div className="mt-5 flex flex-col justify-between gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center">
+                  <p className="text-sm text-slate-600">
+                    Page {userPage} of {userTotalPages}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      disabled={userPage <= 1}
+                      onClick={() => setUserPage((current) => Math.max(1, current - 1))}
+                      type="button"
+                      variant="outline"
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      disabled={userPage >= userTotalPages}
+                      onClick={() =>
+                        setUserPage((current) => Math.min(userTotalPages, current + 1))
+                      }
+                      type="button"
+                      variant="outline"
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </div>
+              </>
             ) : null}
           </CardContent>
         </Card>
