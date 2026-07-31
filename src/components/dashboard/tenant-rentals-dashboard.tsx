@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { FormEvent, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import {
   AlertCircle,
   CalendarClock,
@@ -13,16 +13,18 @@ import {
   Loader2,
   MapPin,
   ReceiptText,
+  Star,
   XCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label, Textarea } from "@/components/ui/input";
 import { api } from "@/lib/api";
 import { getStoredToken, getStoredUser } from "@/lib/auth-session";
 import { getErrorMessage } from "@/lib/errors";
 import { formatCurrency } from "@/lib/format";
-import type { Payment, PaymentStatus, RentalRequest, RentalStatus, User } from "@/types/rentnest";
+import type { Payment, PaymentStatus, RentalRequest, RentalStatus, Review, User } from "@/types/rentnest";
 
 type AuthSnapshot = {
   token: string | null;
@@ -110,15 +112,19 @@ function PaymentBadge({ status }: { status: PaymentStatus }) {
 }
 
 function RentalRequestItem({
+  onReviewCreated,
   onPayNow,
   payments,
   payingRequestId,
   request,
+  token,
 }: {
+  onReviewCreated: (requestId: string, review: Review) => void;
   onPayNow: (requestId: string) => void;
   payments: Payment[];
   payingRequestId: string | null;
   request: RentalRequest;
+  token: string | null;
 }) {
   const completedPayment = payments.find((payment) => payment.status === "COMPLETED");
   const latestPayment = payments[0];
@@ -235,7 +241,145 @@ function RentalRequestItem({
           Waiting for landlord approval before payment.
         </div>
       ) : null}
+
+      {request.status === "COMPLETED" ? (
+        <ReviewPanel
+          onReviewCreated={onReviewCreated}
+          request={request}
+          token={token}
+        />
+      ) : null}
     </article>
+  );
+}
+
+function ReviewPanel({
+  onReviewCreated,
+  request,
+  token,
+}: {
+  onReviewCreated: (requestId: string, review: Review) => void;
+  request: RentalRequest;
+  token: string | null;
+}) {
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!token) {
+      setError("Please login as a tenant before submitting a review.");
+      return;
+    }
+
+    if (!request.property?.id) {
+      setError("Property details are missing for this rental request.");
+      return;
+    }
+
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      setError("Rating must be between 1 and 5.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const review = await api.reviews.create(token, {
+        rentalRequestId: request.id,
+        propertyId: request.property.id,
+        rating,
+        comment: comment.trim() || undefined,
+      });
+
+      onReviewCreated(request.id, review);
+      setComment("");
+    } catch (reviewError) {
+      setError(getErrorMessage(reviewError));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (request.review) {
+    return (
+      <div className="mt-4 rounded-md border border-purple-200 bg-purple-50 p-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge className="gap-1.5" tone="purple">
+            <Star size={14} fill="currentColor" aria-hidden="true" />
+            Reviewed {request.review.rating}/5
+          </Badge>
+          <span className="text-xs font-medium text-purple-700">
+            {formatDate(request.review.createdAt)}
+          </span>
+        </div>
+        {request.review.comment ? (
+          <p className="mt-3 text-sm leading-6 text-purple-800">
+            {request.review.comment}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <form
+      className="mt-4 grid gap-4 rounded-md border border-slate-200 bg-slate-50 p-4"
+      onSubmit={handleSubmit}
+    >
+      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div>
+          <h3 className="text-sm font-semibold text-slate-950">Leave a review</h3>
+          <p className="mt-1 text-sm text-slate-600">
+            Completed rentals can be reviewed once.
+          </p>
+        </div>
+        <div className="flex gap-1" aria-label="Rating">
+          {[1, 2, 3, 4, 5].map((value) => (
+            <button
+              aria-label={`${value} star rating`}
+              className="rounded-md p-1 text-amber-500 hover:bg-amber-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700"
+              key={value}
+              onClick={() => setRating(value)}
+              type="button"
+            >
+              <Star
+                size={22}
+                fill={value <= rating ? "currentColor" : "none"}
+                aria-hidden="true"
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {error ? (
+        <div className="flex gap-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <AlertCircle className="mt-0.5 shrink-0" size={16} aria-hidden="true" />
+          <p>{error}</p>
+        </div>
+      ) : null}
+
+      <div className="grid gap-2">
+        <Label htmlFor={`review-${request.id}`}>Review comment</Label>
+        <Textarea
+          id={`review-${request.id}`}
+          maxLength={1000}
+          onChange={(event) => setComment(event.target.value)}
+          placeholder="Share your experience with this rental."
+          value={comment}
+        />
+      </div>
+
+      <Button className="w-full sm:w-fit" disabled={isSubmitting} type="submit">
+        {isSubmitting ? <Loader2 className="animate-spin" size={16} aria-hidden="true" /> : null}
+        Submit review
+      </Button>
+    </form>
   );
 }
 
@@ -349,6 +493,14 @@ export function TenantRentalsDashboard() {
     }
   };
 
+  const handleReviewCreated = (requestId: string, review: Review) => {
+    setRequests((currentRequests) =>
+      currentRequests.map((request) =>
+        request.id === requestId ? { ...request, review } : request,
+      ),
+    );
+  };
+
   return (
     <main className="bg-slate-50">
       <section className="border-b border-slate-200 bg-white">
@@ -436,10 +588,12 @@ export function TenantRentalsDashboard() {
                 {visibleRequests.map((request) => (
                   <RentalRequestItem
                     key={request.id}
+                    onReviewCreated={handleReviewCreated}
                     onPayNow={handlePayNow}
                     payments={paymentsByRequestId.get(request.id) ?? []}
                     request={request}
                     payingRequestId={payingRequestId}
+                    token={token}
                   />
                 ))}
               </div>
