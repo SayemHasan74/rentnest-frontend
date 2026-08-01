@@ -223,6 +223,8 @@ export type Payment = {
 
 export type CreatePaymentPayload = {
   rentalRequestId: string;
+  successUrl?: string;
+  cancelUrl?: string;
 };
 
 export type CheckoutSession = {

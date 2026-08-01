@@ -98,7 +98,11 @@ export function TenantPayPanel({ rentalRequestId }: { rentalRequestId: string })
     setMessage("");
 
     try {
-      const checkout = await api.payments.create(token, { rentalRequestId });
+      const checkout = await api.payments.create(token, {
+        rentalRequestId,
+        successUrl: `${window.location.origin}/payment/success`,
+        cancelUrl: `${window.location.origin}/payment/cancel`,
+      });
 
       if (!checkout.checkoutSession.url) {
         setError("Stripe did not return a checkout URL.");

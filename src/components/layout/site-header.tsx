@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Building,
   LayoutDashboard,
@@ -17,17 +17,18 @@ import { Button, buttonClasses } from "@/components/ui/button";
 import {
   AUTH_SESSION_EVENT,
   clearAuthSession,
+  getRoleDashboardPath,
   getStoredToken,
   getStoredUser,
   roleLabels,
+  syncAuthCookies,
 } from "@/lib/auth-session";
 import { cn } from "@/lib/utils";
 import type { User } from "@/types/rentnest";
 
-const navLinks = [
+const publicNavLinks = [
   { href: "/", label: "Home" },
   { href: "/properties", label: "Properties", icon: Search },
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 ];
 
 const subscribeToAuthSession = (callback: () => void) => {
@@ -47,7 +48,6 @@ const getServerAuthSnapshot = () => JSON.stringify({ token: null, user: null });
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const userSnapshot = useSyncExternalStore(
     subscribeToAuthSession,
@@ -59,15 +59,17 @@ export function SiteHeader() {
     user: User | null;
   };
   const isAuthenticated = Boolean(token && user);
+  const dashboardPath = user ? getRoleDashboardPath(user.role) : "/dashboard";
+  const navLinks = [
+    ...publicNavLinks,
+    { href: dashboardPath, label: "Dashboard", icon: LayoutDashboard },
+  ];
 
   useEffect(() => {
-    if (isAuthenticated || !pathname.startsWith("/dashboard")) {
-      return;
+    if (isAuthenticated && token && user) {
+      syncAuthCookies(token, user);
     }
-
-    clearAuthSession();
-    router.replace(`/auth/login?from=${encodeURIComponent(pathname)}`);
-  }, [isAuthenticated, pathname, router]);
+  }, [isAuthenticated, token, user]);
 
   const handleLogout = () => {
     clearAuthSession();
@@ -79,7 +81,7 @@ export function SiteHeader() {
     <>
       <Link
         className={buttonClasses({ variant: "ghost" })}
-        href="/dashboard"
+        href={dashboardPath}
       >
         <LayoutDashboard size={16} aria-hidden="true" />
         {roleLabels[user.role]}
@@ -175,7 +177,7 @@ export function SiteHeader() {
               <>
                 <Link
                   className={buttonClasses({ variant: "outline" })}
-                  href="/dashboard"
+                  href={dashboardPath}
                   onClick={() => setIsOpen(false)}
                 >
                   <LayoutDashboard size={16} aria-hidden="true" />

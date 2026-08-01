@@ -42,6 +42,11 @@ const deleteCookie = (name: string) => {
   document.cookie = `${name}=; path=/; max-age=0; samesite=lax`;
 };
 
+export const syncAuthCookies = (accessToken: string, user: User) => {
+  setCookie(AUTH_TOKEN_COOKIE, accessToken);
+  setCookie(AUTH_ROLE_COOKIE, user.role);
+};
+
 export const persistAuthSession = ({ accessToken, user }: AuthPayload) => {
   if (!isBrowser()) {
     return;
@@ -49,8 +54,7 @@ export const persistAuthSession = ({ accessToken, user }: AuthPayload) => {
 
   window.localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
   window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
-  setCookie(AUTH_TOKEN_COOKIE, accessToken);
-  setCookie(AUTH_ROLE_COOKIE, user.role);
+  syncAuthCookies(accessToken, user);
   window.dispatchEvent(new Event(AUTH_SESSION_EVENT));
 };
 
@@ -94,6 +98,22 @@ export const getRoleDashboardPath = (role: UserRole) => {
   };
 
   return dashboardPaths[role];
+};
+
+export const getSafePostLoginPath = (role: UserRole, from: string | null) => {
+  const dashboardPath = getRoleDashboardPath(role);
+
+  if (!from || !from.startsWith("/") || from.startsWith("//")) {
+    return dashboardPath;
+  }
+
+  if (from === "/dashboard") {
+    return dashboardPath;
+  }
+
+  return from === dashboardPath || from.startsWith(`${dashboardPath}/`)
+    ? from
+    : dashboardPath;
 };
 
 export const canAccessRole = (userRole: UserRole | null, allowedRoles: UserRole[]) =>

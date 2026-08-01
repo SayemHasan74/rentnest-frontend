@@ -41,6 +41,8 @@ The checkout session ID is saved in `sessionStorage` before redirecting to
 Stripe. The success route uses Stripe's `session_id` query parameter, while the
 cancel route uses the saved session ID. Both routes synchronize the result with
 the backend before directing the tenant back to the dashboard.
+The checkout request also supplies frontend-origin success and cancel URLs so
+the same flow returns correctly in local development and on Vercel.
 
 ## Landlord
 

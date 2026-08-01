@@ -1,12 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { getErrorMessage } from "@/lib/errors";
-import { getRoleDashboardPath, persistAuthSession } from "@/lib/auth-session";
+import {
+  getRoleDashboardPath,
+  getSafePostLoginPath,
+  getStoredToken,
+  getStoredUser,
+  persistAuthSession,
+  syncAuthCookies,
+} from "@/lib/auth-session";
 import { Button } from "@/components/ui/button";
 import { Input, Label, Textarea } from "@/components/ui/input";
 import type { RegisterPayload } from "@/types/rentnest";
@@ -31,13 +38,24 @@ const getInitialRegisterValues = (): RegisterPayload => ({
 });
 
 export function AuthForm({ mode }: { mode: AuthMode }) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const isRegister = mode === "register";
   const [values, setValues] = useState(getInitialRegisterValues);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const token = getStoredToken();
+    const user = getStoredUser();
+
+    if (!token || !user) {
+      return;
+    }
+
+    syncAuthCookies(token, user);
+    window.location.replace(getRoleDashboardPath(user.role));
+  }, []);
 
   const updateValue = (name: keyof RegisterPayload, value: string) => {
     setValues((current) => ({ ...current, [name]: value }));
@@ -71,13 +89,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const loginAndRedirect = async (email: string, password: string) => {
     const auth = await api.auth.login({ email, password });
     const from = searchParams.get("from");
-    const nextPath =
-      from && from.startsWith("/") && !from.startsWith("//")
-        ? from
-        : getRoleDashboardPath(auth.user.role);
+    const nextPath = getSafePostLoginPath(auth.user.role, from);
 
     persistAuthSession(auth);
-    router.push(nextPath);
+    window.location.assign(nextPath);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
