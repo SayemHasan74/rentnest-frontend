@@ -373,15 +373,14 @@ function AddPropertyForm({
 
     const invalidImage = images.find((image) => {
       try {
-        new URL(image);
-        return false;
+        return new URL(image).protocol !== "https:";
       } catch {
         return true;
       }
     });
 
     if (invalidImage) {
-      errors.images = "Every image must be a valid URL.";
+      errors.images = "Every image must be a valid HTTPS URL.";
     }
 
     setFieldErrors(errors);

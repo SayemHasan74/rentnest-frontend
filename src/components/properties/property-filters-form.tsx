@@ -3,7 +3,7 @@
 import { SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import type { Category } from "@/types/rentnest";
@@ -26,6 +26,21 @@ const defaultValues: FilterValues = {
   limit: "9",
 };
 
+const buildFilterUrl = (values: FilterValues) => {
+  const params = new URLSearchParams();
+
+  Object.entries(values).forEach(([key, value]) => {
+    const normalized = value.trim();
+
+    if (normalized) {
+      params.set(key, normalized);
+    }
+  });
+
+  params.set("page", "1");
+  return `/properties?${params.toString()}`;
+};
+
 export function PropertyFiltersForm({
   categories,
   values,
@@ -34,23 +49,28 @@ export function PropertyFiltersForm({
   values: FilterValues;
 }) {
   const router = useRouter();
+  const [filterValues, setFilterValues] = useState(values);
+  const initialFilterValues = useRef(JSON.stringify(values));
+
+  useEffect(() => {
+    if (JSON.stringify(filterValues) === initialFilterValues.current) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      router.replace(buildFilterUrl(filterValues));
+    }, 450);
+
+    return () => window.clearTimeout(timeout);
+  }, [filterValues, router]);
+
+  const updateFilter = (name: keyof FilterValues, value: string) => {
+    setFilterValues((current) => ({ ...current, [name]: value }));
+  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    const params = new URLSearchParams();
-
-    for (const [key, value] of formData.entries()) {
-      const normalized = String(value).trim();
-
-      if (normalized) {
-        params.set(key, normalized);
-      }
-    }
-
-    params.set("page", "1");
-    router.push(`/properties?${params.toString()}`);
+    router.push(buildFilterUrl(filterValues));
   };
 
   return (
@@ -67,10 +87,11 @@ export function PropertyFiltersForm({
         <div className="grid gap-2">
           <Label htmlFor="location">Location</Label>
           <Input
-            defaultValue={values.location}
             id="location"
             name="location"
+            onChange={(event) => updateFilter("location", event.target.value)}
             placeholder="Banani, Uttara, Dhaka"
+            value={filterValues.location}
           />
         </div>
 
@@ -78,9 +99,10 @@ export function PropertyFiltersForm({
           <Label htmlFor="type">Property type</Label>
           <select
             className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100"
-            defaultValue={values.type}
             id="type"
             name="type"
+            onChange={(event) => updateFilter("type", event.target.value)}
+            value={filterValues.type}
           >
             <option value="">Any type</option>
             {categories.map((category) => (
@@ -95,23 +117,25 @@ export function PropertyFiltersForm({
           <div className="grid gap-2">
             <Label htmlFor="minPrice">Min rent</Label>
             <Input
-              defaultValue={values.minPrice}
               id="minPrice"
               min="1"
               name="minPrice"
+              onChange={(event) => updateFilter("minPrice", event.target.value)}
               placeholder="30000"
               type="number"
+              value={filterValues.minPrice}
             />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="maxPrice">Max rent</Label>
             <Input
-              defaultValue={values.maxPrice}
               id="maxPrice"
               min="1"
               name="maxPrice"
+              onChange={(event) => updateFilter("maxPrice", event.target.value)}
               placeholder="80000"
               type="number"
+              value={filterValues.maxPrice}
             />
           </div>
         </div>
@@ -119,10 +143,11 @@ export function PropertyFiltersForm({
         <div className="grid gap-2">
           <Label htmlFor="amenities">Amenities</Label>
           <Input
-            defaultValue={values.amenities}
             id="amenities"
             name="amenities"
+            onChange={(event) => updateFilter("amenities", event.target.value)}
             placeholder="Parking, Security"
+            value={filterValues.amenities}
           />
           <p className="text-xs text-slate-500">Separate multiple amenities with commas.</p>
         </div>
@@ -131,9 +156,10 @@ export function PropertyFiltersForm({
           <Label htmlFor="limit">Listings per page</Label>
           <select
             className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100"
-            defaultValue={values.limit || defaultValues.limit}
             id="limit"
             name="limit"
+            onChange={(event) => updateFilter("limit", event.target.value)}
+            value={filterValues.limit || defaultValues.limit}
           >
             <option value="6">6</option>
             <option value="9">9</option>
@@ -143,10 +169,11 @@ export function PropertyFiltersForm({
       </div>
 
       <div className="mt-5 grid gap-2">
-        <Button type="submit">Apply filters</Button>
+        <Button type="submit">Update now</Button>
         <Link
           className={buttonClasses({ variant: "outline" })}
           href="/properties"
+          onClick={() => setFilterValues(defaultValues)}
         >
           <X size={16} aria-hidden="true" />
           Clear filters

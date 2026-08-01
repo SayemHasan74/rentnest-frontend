@@ -602,15 +602,17 @@ export function AdminUsersDashboard() {
   );
 
   const stats = useMemo(() => {
-    const tenants = visibleUsers.filter((item) => item.role === "TENANT").length;
+    const pendingRequests = visibleRentals.filter(
+      (request) => request.status === "PENDING",
+    ).length;
 
     return [
       { label: "Total users", value: visibleUsers.length },
-      { label: "Tenants", value: tenants },
       { label: "Properties", value: visibleProperties.length },
+      { label: "Pending requests", value: pendingRequests },
       { label: "Categories", value: visibleCategories.length },
     ];
-  }, [visibleCategories, visibleProperties, visibleUsers]);
+  }, [visibleCategories, visibleProperties, visibleRentals, visibleUsers]);
 
   const usersPerPage = 8;
   const userTotalPages = Math.max(1, Math.ceil(visibleUsers.length / usersPerPage));

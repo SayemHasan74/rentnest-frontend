@@ -11,6 +11,7 @@ import { api } from "@/lib/api";
 import { getStoredToken, getStoredUser } from "@/lib/auth-session";
 import { getErrorMessage } from "@/lib/errors";
 import { formatCurrency } from "@/lib/format";
+import { storeCheckoutSessionId } from "@/lib/payment-session";
 import type { RentalRequest, User } from "@/types/rentnest";
 
 type AuthSnapshot = {
@@ -104,6 +105,7 @@ export function TenantPayPanel({ rentalRequestId }: { rentalRequestId: string })
         return;
       }
 
+      storeCheckoutSessionId(checkout.checkoutSession.id);
       setMessage("Redirecting to Stripe Checkout.");
       window.location.href = checkout.checkoutSession.url;
     } catch (paymentError) {
