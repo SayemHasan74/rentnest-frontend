@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { BackendWarmup } from "@/components/layout/backend-warmup";
+import { SessionVerifier } from "@/components/layout/session-verifier";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,6 +33,7 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         <BackendWarmup />
+        <SessionVerifier />
         <SiteHeader />
         <div className="flex-1">{children}</div>
         <SiteFooter />

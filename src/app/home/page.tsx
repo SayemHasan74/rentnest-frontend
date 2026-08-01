@@ -26,16 +26,25 @@ const getHomeData = async () => {
 
   return {
     categories: categoryResult.status === "fulfilled" ? categoryResult.value : [],
+    errorMessage:
+      propertyResult.status === "rejected" || categoryResult.status === "rejected"
+        ? "Some RentNest data could not be refreshed. Available results are shown below."
+        : "",
     properties: propertyData.properties,
     totalProperties: propertyData.meta.total,
   };
 };
 
 export default async function HomePage() {
-  const { categories, properties, totalProperties } = await getHomeData();
+  const { categories, errorMessage, properties, totalProperties } = await getHomeData();
 
   return (
     <main className="bg-slate-50">
+      {errorMessage ? (
+        <div className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-center text-sm font-medium text-amber-900">
+          {errorMessage}
+        </div>
+      ) : null}
       <section className="border-b border-slate-300 bg-white">
         <div className="mx-auto w-full max-w-[90rem] px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
           <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-end">

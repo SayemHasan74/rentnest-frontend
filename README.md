@@ -52,6 +52,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Verification
 
 ```bash
+npm test
 npm run lint
 npm run build
 ```
@@ -115,8 +116,10 @@ Shared UX:
 - Route-level loading skeletons.
 - Route-level error fallback.
 - Toast-style success and failure feedback for dashboard actions.
+- Visible warnings when cached dashboard or home data cannot be refreshed.
 - Background API warmup to reduce Render cold-start delays.
 - Five-minute session cache for instant dashboard revisits with background refresh.
+- Startup session verification through `GET /api/auth/me`.
 
 ## API Integration
 

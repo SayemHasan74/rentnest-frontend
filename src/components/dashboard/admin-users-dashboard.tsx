@@ -532,6 +532,7 @@ export function AdminUsersDashboard() {
     search: "",
   });
   const [error, setError] = useState("");
+  const [refreshError, setRefreshError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
   const [categoryMessage, setCategoryMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -585,6 +586,7 @@ export function AdminUsersDashboard() {
 
       setIsLoading(!cached);
       setError("");
+      setRefreshError("");
 
       try {
         const [userData, propertyData, rentalData, categoryData] = await Promise.all([
@@ -608,8 +610,13 @@ export function AdminUsersDashboard() {
           });
         }
       } catch (fetchError) {
-        if (isActive && !cached) {
-          setError(getErrorMessage(fetchError));
+        if (isActive) {
+          const message = getErrorMessage(fetchError);
+          if (cached) {
+            setRefreshError(`${message} Showing saved dashboard data.`);
+          } else {
+            setError(message);
+          }
         }
       } finally {
         if (isActive) {
@@ -789,7 +796,7 @@ export function AdminUsersDashboard() {
   return (
     <main className="bg-slate-50">
       <Toast message={actionMessage || categoryMessage} tone="success" />
-      <Toast message={error} tone="error" />
+      <Toast message={error || refreshError} tone="error" />
       <section className="border-b border-slate-300 bg-white">
         <div className="mx-auto w-full max-w-[90rem] px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
           <p className="text-xs font-semibold uppercase text-slate-500">Admin dashboard</p>

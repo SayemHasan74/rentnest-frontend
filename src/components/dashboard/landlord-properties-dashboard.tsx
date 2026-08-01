@@ -850,6 +850,7 @@ export function LandlordPropertiesDashboard() {
 
       setIsLoading(!cached);
       setError("");
+      setActionError("");
 
       try {
         const [propertyData, requestData, categoryData] = await Promise.all([
@@ -869,8 +870,13 @@ export function LandlordPropertiesDashboard() {
           });
         }
       } catch (fetchError) {
-        if (isActive && !cached) {
-          setError(getErrorMessage(fetchError));
+        if (isActive) {
+          const message = getErrorMessage(fetchError);
+          if (cached) {
+            setActionError(`${message} Showing saved dashboard data.`);
+          } else {
+            setError(message);
+          }
         }
       } finally {
         if (isActive) {
