@@ -470,14 +470,21 @@ export function TenantRentalsDashboard() {
   const stats = useMemo(() => {
     const pending = visibleRequests.filter((request) => request.status === "PENDING").length;
     const approved = visibleRequests.filter((request) => request.status === "APPROVED").length;
-    const active = visibleRequests.filter((request) => request.status === "ACTIVE").length;
-    const paid = visiblePayments.filter((payment) => payment.status === "COMPLETED").length;
+    const paidRentalIds = new Set(
+      visibleRequests
+        .filter((request) => request.status === "ACTIVE" || request.status === "COMPLETED")
+        .map((request) => request.id),
+    );
+
+    visiblePayments
+      .filter((payment) => payment.status === "COMPLETED")
+      .forEach((payment) => paidRentalIds.add(payment.rentalRequestId));
 
     return [
       { label: "Total requests", value: visibleRequests.length },
       { label: "Pending", value: pending },
       { label: "Approved", value: approved },
-      { label: "Paid rentals", value: active + paid },
+      { label: "Paid rentals", value: paidRentalIds.size },
     ];
   }, [visiblePayments, visibleRequests]);
 

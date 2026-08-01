@@ -32,3 +32,15 @@ test("background API failures have visible UI feedback", () => {
   assert.match(warmup, /<Toast message=\{error\}/);
   assert.match(verifier, /<Toast message=\{errorMessage\}/);
 });
+
+test("paid rentals are counted once across rental and payment records", () => {
+  const dashboard = readFileSync(
+    "src/components/dashboard/tenant-rentals-dashboard.tsx",
+    "utf8",
+  );
+
+  assert.match(dashboard, /const paidRentalIds = new Set/);
+  assert.match(dashboard, /paidRentalIds\.add\(payment\.rentalRequestId\)/);
+  assert.match(dashboard, /value: paidRentalIds\.size/);
+  assert.doesNotMatch(dashboard, /value: active \+ paid/);
+});
