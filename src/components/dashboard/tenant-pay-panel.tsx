@@ -119,9 +119,9 @@ export function TenantPayPanel({ rentalRequestId }: { rentalRequestId: string })
     <main className="bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
       <Toast message={message} tone="success" />
       <Toast message={error} tone="error" />
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-3xl py-5">
         <Link
-          className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+          className="border-b border-slate-950 pb-1 text-sm font-semibold text-slate-950"
           href="/dashboard/tenant"
         >
           Back to tenant dashboard

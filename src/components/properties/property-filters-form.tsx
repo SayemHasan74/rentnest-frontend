@@ -75,11 +75,11 @@ export function PropertyFiltersForm({
 
   return (
     <form
-      className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+      className="border-t border-slate-950 bg-transparent py-5 lg:sticky lg:top-24"
       onSubmit={handleSubmit}
     >
       <div className="flex items-center gap-2">
-        <SlidersHorizontal className="text-emerald-700" size={18} aria-hidden="true" />
+        <SlidersHorizontal className="text-slate-950" size={18} aria-hidden="true" />
         <h2 className="text-base font-semibold text-slate-950">Filters</h2>
       </div>
 
@@ -98,7 +98,7 @@ export function PropertyFiltersForm({
         <div className="grid gap-2">
           <Label htmlFor="type">Property type</Label>
           <select
-            className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100"
+            className="h-10 w-full rounded-sm border border-slate-400 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
             id="type"
             name="type"
             onChange={(event) => updateFilter("type", event.target.value)}
@@ -155,7 +155,7 @@ export function PropertyFiltersForm({
         <div className="grid gap-2">
           <Label htmlFor="limit">Listings per page</Label>
           <select
-            className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100"
+            className="h-10 w-full rounded-sm border border-slate-400 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
             id="limit"
             name="limit"
             onChange={(event) => updateFilter("limit", event.target.value)}

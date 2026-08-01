@@ -17,7 +17,7 @@ export function PropertyGallery({
 
   return (
     <div className="grid gap-3 lg:grid-cols-[1.4fr_0.6fr]">
-      <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-slate-100">
+      <div className="relative aspect-[16/10] overflow-hidden bg-slate-200">
         <Image
           alt={title}
           className="object-cover"
@@ -30,7 +30,7 @@ export function PropertyGallery({
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
         {previewImages.map((image, index) => (
           <div
-            className="relative aspect-[16/10] overflow-hidden rounded-lg bg-slate-100 lg:aspect-auto"
+            className="relative aspect-[16/10] overflow-hidden bg-slate-200 lg:aspect-auto"
             key={`${image}-${index}`}
           >
             <Image

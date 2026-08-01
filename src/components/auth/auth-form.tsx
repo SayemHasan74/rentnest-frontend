@@ -132,13 +132,13 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   };
 
   return (
-    <div className="mx-auto w-full max-w-md">
-      <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="mx-auto w-full max-w-lg">
+      <div className="border-t border-slate-950 bg-white px-0 py-8 sm:px-8">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
+          <p className="text-xs font-semibold uppercase text-slate-500">
             {isRegister ? "Create account" : "Welcome back"}
           </p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">
+          <h1 className="mt-3 text-4xl font-semibold text-slate-950">
             {isRegister ? "Join RentNest" : "Login to RentNest"}
           </h1>
           <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -212,9 +212,9 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                 <div className="grid grid-cols-2 gap-2">
                   {(["TENANT", "LANDLORD"] as const).map((role) => (
                     <button
-                      className={`h-10 rounded-md border px-3 text-sm font-semibold transition ${
+                      className={`h-10 rounded-sm border px-3 text-sm font-semibold transition ${
                         values.role === role
-                          ? "border-emerald-700 bg-emerald-50 text-emerald-800"
+                          ? "border-black bg-black text-white"
                           : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
                       }`}
                       key={role}
@@ -270,7 +270,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             <div className="mt-3 grid gap-2">
               {demoAccounts.map((account) => (
                 <button
-                  className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2 text-left text-sm transition hover:bg-slate-50"
+                  className="flex items-center justify-between border-b border-slate-300 px-1 py-3 text-left text-sm transition hover:bg-slate-50"
                   disabled={isSubmitting}
                   key={account.email}
                   onClick={() => void handleDemoAccount(account)}
@@ -287,7 +287,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         <p className="mt-6 text-center text-sm text-slate-600">
           {isRegister ? "Already have an account?" : "Need an account?"}{" "}
           <Link
-            className="font-semibold text-emerald-700 hover:text-emerald-800"
+            className="border-b border-slate-950 font-semibold text-slate-950"
             href={isRegister ? "/auth/login" : "/auth/register"}
           >
             {isRegister ? "Login" : "Register"}

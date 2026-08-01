@@ -91,7 +91,7 @@ export function PaymentResult({ status }: { status: "success" | "cancel" }) {
 
   return (
     <main className="bg-slate-50 px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-xl rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm">
+      <div className="mx-auto max-w-xl border-y border-slate-950 bg-white p-8 text-center">
         <Icon
           className={
             isVerifying
@@ -105,7 +105,7 @@ export function PaymentResult({ status }: { status: "success" | "cancel" }) {
           size={42}
           aria-hidden="true"
         />
-        <h1 className="mt-5 text-3xl font-bold tracking-tight text-slate-950">
+        <h1 className="mt-5 text-3xl font-semibold text-slate-950">
           {title}
         </h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">

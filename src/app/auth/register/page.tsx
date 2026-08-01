@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function RegisterPage() {
   return (
-    <main className="bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
+    <main className="flex min-h-[70vh] items-center bg-slate-50 px-4 py-14 sm:px-6 lg:px-8">
       <Suspense>
         <AuthForm mode="register" />
       </Suspense>

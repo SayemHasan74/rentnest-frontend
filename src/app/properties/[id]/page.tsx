@@ -85,10 +85,10 @@ export default async function PropertyDetailsPage({
 
   return (
     <main className="bg-slate-50">
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="border-b border-slate-300 bg-white">
+        <div className="mx-auto w-full max-w-[90rem] px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
           <Link
-            className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+            className="border-b border-slate-950 pb-1 text-sm font-semibold text-slate-950"
             href="/properties"
           >
             Back to properties
@@ -96,7 +96,7 @@ export default async function PropertyDetailsPage({
           <div className="mt-6 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
               <Badge tone="emerald">{property.category?.name ?? "Rental"}</Badge>
-              <h1 className="mt-4 max-w-4xl text-4xl font-bold tracking-tight text-slate-950">
+              <h1 className="mt-4 max-w-4xl text-4xl font-semibold text-slate-950 sm:text-6xl">
                 {property.title}
               </h1>
               <p className="mt-4 flex items-center gap-2 text-sm text-slate-600">
@@ -104,17 +104,17 @@ export default async function PropertyDetailsPage({
                 {property.address || property.location}
               </p>
             </div>
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-4 text-right">
-              <p className="text-2xl font-bold text-emerald-800">
+            <div className="border-l border-slate-300 px-5 py-2 text-left lg:text-right">
+              <p className="text-3xl font-semibold text-slate-950">
                 {formatCurrency(property.rentAmount)}
               </p>
-              <p className="mt-1 text-sm font-medium text-emerald-700">per month</p>
+              <p className="mt-1 text-sm font-medium text-slate-600">per month</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="mx-auto w-full max-w-[90rem] px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
         <PropertyGallery images={property.images} title={property.title} />
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_22rem]">

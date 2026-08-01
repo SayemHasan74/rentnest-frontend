@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Building2,
+  Building,
   LayoutDashboard,
   LogIn,
   LogOut,
@@ -94,13 +94,11 @@ export function SiteHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link className="flex items-center gap-2 font-bold text-slate-950" href="/">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-700 text-white">
-            <Building2 size={20} aria-hidden="true" />
-          </span>
-          <span className="text-lg">RentNest</span>
+    <header className="sticky top-0 z-40 border-b border-slate-300 bg-white/95 backdrop-blur-xl">
+      <div className="mx-auto flex h-[4.5rem] w-full max-w-[90rem] items-center justify-between px-4 sm:px-6 lg:px-10">
+        <Link className="flex items-center gap-2.5 font-bold text-slate-950" href="/">
+          <Building size={23} strokeWidth={1.7} aria-hidden="true" />
+          <span className="text-xl">RentNest</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
@@ -112,8 +110,8 @@ export function SiteHeader() {
             return (
               <Link
                 className={cn(
-                  "inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950",
-                  isActive && "bg-slate-100 text-slate-950",
+                  "inline-flex h-10 items-center gap-2 border-b border-transparent px-3 text-sm font-medium text-slate-600 transition hover:border-slate-400 hover:text-slate-950",
+                  isActive && "border-slate-950 text-slate-950",
                 )}
                 href={item.href}
                 key={item.href}
@@ -139,14 +137,14 @@ export function SiteHeader() {
       </div>
 
       {isOpen ? (
-        <div className="border-t border-slate-200 bg-white px-4 py-4 shadow-sm md:hidden">
+        <div className="border-t border-slate-300 bg-white px-4 py-4 md:hidden">
           <nav className="grid gap-2" aria-label="Mobile navigation">
             {navLinks.map((item) => {
               const Icon = item.icon;
 
               return (
                 <Link
-                  className="flex h-10 items-center gap-2 rounded-md px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                  className="flex h-10 items-center gap-2 border-b border-slate-200 px-1 text-sm font-semibold text-slate-700 hover:text-slate-950"
                   href={item.href}
                   key={item.href}
                   onClick={() => setIsOpen(false)}

@@ -463,12 +463,12 @@ export function TenantRentalsDashboard() {
 
   return (
     <main className="bg-slate-50">
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold text-emerald-700">Tenant dashboard</p>
-          <div className="mt-3 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+      <section className="border-b border-slate-300 bg-white">
+        <div className="mx-auto w-full max-w-[90rem] px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
+          <p className="text-xs font-semibold uppercase text-slate-500">Tenant dashboard</p>
+          <div className="mt-4 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-slate-950">
+              <h1 className="text-4xl font-semibold text-slate-950 sm:text-5xl">
                 Rental requests
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
@@ -477,7 +477,7 @@ export function TenantRentalsDashboard() {
               </p>
             </div>
             {user ? (
-              <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+              <div className="border-l border-slate-300 px-4 py-2 text-sm">
                 <p className="font-semibold text-slate-950">{user.name}</p>
                 <p className="text-slate-600">{user.email}</p>
               </div>
@@ -486,7 +486,7 @@ export function TenantRentalsDashboard() {
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:px-8">
+      <section className="mx-auto grid w-full max-w-[90rem] gap-6 px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((item) => (
             <Card key={item.label}>

@@ -7,7 +7,6 @@ import {
 } from "@/components/properties/property-filters-form";
 import { PropertyPagination } from "@/components/properties/property-pagination";
 import { PropertyCard } from "@/components/properties/property-card";
-import { Badge } from "@/components/ui/badge";
 import { buttonClasses } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { formatNumber } from "@/lib/format";
@@ -94,34 +93,34 @@ export default async function PropertiesPage({
 
   return (
     <main className="bg-slate-50">
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <Badge tone="emerald">Available rentals</Badge>
-          <div className="mt-5 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+      <section className="border-b border-slate-300 bg-white">
+        <div className="mx-auto w-full max-w-[90rem] px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
+          <p className="text-xs font-semibold uppercase text-slate-500">Available rentals</p>
+          <div className="mt-4 flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
             <div>
-              <h1 className="text-4xl font-bold tracking-tight text-slate-950">
-                Browse properties
+              <h1 className="max-w-3xl text-4xl font-semibold text-slate-950 sm:text-6xl">
+                A home for every way of living.
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-                Search by location, price, property type, and amenities using
-                the live RentNest property API.
+                Browse by location, price, property type, and the details that
+                make a place feel right.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                <p className="font-bold text-slate-950">
+            <div className="grid grid-cols-3 border-y border-slate-300 text-sm lg:min-w-[25rem]">
+              <div className="border-r border-slate-300 px-4 py-4">
+                <p className="text-xl font-semibold text-slate-950">
                   {formatNumber(propertyData?.meta.total ?? 0)}
                 </p>
                 <p className="mt-1 text-slate-600">Matches</p>
               </div>
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                <p className="font-bold text-slate-950">
+              <div className="border-r border-slate-300 px-4 py-4">
+                <p className="text-xl font-semibold text-slate-950">
                   {formatNumber(categories.length)}
                 </p>
                 <p className="mt-1 text-slate-600">Types</p>
               </div>
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                <p className="font-bold text-slate-950">
+              <div className="px-4 py-4">
+                <p className="text-xl font-semibold text-slate-950">
                   {formatNumber(propertyData?.meta.page ?? filters.page ?? 1)}
                 </p>
                 <p className="mt-1 text-slate-600">Page</p>
@@ -131,7 +130,7 @@ export default async function PropertiesPage({
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[18rem_1fr] lg:px-8">
+      <section className="mx-auto grid w-full max-w-[90rem] gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[18rem_1fr] lg:px-10 lg:py-14">
         <aside>
           <PropertyFiltersForm
             categories={categories as Category[]}
@@ -156,7 +155,7 @@ export default async function PropertiesPage({
 
           {propertyData && propertyData.properties.length > 0 ? (
             <>
-              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-x-5 gap-y-10 md:grid-cols-2 xl:grid-cols-3">
                 {propertyData.properties.map((property, index) => (
                   <PropertyCard
                     key={property.id}
@@ -173,7 +172,7 @@ export default async function PropertiesPage({
           ) : null}
 
           {propertyData && propertyData.properties.length === 0 ? (
-            <div className="rounded-lg border border-slate-200 bg-white p-10 text-center shadow-sm">
+            <div className="border-y border-slate-300 bg-white p-10 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-slate-100 text-slate-600">
                 <HomeIcon size={24} aria-hidden="true" />
               </div>
