@@ -44,3 +44,16 @@ test("paid rentals are counted once across rental and payment records", () => {
   assert.match(dashboard, /value: paidRentalIds\.size/);
   assert.doesNotMatch(dashboard, /value: active \+ paid/);
 });
+
+test("offline browser state produces global visible feedback", () => {
+  const layout = readFileSync("src/app/layout.tsx", "utf8");
+  const networkToast = readFileSync(
+    "src/components/layout/network-status-toast.tsx",
+    "utf8",
+  );
+
+  assert.match(layout, /<NetworkStatusToast \/>/);
+  assert.match(networkToast, /window\.addEventListener\("offline", updateStatus\)/);
+  assert.match(networkToast, /You are offline/);
+  assert.match(networkToast, /placement="bottom"/);
+});
