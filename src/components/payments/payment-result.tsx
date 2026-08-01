@@ -22,7 +22,6 @@ export function PaymentResult({ status }: { status: "success" | "cancel" }) {
   const hasStartedVerification = useRef(false);
   const [resultState, setResultState] = useState<ResultState>("idle");
   const [error, setError] = useState("");
-  const [sessionId, setSessionId] = useState(sessionIdFromUrl);
 
   useEffect(() => {
     if (hasStartedVerification.current) {
@@ -33,8 +32,6 @@ export function PaymentResult({ status }: { status: "success" | "cancel" }) {
     const confirmResult = async () => {
       const providerSessionId = sessionIdFromUrl ?? getCheckoutSessionId();
       const token = getStoredToken();
-
-      setSessionId(providerSessionId);
 
       if (!providerSessionId || !token) {
         return;
@@ -48,6 +45,9 @@ export function PaymentResult({ status }: { status: "success" | "cancel" }) {
           status: isSuccess ? "COMPLETED" : "CANCELLED",
         });
         clearCheckoutSessionId();
+        if (sessionIdFromUrl) {
+          window.history.replaceState(null, "", window.location.pathname);
+        }
         setResultState(isSuccess ? "confirmed" : "cancelled");
       } catch (confirmationError) {
         setError(getErrorMessage(confirmationError));
@@ -111,11 +111,6 @@ export function PaymentResult({ status }: { status: "success" | "cancel" }) {
         <p className="mt-3 text-sm leading-6 text-slate-600">
           {description}
         </p>
-        {sessionId ? (
-          <p className="mt-4 rounded-md bg-slate-50 p-3 font-mono text-xs text-slate-600 ring-1 ring-slate-200">
-            {sessionId}
-          </p>
-        ) : null}
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link className={buttonClasses()} href="/dashboard/tenant">
             Tenant dashboard

@@ -57,3 +57,14 @@ test("offline browser state produces global visible feedback", () => {
   assert.match(networkToast, /You are offline/);
   assert.match(networkToast, /placement="bottom"/);
 });
+
+test("payment result never renders the Stripe session identifier", () => {
+  const paymentResult = readFileSync(
+    "src/components/payments/payment-result.tsx",
+    "utf8",
+  );
+
+  assert.doesNotMatch(paymentResult, /\{sessionId\}/);
+  assert.match(paymentResult, /window\.history\.replaceState/);
+  assert.match(paymentResult, /window\.location\.pathname/);
+});
