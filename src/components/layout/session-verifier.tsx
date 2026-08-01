@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Toast } from "@/components/ui/toast";
 import { api, ApiError } from "@/lib/api";
 import {
   clearAuthSession,
@@ -9,6 +10,8 @@ import {
 } from "@/lib/auth-session";
 
 export function SessionVerifier() {
+  const [errorMessage, setErrorMessage] = useState("");
+
   useEffect(() => {
     const token = getStoredToken();
 
@@ -27,9 +30,17 @@ export function SessionVerifier() {
             const from = encodeURIComponent(window.location.pathname);
             window.location.assign(`/auth/login?from=${from}`);
           }
+
+          return;
         }
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "RentNest could not verify your session. Please try again.",
+        );
       });
   }, []);
 
-  return null;
+  return <Toast message={errorMessage} tone="error" />;
 }

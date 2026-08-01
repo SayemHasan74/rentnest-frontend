@@ -58,6 +58,7 @@ const getBrowseData = async (filters: PropertyFilters) => {
   return {
     categories:
       categoryResult.status === "fulfilled" ? categoryResult.value : [],
+    hasCategoryError: categoryResult.status === "rejected",
     propertyResult,
   };
 };
@@ -69,7 +70,7 @@ export default async function PropertiesPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const filters = buildPropertyFilters(resolvedSearchParams);
-  const { categories, propertyResult } = await getBrowseData(filters);
+  const { categories, hasCategoryError, propertyResult } = await getBrowseData(filters);
   const filterValues = {
     location: getStringParam(resolvedSearchParams, "location"),
     type: getStringParam(resolvedSearchParams, "type"),
@@ -139,6 +140,12 @@ export default async function PropertiesPage({
         </aside>
 
         <div>
+          {hasCategoryError ? (
+            <div className="mb-6 rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+              Property types could not be refreshed. Other filters and available listings still work.
+            </div>
+          ) : null}
+
           {hasError ? (
             <div className="rounded-lg border border-red-200 bg-red-50 p-6">
               <div className="flex gap-3 text-red-700">
