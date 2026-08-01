@@ -12,11 +12,12 @@ import {
   UserPlus,
   X,
 } from "lucide-react";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Button, buttonClasses } from "@/components/ui/button";
 import {
   AUTH_SESSION_EVENT,
   clearAuthSession,
+  getStoredToken,
   getStoredUser,
   roleLabels,
 } from "@/lib/auth-session";
@@ -39,9 +40,10 @@ const subscribeToAuthSession = (callback: () => void) => {
   };
 };
 
-const getAuthSnapshot = () => JSON.stringify(getStoredUser());
+const getAuthSnapshot = () =>
+  JSON.stringify({ token: getStoredToken(), user: getStoredUser() });
 
-const getServerAuthSnapshot = () => JSON.stringify(null);
+const getServerAuthSnapshot = () => JSON.stringify({ token: null, user: null });
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -52,15 +54,28 @@ export function SiteHeader() {
     getAuthSnapshot,
     getServerAuthSnapshot,
   );
-  const user = JSON.parse(userSnapshot) as User | null;
+  const { token, user } = JSON.parse(userSnapshot) as {
+    token: string | null;
+    user: User | null;
+  };
+  const isAuthenticated = Boolean(token && user);
+
+  useEffect(() => {
+    if (isAuthenticated || !pathname.startsWith("/dashboard")) {
+      return;
+    }
+
+    clearAuthSession();
+    router.replace(`/auth/login?from=${encodeURIComponent(pathname)}`);
+  }, [isAuthenticated, pathname, router]);
 
   const handleLogout = () => {
     clearAuthSession();
     setIsOpen(false);
-    router.push("/");
+    window.location.assign("/");
   };
 
-  const authActions = user ? (
+  const authActions = isAuthenticated && user ? (
     <>
       <Link
         className={buttonClasses({ variant: "ghost" })}
@@ -156,7 +171,7 @@ export function SiteHeader() {
             })}
           </nav>
           <div className="mt-4 grid gap-2">
-            {user ? (
+            {isAuthenticated && user ? (
               <>
                 <Link
                   className={buttonClasses({ variant: "outline" })}

@@ -36,10 +36,6 @@ export function proxy(request: NextRequest) {
   const roleCookie = request.cookies.get(AUTH_ROLE_COOKIE)?.value;
   const role = isUserRole(roleCookie) ? roleCookie : null;
 
-  if (pathname.startsWith("/auth") && token && role) {
-    return createRedirect(request, roleDashboardPaths[role]);
-  }
-
   if (pathname === "/dashboard" && token && role) {
     return createRedirect(request, roleDashboardPaths[role]);
   }
