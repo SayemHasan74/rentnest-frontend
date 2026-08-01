@@ -8,7 +8,13 @@ import type { Property } from "@/types/rentnest";
 const fallbackImage =
   "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267";
 
-export function PropertyCard({ property }: { property: Property }) {
+export function PropertyCard({
+  priority = false,
+  property,
+}: {
+  priority?: boolean;
+  property: Property;
+}) {
   const imageUrl = property.images[0] || fallbackImage;
 
   return (
@@ -23,6 +29,7 @@ export function PropertyCard({ property }: { property: Property }) {
             alt={property.title}
             className="object-cover"
             fill
+            priority={priority}
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             src={imageUrl}
           />

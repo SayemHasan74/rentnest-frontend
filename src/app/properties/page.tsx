@@ -157,8 +157,12 @@ export default async function PropertiesPage({
           {propertyData && propertyData.properties.length > 0 ? (
             <>
               <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                {propertyData.properties.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
+                {propertyData.properties.map((property, index) => (
+                  <PropertyCard
+                    key={property.id}
+                    priority={index === 0}
+                    property={property}
+                  />
                 ))}
               </div>
               <PropertyPagination

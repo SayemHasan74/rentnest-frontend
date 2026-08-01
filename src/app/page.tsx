@@ -155,8 +155,12 @@ export default async function Home() {
 
           {properties.length > 0 ? (
             <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {properties.map((property: Property) => (
-                <PropertyCard key={property.id} property={property} />
+              {properties.map((property: Property, index: number) => (
+                <PropertyCard
+                  key={property.id}
+                  priority={index === 0}
+                  property={property}
+                />
               ))}
             </div>
           ) : (
