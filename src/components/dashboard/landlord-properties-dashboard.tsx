@@ -24,10 +24,12 @@ import { Button, buttonClasses } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input, Label, Textarea } from "@/components/ui/input";
 import { Toast } from "@/components/ui/toast";
+import { DashboardContentSkeleton } from "@/components/ui/dashboard-content-skeleton";
 import { api } from "@/lib/api";
 import { getStoredToken, getStoredUser } from "@/lib/auth-session";
 import { getErrorMessage } from "@/lib/errors";
 import { formatCurrency } from "@/lib/format";
+import { getDashboardCache, setDashboardCache } from "@/lib/dashboard-cache";
 import type {
   Category,
   PaymentStatus,
@@ -42,6 +44,12 @@ import type {
 type AuthSnapshot = {
   token: string | null;
   user: User | null;
+};
+
+type LandlordDashboardCache = {
+  properties: Property[];
+  requests: RentalRequest[];
+  categories: Category[];
 };
 
 type PropertyFormValues = {
@@ -819,18 +827,28 @@ export function LandlordPropertiesDashboard() {
   const [deletingPropertyId, setDeletingPropertyId] = useState<string | null>(null);
   const [updatingRequestId, setUpdatingRequestId] = useState<string | null>(null);
   const [completingRequestId, setCompletingRequestId] = useState<string | null>(null);
+  const cacheKey = user ? `landlord:${user.id}` : null;
 
   useEffect(() => {
     let isActive = true;
 
-    if (!token) {
+    if (!token || !cacheKey) {
       return () => {
         isActive = false;
       };
     }
+    const dashboardCacheKey = cacheKey ?? "";
 
     const loadProperties = async () => {
-      setIsLoading(true);
+      const cached = getDashboardCache<LandlordDashboardCache>(dashboardCacheKey);
+
+      if (cached) {
+        setProperties(cached.properties);
+        setRequests(cached.requests);
+        setCategories(cached.categories);
+      }
+
+      setIsLoading(!cached);
       setError("");
 
       try {
@@ -844,9 +862,14 @@ export function LandlordPropertiesDashboard() {
           setProperties(propertyData);
           setRequests(requestData);
           setCategories(categoryData);
+          setDashboardCache(dashboardCacheKey, {
+            properties: propertyData,
+            requests: requestData,
+            categories: categoryData,
+          });
         }
       } catch (fetchError) {
-        if (isActive) {
+        if (isActive && !cached) {
           setError(getErrorMessage(fetchError));
         }
       } finally {
@@ -861,7 +884,7 @@ export function LandlordPropertiesDashboard() {
     return () => {
       isActive = false;
     };
-  }, [token]);
+  }, [cacheKey, token]);
 
   const visibleProperties = useMemo(
     () => (token ? properties : []),
@@ -1183,10 +1206,7 @@ export function LandlordPropertiesDashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex min-h-40 items-center justify-center gap-2 text-sm font-semibold text-slate-600">
-                <Loader2 className="animate-spin" size={18} aria-hidden="true" />
-                Loading properties
-              </div>
+              <DashboardContentSkeleton label="Loading properties" />
             ) : null}
 
             {!isLoading && error ? (
@@ -1242,10 +1262,7 @@ export function LandlordPropertiesDashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex min-h-40 items-center justify-center gap-2 text-sm font-semibold text-slate-600">
-                <Loader2 className="animate-spin" size={18} aria-hidden="true" />
-                Loading rental requests
-              </div>
+              <DashboardContentSkeleton label="Loading rental requests" />
             ) : null}
 
             {!isLoading && !error && visibleRequests.length === 0 ? (

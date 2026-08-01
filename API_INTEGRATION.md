@@ -15,8 +15,9 @@ NEXT_PUBLIC_API_BASE_URL=https://rentnest-server.onrender.com/api
 
 | Frontend route or component | Method and endpoint | Purpose |
 | --- | --- | --- |
-| `src/app/page.tsx` | `GET /properties` | Featured properties and marketplace totals |
-| `src/app/page.tsx` | `GET /categories` | Category totals |
+| `src/app/page.tsx` | None | Static landing page that renders immediately and warms the API in the background |
+| `src/app/home/page.tsx` | `GET /properties` | Cached featured properties and marketplace totals |
+| `src/app/home/page.tsx` | `GET /categories` | Cached property-type navigation and totals |
 | `src/app/properties/page.tsx` | `GET /properties` | Paginated location, price, type, and amenity filtering |
 | `src/app/properties/page.tsx` | `GET /categories` | Property-type filter options |
 | `src/app/properties/[id]/page.tsx` | `GET /properties/:id` | Property details, gallery, landlord, and reviews |
@@ -77,3 +78,5 @@ the same flow returns correctly in local development and on Vercel.
 - `src/app/not-found.tsx` handles unknown routes and missing properties.
 - Forms render field-level validation and API messages.
 - Dashboard mutations render success and error toast notifications.
+- The app warms the Render API in the background on first entry.
+- Role dashboards reuse five-minute session data while fresh API data reloads.

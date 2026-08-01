@@ -19,16 +19,23 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DashboardContentSkeleton } from "@/components/ui/dashboard-content-skeleton";
 import { Label, Textarea } from "@/components/ui/input";
 import { api } from "@/lib/api";
 import { getStoredToken, getStoredUser } from "@/lib/auth-session";
 import { getErrorMessage } from "@/lib/errors";
 import { formatCurrency } from "@/lib/format";
+import { getDashboardCache, setDashboardCache } from "@/lib/dashboard-cache";
 import type { Payment, PaymentStatus, RentalRequest, RentalStatus, Review, User } from "@/types/rentnest";
 
 type AuthSnapshot = {
   token: string | null;
   user: User | null;
+};
+
+type TenantDashboardCache = {
+  requests: RentalRequest[];
+  payments: Payment[];
 };
 
 const statusTone: Record<RentalStatus, "slate" | "emerald" | "blue" | "amber" | "red" | "purple"> = {
@@ -383,18 +390,27 @@ export function TenantRentalsDashboard() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const cacheKey = user ? `tenant:${user.id}` : null;
 
   useEffect(() => {
     let isActive = true;
 
-    if (!token) {
+    if (!token || !cacheKey) {
       return () => {
         isActive = false;
       };
     }
+    const dashboardCacheKey = cacheKey ?? "";
 
     const loadRequests = async () => {
-      setIsLoading(true);
+      const cached = getDashboardCache<TenantDashboardCache>(dashboardCacheKey);
+
+      if (cached) {
+        setRequests(cached.requests);
+        setPayments(cached.payments);
+      }
+
+      setIsLoading(!cached);
       setError("");
 
       try {
@@ -406,9 +422,13 @@ export function TenantRentalsDashboard() {
         if (isActive) {
           setRequests(rentalData);
           setPayments(paymentData);
+          setDashboardCache(dashboardCacheKey, {
+            requests: rentalData,
+            payments: paymentData,
+          });
         }
       } catch (fetchError) {
-        if (isActive) {
+        if (isActive && !cached) {
           setError(getErrorMessage(fetchError));
         }
       } finally {
@@ -423,7 +443,7 @@ export function TenantRentalsDashboard() {
     return () => {
       isActive = false;
     };
-  }, [token]);
+  }, [cacheKey, token]);
 
   const visibleRequests = useMemo(() => (token ? requests : []), [requests, token]);
   const visiblePayments = useMemo(() => (token ? payments : []), [payments, token]);
@@ -504,10 +524,7 @@ export function TenantRentalsDashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex min-h-40 items-center justify-center gap-2 text-sm font-semibold text-slate-600">
-                <Loader2 className="animate-spin" size={18} aria-hidden="true" />
-                Loading rental requests
-              </div>
+              <DashboardContentSkeleton label="Loading rental requests" />
             ) : null}
 
             {!isLoading && error ? (
@@ -558,10 +575,7 @@ export function TenantRentalsDashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex min-h-32 items-center justify-center gap-2 text-sm font-semibold text-slate-600">
-                <Loader2 className="animate-spin" size={18} aria-hidden="true" />
-                Loading payments
-              </div>
+              <DashboardContentSkeleton label="Loading payments" />
             ) : null}
 
             {!isLoading && !error && visiblePayments.length === 0 ? (

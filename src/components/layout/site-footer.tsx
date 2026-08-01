@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, Building } from "lucide-react";
 
 const footerLinks = [
+  { href: "/home", label: "Home" },
   { href: "/properties", label: "Browse properties" },
   { href: "/auth/login", label: "Login" },
   { href: "/auth/register", label: "Register" },

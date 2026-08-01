@@ -59,7 +59,8 @@ npm run build
 ## Routes
 
 ```text
-/                         Public home page with featured listings
+/                         Static marketing landing page
+/home                     Cached property-focused application home
 /properties               Public property browse and filters
 /properties/[id]          Property details, gallery, reviews, rental request
 /auth/login               Login with demo account shortcuts
@@ -114,6 +115,8 @@ Shared UX:
 - Route-level loading skeletons.
 - Route-level error fallback.
 - Toast-style success and failure feedback for dashboard actions.
+- Background API warmup to reduce Render cold-start delays.
+- Five-minute session cache for instant dashboard revisits with background refresh.
 
 ## API Integration
 

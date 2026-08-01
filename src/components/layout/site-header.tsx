@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 import type { User } from "@/types/rentnest";
 
 const publicNavLinks = [
-  { href: "/", label: "Home" },
+  { href: "/home", label: "Home" },
   { href: "/properties", label: "Properties", icon: Search },
 ];
 
@@ -121,8 +121,7 @@ export function SiteHeader() {
         <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
           {navLinks.map((item) => {
             const Icon = item.icon;
-            const isActive =
-              item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            const isActive = pathname.startsWith(item.href);
 
             return (
               <Link

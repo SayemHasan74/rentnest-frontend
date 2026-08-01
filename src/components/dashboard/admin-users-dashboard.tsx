@@ -22,10 +22,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input, Label } from "@/components/ui/input";
 import { Toast } from "@/components/ui/toast";
+import { DashboardContentSkeleton } from "@/components/ui/dashboard-content-skeleton";
 import { api } from "@/lib/api";
 import { getStoredToken, getStoredUser } from "@/lib/auth-session";
 import { getErrorMessage } from "@/lib/errors";
 import { formatCurrency } from "@/lib/format";
+import { getDashboardCache, setDashboardCache } from "@/lib/dashboard-cache";
 import type {
   AdminUserQuery,
   Category,
@@ -43,6 +45,13 @@ import type {
 type AuthSnapshot = {
   token: string | null;
   user: User | null;
+};
+
+type AdminDashboardCache = {
+  users: User[];
+  properties: Property[];
+  rentals: RentalRequest[];
+  categories: Category[];
 };
 
 type UserFilters = {
@@ -532,9 +541,10 @@ export function AdminUsersDashboard() {
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
   const [userPage, setUserPage] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
+  const cacheKey = user ? `admin:${user.id}` : null;
 
   const loadUsers = async (query: AdminUserQuery = toQuery(filters)) => {
-    if (!token) {
+    if (!token || !cacheKey) {
       return;
     }
 
@@ -560,9 +570,20 @@ export function AdminUsersDashboard() {
         isActive = false;
       };
     }
+    const dashboardCacheKey = cacheKey ?? "";
 
     const loadInitialUsers = async () => {
-      setIsLoading(true);
+      const cached = getDashboardCache<AdminDashboardCache>(dashboardCacheKey);
+
+      if (cached) {
+        setUsers(cached.users);
+        setTotalUsers(cached.users.length);
+        setProperties(cached.properties);
+        setRentals(cached.rentals);
+        setCategories(cached.categories);
+      }
+
+      setIsLoading(!cached);
       setError("");
 
       try {
@@ -579,9 +600,15 @@ export function AdminUsersDashboard() {
           setProperties(propertyData);
           setRentals(rentalData);
           setCategories(categoryData);
+          setDashboardCache(dashboardCacheKey, {
+            users: userData,
+            properties: propertyData,
+            rentals: rentalData,
+            categories: categoryData,
+          });
         }
       } catch (fetchError) {
-        if (isActive) {
+        if (isActive && !cached) {
           setError(getErrorMessage(fetchError));
         }
       } finally {
@@ -596,7 +623,7 @@ export function AdminUsersDashboard() {
     return () => {
       isActive = false;
     };
-  }, [token]);
+  }, [cacheKey, token]);
 
   const visibleUsers = useMemo(() => (token ? users : []), [token, users]);
   const visibleProperties = useMemo(
@@ -879,10 +906,7 @@ export function AdminUsersDashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex min-h-40 items-center justify-center gap-2 text-sm font-semibold text-slate-600">
-                <Loader2 className="animate-spin" size={18} aria-hidden="true" />
-                Loading users
-              </div>
+              <DashboardContentSkeleton label="Loading users" />
             ) : null}
 
             {!isLoading && error ? (
@@ -955,10 +979,7 @@ export function AdminUsersDashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex min-h-40 items-center justify-center gap-2 text-sm font-semibold text-slate-600">
-                <Loader2 className="animate-spin" size={18} aria-hidden="true" />
-                Loading categories
-              </div>
+              <DashboardContentSkeleton label="Loading categories" />
             ) : null}
 
             {!isLoading && error ? (
@@ -1018,10 +1039,7 @@ export function AdminUsersDashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex min-h-40 items-center justify-center gap-2 text-sm font-semibold text-slate-600">
-                <Loader2 className="animate-spin" size={18} aria-hidden="true" />
-                Loading properties
-              </div>
+              <DashboardContentSkeleton label="Loading properties" />
             ) : null}
 
             {!isLoading && !error && visibleProperties.length === 0 ? (
@@ -1052,10 +1070,7 @@ export function AdminUsersDashboard() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="flex min-h-40 items-center justify-center gap-2 text-sm font-semibold text-slate-600">
-                <Loader2 className="animate-spin" size={18} aria-hidden="true" />
-                Loading rentals
-              </div>
+              <DashboardContentSkeleton label="Loading rentals" />
             ) : null}
 
             {!isLoading && !error && visibleRentals.length === 0 ? (
