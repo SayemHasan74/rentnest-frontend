@@ -74,16 +74,26 @@ export async function apiRequest<T>(
   path: string,
   { token, body, headers, query, ...init }: RequestOptions = {},
 ): Promise<T> {
-  const response = await fetch(buildUrl(path, query), {
-    ...init,
-    headers: {
-      Accept: "application/json",
-      ...(body === undefined ? {} : { "Content-Type": "application/json" }),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(buildUrl(path, query), {
+      ...init,
+      headers: {
+        Accept: "application/json",
+        ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch {
+    throw new ApiError(503, {
+      success: false,
+      message: "Could not reach RentNest. Check your connection and try again.",
+      errorDetails: null,
+    });
+  }
 
   const payload: unknown = await response.json().catch(() => ({
     success: false,

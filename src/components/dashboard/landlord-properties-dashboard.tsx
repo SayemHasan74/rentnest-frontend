@@ -70,7 +70,7 @@ const rentalStatusTone: Record<RentalStatus, "slate" | "emerald" | "blue" | "amb
   APPROVED: "blue",
   REJECTED: "red",
   ACTIVE: "emerald",
-  COMPLETED: "purple",
+  COMPLETED: "slate",
   CANCELLED: "slate",
 };
 
@@ -876,8 +876,8 @@ export function LandlordPropertiesDashboard() {
     const available = visibleProperties.filter(
       (property) => property.status === "AVAILABLE",
     ).length;
-    const pendingRequests = visibleRequests.filter(
-      (request) => request.status === "PENDING",
+    const activeRequests = visibleRequests.filter(
+      (request) => request.status === "ACTIVE",
     ).length;
     const earnings = visibleRequests.reduce(
       (total, request) =>
@@ -892,7 +892,7 @@ export function LandlordPropertiesDashboard() {
     return [
       { label: "Total listings", value: visibleProperties.length },
       { label: "Available", value: available },
-      { label: "Pending requests", value: pendingRequests },
+      { label: "Active requests", value: activeRequests },
       { label: "Earnings", value: formatCurrency(earnings) },
     ];
   }, [visibleProperties, visibleRequests]);
@@ -1027,6 +1027,15 @@ export function LandlordPropertiesDashboard() {
     setUpdatingRequestId(requestId);
     setActionError("");
     setActionMessage("");
+    const previousRequest = requests.find((request) => request.id === requestId);
+
+    if (!previousRequest) {
+      setUpdatingRequestId(null);
+      setActionError("Rental request could not be found.");
+      return;
+    }
+
+    replaceRequest({ ...previousRequest, status: "APPROVED" });
 
     try {
       const updatedRequest = await api.landlord.updateRequest(token, requestId, {
@@ -1036,6 +1045,7 @@ export function LandlordPropertiesDashboard() {
       replaceRequest(updatedRequest);
       setActionMessage("Rental request approved.");
     } catch (updateError) {
+      replaceRequest(previousRequest);
       setActionError(getErrorMessage(updateError));
     } finally {
       setUpdatingRequestId(null);
@@ -1051,6 +1061,15 @@ export function LandlordPropertiesDashboard() {
     setUpdatingRequestId(requestId);
     setActionError("");
     setActionMessage("");
+    const previousRequest = requests.find((request) => request.id === requestId);
+
+    if (!previousRequest) {
+      setUpdatingRequestId(null);
+      setActionError("Rental request could not be found.");
+      return;
+    }
+
+    replaceRequest({ ...previousRequest, status: "REJECTED", rejectionReason });
 
     try {
       const updatedRequest = await api.landlord.updateRequest(token, requestId, {
@@ -1061,6 +1080,7 @@ export function LandlordPropertiesDashboard() {
       replaceRequest(updatedRequest);
       setActionMessage("Rental request rejected.");
     } catch (updateError) {
+      replaceRequest(previousRequest);
       setActionError(getErrorMessage(updateError));
     } finally {
       setUpdatingRequestId(null);

@@ -92,17 +92,18 @@ Tenant:
 
 Landlord:
 - View owned properties.
+- View active requests and payment earnings at a glance.
 - Add new property listings.
 - Edit existing property listings.
 - Delete eligible property listings.
 - Toggle property availability.
 - Review rental requests.
-- Approve or reject pending requests.
+- Approve or reject pending requests with optimistic UI updates.
 - Complete active paid rentals.
 - View earnings from completed payments.
 
 Admin:
-- View and filter users by role, status, and search.
+- View and filter users in a responsive data table by role, status, and search.
 - Paginate user management results.
 - Ban or activate user accounts.
 - Monitor all properties.

@@ -36,7 +36,7 @@ const statusTone: Record<RentalStatus, "slate" | "emerald" | "blue" | "amber" | 
   APPROVED: "blue",
   REJECTED: "red",
   ACTIVE: "emerald",
-  COMPLETED: "purple",
+  COMPLETED: "slate",
   CANCELLED: "slate",
 };
 

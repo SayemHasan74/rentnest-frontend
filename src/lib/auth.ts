@@ -111,9 +111,13 @@ export const getSafePostLoginPath = (role: UserRole, from: string | null) => {
     return dashboardPath;
   }
 
-  return from === dashboardPath || from.startsWith(`${dashboardPath}/`)
-    ? from
-    : dashboardPath;
+  if (from.startsWith("/dashboard")) {
+    return from === dashboardPath || from.startsWith(`${dashboardPath}/`)
+      ? from
+      : dashboardPath;
+  }
+
+  return from === "/" || from.startsWith("/properties") ? from : dashboardPath;
 };
 
 export const canAccessRole = (userRole: UserRole | null, allowedRoles: UserRole[]) =>

@@ -77,7 +77,7 @@ const rentalStatusTone: Record<RentalStatus, "slate" | "emerald" | "blue" | "amb
   APPROVED: "blue",
   REJECTED: "red",
   ACTIVE: "emerald",
-  COMPLETED: "purple",
+  COMPLETED: "slate",
   CANCELLED: "slate",
 };
 
@@ -132,78 +132,84 @@ function UserStatusBadge({ status }: { status: UserStatus }) {
   );
 }
 
-function AdminUserCard({
+function AdminUsersTable({
   currentAdminId,
   onUpdateStatus,
   updatingUserId,
-  user,
+  users,
 }: {
   currentAdminId: string | null;
   onUpdateStatus: (user: User) => void;
   updatingUserId: string | null;
-  user: User;
+  users: User[];
 }) {
-  const nextStatus: UserStatus = user.status === "ACTIVE" ? "BANNED" : "ACTIVE";
-  const isSelf = currentAdminId === user.id;
-  const isUpdating = updatingUserId === user.id;
-
   return (
-    <article className="rounded-md border border-slate-200 p-4">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge tone={roleTone[user.role]}>{user.role}</Badge>
-            <UserStatusBadge status={user.status} />
-            {isSelf ? <Badge tone="slate">Current admin</Badge> : null}
-          </div>
-          <h2 className="mt-3 text-lg font-semibold text-slate-950">{user.name}</h2>
-          <p className="mt-1 text-sm text-slate-600">{user.email}</p>
-        </div>
-        <Button
-          disabled={isSelf || isUpdating}
-          onClick={() => onUpdateStatus(user)}
-          size="sm"
-          type="button"
-          variant={nextStatus === "ACTIVE" ? "primary" : "outline"}
-        >
-          {isUpdating ? (
-            <Loader2 className="animate-spin" size={15} aria-hidden="true" />
-          ) : nextStatus === "ACTIVE" ? (
-            <Shield size={15} aria-hidden="true" />
-          ) : (
-            <ShieldOff size={15} aria-hidden="true" />
-          )}
-          Mark {nextStatus.toLowerCase()}
-        </Button>
-      </div>
+    <div className="overflow-x-auto border border-slate-200">
+      <table className="w-full min-w-[58rem] border-collapse text-left text-sm">
+        <thead className="bg-slate-100 text-xs uppercase text-slate-600">
+          <tr>
+            <th className="px-4 py-3 font-semibold" scope="col">User</th>
+            <th className="px-4 py-3 font-semibold" scope="col">Role</th>
+            <th className="px-4 py-3 font-semibold" scope="col">Status</th>
+            <th className="px-4 py-3 font-semibold" scope="col">Phone</th>
+            <th className="px-4 py-3 font-semibold" scope="col">Joined</th>
+            <th className="px-4 py-3 text-right font-semibold" scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-200 bg-white">
+          {users.map((user) => {
+            const nextStatus: UserStatus = user.status === "ACTIVE" ? "BANNED" : "ACTIVE";
+            const isSelf = currentAdminId === user.id;
+            const isUpdating = updatingUserId === user.id;
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
-          <p className="text-xs font-medium uppercase text-slate-500">Phone</p>
-          <p className="mt-1 font-semibold text-slate-950">
-            {user.phone || "Not provided"}
-          </p>
-        </div>
-        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
-          <p className="text-xs font-medium uppercase text-slate-500">Address</p>
-          <p className="mt-1 font-semibold text-slate-950">
-            {user.address || "Not provided"}
-          </p>
-        </div>
-        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
-          <p className="text-xs font-medium uppercase text-slate-500">Joined</p>
-          <p className="mt-1 font-semibold text-slate-950">
-            {formatDate(user.createdAt)}
-          </p>
-        </div>
-        <div className="rounded-md bg-slate-50 p-3 ring-1 ring-slate-200">
-          <p className="text-xs font-medium uppercase text-slate-500">Updated</p>
-          <p className="mt-1 font-semibold text-slate-950">
-            {formatDate(user.updatedAt)}
-          </p>
-        </div>
-      </div>
-    </article>
+            return (
+              <tr key={user.id}>
+                <td className="px-4 py-4 align-top">
+                  <p className="font-semibold text-slate-950">{user.name}</p>
+                  <p className="mt-1 text-slate-600">{user.email}</p>
+                  <p className="mt-1 max-w-64 text-xs text-slate-500">
+                    {user.address || "Address not provided"}
+                  </p>
+                </td>
+                <td className="px-4 py-4 align-top">
+                  <Badge tone={roleTone[user.role]}>{user.role}</Badge>
+                </td>
+                <td className="px-4 py-4 align-top">
+                  <div className="flex flex-wrap gap-2">
+                    <UserStatusBadge status={user.status} />
+                    {isSelf ? <Badge tone="slate">Current admin</Badge> : null}
+                  </div>
+                </td>
+                <td className="px-4 py-4 align-top text-slate-700">
+                  {user.phone || "Not provided"}
+                </td>
+                <td className="px-4 py-4 align-top text-slate-700">
+                  {formatDate(user.createdAt)}
+                </td>
+                <td className="px-4 py-4 text-right align-top">
+                  <Button
+                    disabled={isSelf || isUpdating}
+                    onClick={() => onUpdateStatus(user)}
+                    size="sm"
+                    type="button"
+                    variant={nextStatus === "ACTIVE" ? "primary" : "outline"}
+                  >
+                    {isUpdating ? (
+                      <Loader2 className="animate-spin" size={15} aria-hidden="true" />
+                    ) : nextStatus === "ACTIVE" ? (
+                      <Shield size={15} aria-hidden="true" />
+                    ) : (
+                      <ShieldOff size={15} aria-hidden="true" />
+                    )}
+                    {nextStatus === "ACTIVE" ? "Unban" : "Ban"}
+                  </Button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -525,6 +531,7 @@ export function AdminUsersDashboard() {
   const [updatingCategoryId, setUpdatingCategoryId] = useState<string | null>(null);
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
   const [userPage, setUserPage] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
 
   const loadUsers = async (query: AdminUserQuery = toQuery(filters)) => {
     if (!token) {
@@ -568,6 +575,7 @@ export function AdminUsersDashboard() {
 
         if (isActive) {
           setUsers(userData);
+          setTotalUsers(userData.length);
           setProperties(propertyData);
           setRentals(rentalData);
           setCategories(categoryData);
@@ -607,12 +615,12 @@ export function AdminUsersDashboard() {
     ).length;
 
     return [
-      { label: "Total users", value: visibleUsers.length },
+      { label: "Total users", value: totalUsers },
       { label: "Properties", value: visibleProperties.length },
       { label: "Pending requests", value: pendingRequests },
       { label: "Categories", value: visibleCategories.length },
     ];
-  }, [visibleCategories, visibleProperties, visibleRentals, visibleUsers]);
+  }, [totalUsers, visibleCategories, visibleProperties, visibleRentals]);
 
   const usersPerPage = 8;
   const userTotalPages = Math.max(1, Math.ceil(visibleUsers.length / usersPerPage));
@@ -905,17 +913,12 @@ export function AdminUsersDashboard() {
 
             {!isLoading && !error && visibleUsers.length > 0 ? (
               <>
-                <div className="grid gap-4">
-                  {paginatedUsers.map((item) => (
-                    <AdminUserCard
-                      currentAdminId={user?.id ?? null}
-                      key={item.id}
-                      onUpdateStatus={handleUpdateStatus}
-                      updatingUserId={updatingUserId}
-                      user={item}
-                    />
-                  ))}
-                </div>
+                <AdminUsersTable
+                  currentAdminId={user?.id ?? null}
+                  onUpdateStatus={handleUpdateStatus}
+                  updatingUserId={updatingUserId}
+                  users={paginatedUsers}
+                />
                 <div className="mt-5 flex flex-col justify-between gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center">
                   <p className="text-sm text-slate-600">
                     Page {userPage} of {userTotalPages}
