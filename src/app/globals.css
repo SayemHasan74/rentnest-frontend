@@ -93,6 +93,26 @@ select {
   border: 3px solid #e9e7e1;
 }
 
+@keyframes home-ticker-left-to-right {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.home-ticker-track {
+  animation: home-ticker-left-to-right 30s linear infinite;
+  will-change: transform;
+}
+
+.home-ticker:hover .home-ticker-track,
+.home-ticker:focus-within .home-ticker-track {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

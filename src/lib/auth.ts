@@ -114,6 +114,34 @@ export const getPaymentResultAction = (user: User | null) => {
   };
 };
 
+export const getHomeRoleAction = (user: User | null) => {
+  if (user?.role === "LANDLORD") {
+    return {
+      href: "/dashboard/landlord#add-property",
+      label: "List a property",
+    };
+  }
+
+  if (user?.role === "TENANT") {
+    return {
+      href: "/dashboard/tenant#my-requests",
+      label: "View my requests",
+    };
+  }
+
+  if (user?.role === "ADMIN") {
+    return {
+      href: "/dashboard/admin",
+      label: "Open moderation",
+    };
+  }
+
+  return {
+    href: "/auth/register",
+    label: "List your property",
+  };
+};
+
 export const getSafePostLoginPath = (role: UserRole, from: string | null) => {
   const dashboardPath = getRoleDashboardPath(role);
 

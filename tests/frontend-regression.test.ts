@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
+  getHomeRoleAction,
   getPaymentResultAction,
   getSafePostLoginPath,
 } from "../src/lib/auth";
@@ -87,5 +88,25 @@ test("payment result dashboard action follows the active session", () => {
   assert.equal(
     getPaymentResultAction(userWithRole("TENANT")).href,
     "/dashboard/tenant",
+  );
+});
+
+test("homepage actions are appropriate for each role", () => {
+  assert.equal(getHomeRoleAction(null).href, "/auth/register");
+  assert.equal(
+    getHomeRoleAction(userWithRole("LANDLORD")).href,
+    "/dashboard/landlord#add-property",
+  );
+  assert.equal(
+    getHomeRoleAction(userWithRole("TENANT")).href,
+    "/dashboard/tenant#my-requests",
+  );
+  assert.equal(
+    getHomeRoleAction(userWithRole("ADMIN")).href,
+    "/dashboard/admin",
+  );
+  assert.notEqual(
+    getHomeRoleAction(userWithRole("TENANT")).label,
+    "List a property",
   );
 });
