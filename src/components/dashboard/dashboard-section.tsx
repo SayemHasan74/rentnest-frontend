@@ -49,7 +49,7 @@ export function DashboardSection({
 
   return (
     <section
-      className={cn("scroll-mt-24 border", classes.section)}
+      className={cn("min-w-0 scroll-mt-24 border", classes.section)}
       id={id}
     >
       <header
@@ -78,7 +78,7 @@ export function DashboardSection({
           </p>
         </div>
       </header>
-      <div className="p-5 sm:p-6">{children}</div>
+      <div className="min-w-0 p-5 sm:p-6">{children}</div>
     </section>
   );
 }
