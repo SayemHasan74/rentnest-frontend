@@ -110,3 +110,13 @@ test("homepage actions are appropriate for each role", () => {
     "List a property",
   );
 });
+
+test("homepage ticker moves from right to left", () => {
+  const styles = readFileSync("src/app/globals.css", "utf8");
+
+  assert.match(styles, /@keyframes home-ticker-right-to-left/);
+  assert.match(
+    styles,
+    /from\s*\{\s*transform: translateX\(0\);[\s\S]*to\s*\{\s*transform: translateX\(-50%\);/,
+  );
+});

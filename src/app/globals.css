@@ -93,18 +93,18 @@ select {
   border: 3px solid #e9e7e1;
 }
 
-@keyframes home-ticker-left-to-right {
+@keyframes home-ticker-right-to-left {
   from {
-    transform: translateX(-50%);
+    transform: translateX(0);
   }
 
   to {
-    transform: translateX(0);
+    transform: translateX(-50%);
   }
 }
 
 .home-ticker-track {
-  animation: home-ticker-left-to-right 30s linear infinite;
+  animation: home-ticker-right-to-left 30s linear infinite;
   will-change: transform;
 }
 

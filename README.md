@@ -5,22 +5,18 @@ Tenants can browse properties, submit rental requests, pay after landlord
 approval, and leave reviews. Landlords can manage property listings and rental
 requests. Admins can manage users, listings, rentals, and categories.
 
-## Live Application
+## Submission Details
 
-```text
-https://rentnest-frontend-eosin.vercel.app
-```
+| Item | Value |
+| --- | --- |
+| Live application | https://rentnest-frontend-eosin.vercel.app |
+| Frontend repository | https://github.com/SayemHasan74/rentnest-frontend |
+| Backend repository | https://github.com/SayemHasan74/rentnest-server |
+| Backend API | https://rentnest-server.onrender.com/api |
+| Admin email | `admin@rentnest.com` |
+| Admin password | `admin123` |
 
-## Repositories
-
-- Frontend: https://github.com/SayemHasan74/rentnest-frontend
-- Backend: https://github.com/SayemHasan74/rentnest-server
-
-## Live Backend
-
-```text
-https://rentnest-server.onrender.com/api
-```
+The video explanation link is submitted separately through the assignment form.
 
 ## Tech Stack
 
