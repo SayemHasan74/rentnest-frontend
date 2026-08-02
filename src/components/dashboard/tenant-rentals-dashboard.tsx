@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { DashboardSection } from "@/components/dashboard/dashboard-section";
 import { DashboardContentSkeleton } from "@/components/ui/dashboard-content-skeleton";
 import { Label, Textarea } from "@/components/ui/input";
 import { Toast } from "@/components/ui/toast";
@@ -455,6 +456,33 @@ export function TenantRentalsDashboard() {
 
   const visibleRequests = useMemo(() => (token ? requests : []), [requests, token]);
   const visiblePayments = useMemo(() => (token ? payments : []), [payments, token]);
+  const requestGroups = useMemo(
+    () => [
+      {
+        description: "Pending decisions and approved requests ready for payment.",
+        items: visibleRequests.filter((request) =>
+          request.status === "PENDING" || request.status === "APPROVED",
+        ),
+        title: "Needs attention",
+        tone: "border-amber-400 bg-amber-50/50",
+      },
+      {
+        description: "Properties you are currently renting.",
+        items: visibleRequests.filter((request) => request.status === "ACTIVE"),
+        title: "Current rentals",
+        tone: "border-emerald-500 bg-emerald-50/50",
+      },
+      {
+        description: "Completed, rejected, and cancelled rental records.",
+        items: visibleRequests.filter((request) =>
+          ["COMPLETED", "REJECTED", "CANCELLED"].includes(request.status),
+        ),
+        title: "Rental history",
+        tone: "border-slate-500 bg-white",
+      },
+    ],
+    [visibleRequests],
+  );
   const paymentsByRequestId = useMemo(() => {
     const grouped = new Map<string, Payment[]>();
 
@@ -534,11 +562,33 @@ export function TenantRentalsDashboard() {
           ))}
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>My rental requests</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <nav
+          aria-label="Tenant dashboard sections"
+          className="grid border border-slate-300 bg-white sm:grid-cols-2"
+        >
+          {[
+            { href: "#my-requests", label: "My rental requests", number: "01" },
+            { href: "#payment-history", label: "Payment history", number: "02" },
+          ].map((item) => (
+            <a
+              className="flex min-h-14 items-center gap-3 border-b border-slate-300 px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:text-white last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0"
+              href={item.href}
+              key={item.href}
+            >
+              <span className="text-xs text-slate-500">{item.number}</span>
+              {item.label}
+            </a>
+          ))}
+        </nav>
+
+        <DashboardSection
+          description={`${visibleRequests.length} request${visibleRequests.length === 1 ? "" : "s"}. Follow approval, payment, rental, and review status in one place.`}
+          icon={Home}
+          id="my-requests"
+          index="01"
+          title="My rental requests"
+          tone="light"
+        >
             {isLoading ? (
               <DashboardContentSkeleton label="Loading rental requests" />
             ) : null}
@@ -570,26 +620,49 @@ export function TenantRentalsDashboard() {
             ) : null}
 
             {!isLoading && !error && visibleRequests.length > 0 ? (
-              <div className="grid gap-4">
-                {visibleRequests.map((request) => (
-                  <RentalRequestItem
-                    key={request.id}
-                    onReviewCreated={handleReviewCreated}
-                    payments={paymentsByRequestId.get(request.id) ?? []}
-                    request={request}
-                    token={token}
-                  />
-                ))}
+              <div className="grid gap-8">
+                {requestGroups.map((group) =>
+                  group.items.length > 0 ? (
+                    <section key={group.title}>
+                      <div className={`mb-4 border-l-4 p-4 ${group.tone}`}>
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <div>
+                            <h3 className="text-base font-semibold text-slate-950">
+                              {group.title}
+                            </h3>
+                            <p className="mt-1 text-sm text-slate-600">
+                              {group.description}
+                            </p>
+                          </div>
+                          <Badge tone="slate">{group.items.length}</Badge>
+                        </div>
+                      </div>
+                      <div className="grid gap-4">
+                        {group.items.map((request) => (
+                          <RentalRequestItem
+                            key={request.id}
+                            onReviewCreated={handleReviewCreated}
+                            payments={paymentsByRequestId.get(request.id) ?? []}
+                            request={request}
+                            token={token}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  ) : null,
+                )}
               </div>
             ) : null}
-          </CardContent>
-        </Card>
+        </DashboardSection>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Payment history</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <DashboardSection
+          description={`${visiblePayments.length} payment record${visiblePayments.length === 1 ? "" : "s"}. Review amount, provider, status, and payment date.`}
+          icon={ReceiptText}
+          id="payment-history"
+          index="02"
+          title="Payment history"
+          tone="muted"
+        >
             {isLoading ? (
               <DashboardContentSkeleton label="Loading payments" />
             ) : null}
@@ -640,8 +713,7 @@ export function TenantRentalsDashboard() {
                 </table>
               </div>
             ) : null}
-          </CardContent>
-        </Card>
+        </DashboardSection>
       </section>
     </main>
   );

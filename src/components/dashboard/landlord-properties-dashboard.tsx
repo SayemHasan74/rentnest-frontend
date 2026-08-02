@@ -21,7 +21,8 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { DashboardSection } from "@/components/dashboard/dashboard-section";
 import { Input, Label, Textarea } from "@/components/ui/input";
 import { Toast } from "@/components/ui/toast";
 import { DashboardContentSkeleton } from "@/components/ui/dashboard-content-skeleton";
@@ -900,6 +901,33 @@ export function LandlordPropertiesDashboard() {
     () => (token ? requests : []),
     [requests, token],
   );
+  const requestGroups = useMemo(
+    () => [
+      {
+        description: "New requests waiting for your approval or rejection.",
+        items: visibleRequests.filter((request) => request.status === "PENDING"),
+        title: "Needs decision",
+        tone: "border-amber-400 bg-amber-50/50",
+      },
+      {
+        description: "Approved requests and tenants currently renting your properties.",
+        items: visibleRequests.filter((request) =>
+          request.status === "APPROVED" || request.status === "ACTIVE",
+        ),
+        title: "Current rentals",
+        tone: "border-emerald-500 bg-emerald-50/50",
+      },
+      {
+        description: "Completed, rejected, and cancelled request records.",
+        items: visibleRequests.filter((request) =>
+          ["COMPLETED", "REJECTED", "CANCELLED"].includes(request.status),
+        ),
+        title: "Request history",
+        tone: "border-slate-500 bg-white",
+      },
+    ],
+    [visibleRequests],
+  );
 
   const stats = useMemo(() => {
     const available = visibleProperties.filter(
@@ -1179,11 +1207,34 @@ export function LandlordPropertiesDashboard() {
           ))}
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Add property</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <nav
+          aria-label="Landlord dashboard sections"
+          className="grid border border-slate-300 bg-white sm:grid-cols-3"
+        >
+          {[
+            { href: "#add-property", label: "Add property", number: "01" },
+            { href: "#my-properties", label: "My properties", number: "02" },
+            { href: "#rental-requests", label: "Rental requests", number: "03" },
+          ].map((item) => (
+            <a
+              className="flex min-h-14 items-center gap-3 border-b border-slate-300 px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:text-white last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0"
+              href={item.href}
+              key={item.href}
+            >
+              <span className="text-xs text-slate-500">{item.number}</span>
+              {item.label}
+            </a>
+          ))}
+        </nav>
+
+        <DashboardSection
+          description="Publish a new rental with pricing, amenities, category, and image URLs."
+          icon={PlusCircle}
+          id="add-property"
+          index="01"
+          title="Create a listing"
+          tone="dark"
+        >
             {!isLoading && actionError ? (
               <div className="mb-4 flex gap-3 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                 <AlertCircle className="mt-0.5 shrink-0" size={17} aria-hidden="true" />
@@ -1203,14 +1254,16 @@ export function LandlordPropertiesDashboard() {
               isSubmitting={isCreatingProperty}
               onSubmitProperty={handleCreateProperty}
             />
-          </CardContent>
-        </Card>
+        </DashboardSection>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>My properties</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <DashboardSection
+          description={`${visibleProperties.length} listing${visibleProperties.length === 1 ? "" : "s"}. Edit details, change availability, or remove a property.`}
+          icon={Building2}
+          id="my-properties"
+          index="02"
+          title="My properties"
+          tone="light"
+        >
             {isLoading ? (
               <DashboardContentSkeleton label="Loading properties" />
             ) : null}
@@ -1259,14 +1312,16 @@ export function LandlordPropertiesDashboard() {
                 ))}
               </div>
             ) : null}
-          </CardContent>
-        </Card>
+        </DashboardSection>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Rental requests</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <DashboardSection
+          description={`${visibleRequests.length} request${visibleRequests.length === 1 ? "" : "s"}. Review tenant details, payment state, and rental progress.`}
+          icon={ClipboardList}
+          id="rental-requests"
+          index="03"
+          title="Rental requests"
+          tone="muted"
+        >
             {isLoading ? (
               <DashboardContentSkeleton label="Loading rental requests" />
             ) : null}
@@ -1284,22 +1339,42 @@ export function LandlordPropertiesDashboard() {
             ) : null}
 
             {!isLoading && !error && visibleRequests.length > 0 ? (
-              <div className="grid gap-4">
-                {visibleRequests.map((request) => (
-                  <LandlordRequestCard
-                    completingRequestId={completingRequestId}
-                    key={request.id}
-                    onApprove={handleApproveRequest}
-                    onComplete={handleCompleteRequest}
-                    onReject={handleRejectRequest}
-                    request={request}
-                    updatingRequestId={updatingRequestId}
-                  />
-                ))}
+              <div className="grid gap-8">
+                {requestGroups.map((group) =>
+                  group.items.length > 0 ? (
+                    <section key={group.title}>
+                      <div className={`mb-4 border-l-4 p-4 ${group.tone}`}>
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <div>
+                            <h3 className="text-base font-semibold text-slate-950">
+                              {group.title}
+                            </h3>
+                            <p className="mt-1 text-sm text-slate-600">
+                              {group.description}
+                            </p>
+                          </div>
+                          <Badge tone="slate">{group.items.length}</Badge>
+                        </div>
+                      </div>
+                      <div className="grid gap-4">
+                        {group.items.map((request) => (
+                          <LandlordRequestCard
+                            completingRequestId={completingRequestId}
+                            key={request.id}
+                            onApprove={handleApproveRequest}
+                            onComplete={handleCompleteRequest}
+                            onReject={handleRejectRequest}
+                            request={request}
+                            updatingRequestId={updatingRequestId}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  ) : null,
+                )}
               </div>
             ) : null}
-          </CardContent>
-        </Card>
+        </DashboardSection>
       </section>
     </main>
   );

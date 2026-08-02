@@ -1,8 +1,14 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { getSafePostLoginPath } from "../src/lib/auth";
+import {
+  getPaymentResultAction,
+  getSafePostLoginPath,
+} from "../src/lib/auth";
 import { formatCurrency } from "../src/lib/format";
+import type { User } from "../src/types/rentnest";
+
+const userWithRole = (role: User["role"]) => ({ role }) as User;
 
 test("rent is displayed in Bangladeshi taka", () => {
   const formatted = formatCurrency(25_000);
@@ -67,4 +73,19 @@ test("payment result never renders the Stripe session identifier", () => {
   assert.doesNotMatch(paymentResult, /\{sessionId\}/);
   assert.match(paymentResult, /window\.history\.replaceState/);
   assert.match(paymentResult, /window\.location\.pathname/);
+});
+
+test("payment result dashboard action follows the active session", () => {
+  assert.equal(
+    getPaymentResultAction(null).href,
+    "/auth/login?from=%2Fdashboard%2Ftenant",
+  );
+  assert.equal(
+    getPaymentResultAction(userWithRole("LANDLORD")).href,
+    "/dashboard/landlord",
+  );
+  assert.equal(
+    getPaymentResultAction(userWithRole("TENANT")).href,
+    "/dashboard/tenant",
+  );
 });

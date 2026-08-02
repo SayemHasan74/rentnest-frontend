@@ -3,17 +3,36 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle2, Loader2, XCircle } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { buttonClasses } from "@/components/ui/button";
 import { api } from "@/lib/api";
-import { getStoredToken } from "@/lib/auth-session";
+import {
+  getPaymentResultAction,
+  AUTH_SESSION_EVENT,
+  getStoredToken,
+  getStoredUser,
+} from "@/lib/auth-session";
 import { getErrorMessage } from "@/lib/errors";
 import {
   clearCheckoutSessionId,
   getCheckoutSessionId,
 } from "@/lib/payment-session";
+import type { User } from "@/types/rentnest";
 
 type ResultState = "idle" | "verifying" | "confirmed" | "cancelled" | "error";
+
+const subscribeToAuthSession = (callback: () => void) => {
+  window.addEventListener(AUTH_SESSION_EVENT, callback);
+  window.addEventListener("storage", callback);
+
+  return () => {
+    window.removeEventListener(AUTH_SESSION_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
+};
+
+const getAuthUserSnapshot = () => JSON.stringify(getStoredUser());
+const getServerAuthUserSnapshot = () => "null";
 
 export function PaymentResult({ status }: { status: "success" | "cancel" }) {
   const searchParams = useSearchParams();
@@ -22,6 +41,14 @@ export function PaymentResult({ status }: { status: "success" | "cancel" }) {
   const hasStartedVerification = useRef(false);
   const [resultState, setResultState] = useState<ResultState>("idle");
   const [error, setError] = useState("");
+  const userSnapshot = useSyncExternalStore(
+    subscribeToAuthSession,
+    getAuthUserSnapshot,
+    getServerAuthUserSnapshot,
+  );
+  const dashboardAction = getPaymentResultAction(
+    JSON.parse(userSnapshot) as User | null,
+  );
 
   useEffect(() => {
     if (hasStartedVerification.current) {
@@ -112,8 +139,8 @@ export function PaymentResult({ status }: { status: "success" | "cancel" }) {
           {description}
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Link className={buttonClasses()} href="/dashboard/tenant">
-            Tenant dashboard
+          <Link className={buttonClasses()} href={dashboardAction.href}>
+            {dashboardAction.label}
           </Link>
           <Link className={buttonClasses({ variant: "outline" })} href="/properties">
             Browse properties

@@ -3,6 +3,7 @@ export {
   clearAuthSession,
   AUTH_SESSION_EVENT,
   getRoleDashboardPath,
+  getPaymentResultAction,
   getSafePostLoginPath,
   getStoredRole,
   getStoredToken,

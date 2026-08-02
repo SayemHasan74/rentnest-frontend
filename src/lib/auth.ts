@@ -100,6 +100,20 @@ export const getRoleDashboardPath = (role: UserRole) => {
   return dashboardPaths[role];
 };
 
+export const getPaymentResultAction = (user: User | null) => {
+  if (!user) {
+    return {
+      href: "/auth/login?from=%2Fdashboard%2Ftenant",
+      label: "Login to view dashboard",
+    };
+  }
+
+  return {
+    href: getRoleDashboardPath(user.role),
+    label: `${roleLabels[user.role]} dashboard`,
+  };
+};
+
 export const getSafePostLoginPath = (role: UserRole, from: string | null) => {
   const dashboardPath = getRoleDashboardPath(role);
 
