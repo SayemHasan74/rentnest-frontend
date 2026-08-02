@@ -22,12 +22,6 @@ type AuthMode = "login" | "register";
 
 type FieldErrors = Partial<Record<"name" | "email" | "password" | "role", string>>;
 
-const demoAccounts = [
-  { label: "Tenant", email: "tenant@rentnest.com", password: "tenant123" },
-  { label: "Landlord", email: "landlord@rentnest.com", password: "landlord123" },
-  { label: "Admin", email: "admin@rentnest.com", password: "admin123" },
-];
-
 const getInitialRegisterValues = (): RegisterPayload => ({
   name: "",
   email: "",
@@ -125,27 +119,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     }
   };
 
-  const handleDemoAccount = async (account: (typeof demoAccounts)[number]) => {
-    setValues((current) => ({
-      ...current,
-      email: account.email,
-      password: account.password,
-    }));
-    setFieldErrors({});
-    setFormError("");
-
-    if (!isRegister) {
-      setIsSubmitting(true);
-
-      try {
-        await loginAndRedirect(account.email, account.password);
-      } catch (error) {
-        setFormError(getErrorMessage(error));
-        setIsSubmitting(false);
-      }
-    }
-  };
-
   return (
     <div className="mx-auto w-full max-w-lg">
       <div className="border-t border-slate-950 bg-white px-0 py-8 sm:px-8">
@@ -159,7 +132,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           <p className="mt-3 text-sm leading-6 text-slate-600">
             {isRegister
               ? "Choose your role and create a tenant or landlord account."
-              : "Use your account credentials or one of the seeded demo accounts."}
+              : "Enter your account credentials to continue."}
           </p>
         </div>
 
@@ -276,28 +249,6 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             {isRegister ? "Create account" : "Login"}
           </Button>
         </form>
-
-        {!isRegister ? (
-          <div className="mt-5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Demo accounts
-            </p>
-            <div className="mt-3 grid gap-2">
-              {demoAccounts.map((account) => (
-                <button
-                  className="flex items-center justify-between border-b border-slate-300 px-1 py-3 text-left text-sm transition hover:bg-slate-50"
-                  disabled={isSubmitting}
-                  key={account.email}
-                  onClick={() => void handleDemoAccount(account)}
-                  type="button"
-                >
-                  <span className="font-semibold text-slate-800">{account.label}</span>
-                  <span className="font-mono text-xs text-slate-500">{account.email}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : null}
 
         <p className="mt-6 text-center text-sm text-slate-600">
           {isRegister ? "Already have an account?" : "Need an account?"}{" "}
