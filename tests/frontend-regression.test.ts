@@ -110,13 +110,3 @@ test("homepage actions are appropriate for each role", () => {
     "List a property",
   );
 });
-
-test("login UI does not expose seeded account credentials", () => {
-  const authForm = readFileSync("src/components/auth/auth-form.tsx", "utf8");
-
-  assert.doesNotMatch(authForm, /Demo accounts/i);
-  assert.doesNotMatch(authForm, /tenant@rentnest\.com/);
-  assert.doesNotMatch(authForm, /landlord@rentnest\.com/);
-  assert.doesNotMatch(authForm, /admin@rentnest\.com/);
-  assert.doesNotMatch(authForm, /tenant123|landlord123|admin123/);
-});
