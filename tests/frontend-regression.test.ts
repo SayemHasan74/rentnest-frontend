@@ -7,6 +7,10 @@ import {
   getSafePostLoginPath,
 } from "../src/lib/auth";
 import { formatCurrency } from "../src/lib/format";
+import {
+  getAccountNavigationLinks,
+  publicNavigationLinks,
+} from "../src/lib/navigation";
 import type { User } from "../src/types/rentnest";
 
 const userWithRole = (role: User["role"]) => ({ role }) as User;
@@ -130,6 +134,7 @@ test("theme is selected before hydration and remains persistent", () => {
   );
 
   assert.match(layout, /suppressHydrationWarning/);
+  assert.match(layout, /data-scroll-behavior="smooth"/);
   assert.match(layout, /themeInitializationScript/);
   assert.match(layout, /<ThemeProvider>/);
   assert.match(themeLibrary, /rentnest-theme/);
@@ -165,4 +170,62 @@ test("theme controls are available in desktop and mobile navigation", () => {
   assert.match(header, /<ThemeToggle showLabel \/>/);
   assert.match(toggle, /aria-label=\{`Switch to \$\{nextTheme\} mode`\}/);
   assert.match(toggle, /title=\{`Switch to \$\{nextTheme\} mode`\}/);
+});
+
+test("application shell exposes the required logged-out and logged-in actions", () => {
+  const header = readFileSync("src/components/layout/site-header.tsx", "utf8");
+  const loggedOutDestinations = [
+    ...publicNavigationLinks.map((link) => link.href),
+    "/auth/login",
+    "/auth/register",
+  ];
+
+  assert.equal(new Set(loggedOutDestinations).size, 4);
+  assert.match(header, /isAuthenticated \? \[\{ href: dashboardPath/);
+  assert.match(header, /<AccountMenu onLogout=\{handleLogout\} user=\{user\} \/>/);
+
+  for (const role of ["TENANT", "LANDLORD", "ADMIN"] as const) {
+    const loggedInActions = new Set([
+      ...publicNavigationLinks.map((link) => link.href),
+      ...getAccountNavigationLinks(role).map((link) => link.href),
+      "logout",
+    ]);
+
+    assert.ok(loggedInActions.size >= 6, `${role} must expose at least six actions`);
+  }
+});
+
+test("account menu supports pointer, keyboard, and assistive-technology use", () => {
+  const accountMenu = readFileSync(
+    "src/components/layout/account-menu.tsx",
+    "utf8",
+  );
+
+  assert.match(accountMenu, /aria-haspopup="menu"/);
+  assert.match(accountMenu, /aria-expanded=\{isOpen\}/);
+  assert.match(accountMenu, /role="menu"/);
+  assert.match(accountMenu, /role="menuitem"/);
+  assert.match(accountMenu, /event\.key === "Escape"/);
+  assert.match(accountMenu, /document\.addEventListener\("pointerdown"/);
+  assert.match(accountMenu, /triggerRef\.current\?\.focus\(\)/);
+});
+
+test("footer contains only real internal routes and verified maintainer links", () => {
+  const footer = readFileSync("src/components/layout/site-footer.tsx", "utf8");
+
+  for (const route of ["/home", "/properties", "/auth/login", "/auth/register"]) {
+    assert.match(footer, new RegExp(route.replaceAll("/", "\\/")));
+  }
+
+  assert.match(footer, /Hasan Mohammad Sayem/);
+  assert.match(footer, /RentNest project maintainer/);
+  assert.match(footer, /mailto:sayemhasan4700@gmail\.com/);
+  assert.match(footer, /Badda, Dhaka/);
+  assert.match(footer, /https:\/\/github\.com\/SayemHasan74/);
+  assert.match(footer, /https:\/\/portfolio-rose-sigma-60\.vercel\.app\//);
+  assert.match(footer, /https:\/\/www\.facebook\.com\/hasanmohammadsayem\.sayem/);
+  assert.match(footer, /target="_blank"/);
+  assert.match(footer, /rel="noreferrer"/);
+  assert.doesNotMatch(footer, /hello@|support@|contact@/);
+  assert.doesNotMatch(footer, /text-slate-|border-slate-|hover:bg-slate-/);
 });

@@ -29,12 +29,12 @@ Status meanings:
 
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
-| HOME-01 | Full-width navbar background. | VERIFIED | Sticky header spans the viewport. | 3, 16 |
-| HOME-02 | Minimum 4 routes while logged out. | VERIFIED | Home, Properties, Dashboard, Login, and Register are exposed, though route quality will be improved. | 3 |
-| HOME-03 | Minimum 6 routes/actions while logged in. | MISSING | Logged-in navigation does not expose six distinct useful destinations/actions. | 3 |
-| HOME-04 | At least 1 advanced dropdown/profile menu. | MISSING | No advanced menu exists. | 3 |
-| HOME-05 | Sticky or fixed navbar. | VERIFIED | Header uses sticky positioning. | 3, 16 |
-| HOME-06 | Fully responsive navbar. | PARTIAL | Mobile toggle exists; keyboard, focus, and complete breakpoint QA remain. | 3, 16 |
+| HOME-01 | Full-width navbar background. | VERIFIED | The semantic surface and border span the viewport while content remains constrained to the shared maximum width. | 3, 16 |
+| HOME-02 | Minimum 4 routes while logged out. | VERIFIED | Logged-out navigation exposes Home, Properties, Login, and Register; the misleading protected Dashboard link was removed. | 3 |
+| HOME-03 | Minimum 6 routes/actions while logged in. | VERIFIED | Every role receives Home, Properties, dashboard overview, role-specific destinations, account access, theme control, and Logout; automated role-count checks enforce at least six. | 3 |
+| HOME-04 | At least 1 advanced dropdown/profile menu. | VERIFIED | The account dropdown includes identity, role, role-aware destinations, and Logout with outside-click and Escape dismissal. | 3 |
+| HOME-05 | Sticky or fixed navbar. | VERIFIED | Browser QA confirmed `position: sticky` and `top: 0` at all tested breakpoints. | 3, 16 |
+| HOME-06 | Fully responsive navbar. | VERIFIED | Desktop navigation and tablet/mobile disclosure layouts passed 390px, 768px, and 1440px browser testing without overflow. | 3, 16 |
 
 ### Hero
 
@@ -49,9 +49,9 @@ Status meanings:
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
 | HOME-10 | Minimum 8 meaningful homepage sections. | MISSING | `/home` has four top-level sections plus a ticker; `/` has three sections. | 5 |
-| HOME-11 | Fully functional footer. | PARTIAL | Footer renders and navigates, but required information is incomplete. | 3 |
-| HOME-12 | Footer contains only working links. | NEEDS_QA | Existing internal links resolve; final all-link audit remains. | 3, 16 |
-| HOME-13 | Footer includes contact information and social links. | MISSING | Neither real contact details nor social links are present. | 3, 4 |
+| HOME-11 | Fully functional footer. | VERIFIED | The responsive footer includes brand context, application routes, project sources, maintainer contact details, social links, and copyright information. | 3 |
+| HOME-12 | Footer contains only working links. | VERIFIED | Internal routes pass the production build and the GitHub, portfolio, and Facebook destinations returned HTTP 200 during Part 03 verification. | 3, 16 |
+| HOME-13 | Footer includes contact information and social links. | VERIFIED | The maintainer's publicly published name, email, Dhaka location, GitHub, portfolio, and Facebook links are included; no contact value was invented. | 3, 4 |
 
 ## 3. Core Listing / Card Section
 

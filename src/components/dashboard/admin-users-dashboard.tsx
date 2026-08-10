@@ -907,7 +907,7 @@ export function AdminUsersDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="scroll-mt-24" id="users">
           <CardHeader>
             <CardTitle>Users</CardTitle>
           </CardHeader>
@@ -980,7 +980,7 @@ export function AdminUsersDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="scroll-mt-24" id="categories">
           <CardHeader>
             <CardTitle>Categories</CardTitle>
           </CardHeader>
@@ -1040,7 +1040,7 @@ export function AdminUsersDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="scroll-mt-24" id="properties">
           <CardHeader>
             <CardTitle>Properties</CardTitle>
           </CardHeader>

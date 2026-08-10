@@ -4,33 +4,40 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Building,
+  ClipboardList,
+  Home,
   LayoutDashboard,
   LogIn,
-  LogOut,
   Menu,
   Search,
   UserPlus,
+  UsersRound,
   X,
 } from "lucide-react";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { Button, buttonClasses } from "@/components/ui/button";
+import { buttonClasses } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { AccountMenu } from "@/components/layout/account-menu";
 import {
   AUTH_SESSION_EVENT,
   clearAuthSession,
   getRoleDashboardPath,
   getStoredToken,
   getStoredUser,
-  roleLabels,
   syncAuthCookies,
 } from "@/lib/auth-session";
+import { getPrimaryRoleLink, publicNavigationLinks } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import type { User } from "@/types/rentnest";
 
-const publicNavLinks = [
-  { href: "/home", label: "Home" },
-  { href: "/properties", label: "Properties", icon: Search },
-];
+const navIcons = {
+  Home,
+  Properties: Search,
+  Dashboard: LayoutDashboard,
+  "My rental requests": ClipboardList,
+  "My properties": Building,
+  "Manage users": UsersRound,
+} as const;
 
 const subscribeToAuthSession = (callback: () => void) => {
   window.addEventListener("storage", callback);
@@ -61,9 +68,11 @@ export function SiteHeader() {
   };
   const isAuthenticated = Boolean(token && user);
   const dashboardPath = user ? getRoleDashboardPath(user.role) : "/dashboard";
+  const primaryRoleLink = user ? getPrimaryRoleLink(user.role) : null;
   const navLinks = [
-    ...publicNavLinks,
-    { href: dashboardPath, label: "Dashboard", icon: LayoutDashboard },
+    ...publicNavigationLinks,
+    ...(isAuthenticated ? [{ href: dashboardPath, label: "Dashboard" }] : []),
+    ...(isAuthenticated && primaryRoleLink ? [primaryRoleLink] : []),
   ];
 
   useEffect(() => {
@@ -79,19 +88,7 @@ export function SiteHeader() {
   };
 
   const authActions = isAuthenticated && user ? (
-    <>
-      <Link
-        className={buttonClasses({ variant: "ghost" })}
-        href={dashboardPath}
-      >
-        <LayoutDashboard size={16} aria-hidden="true" />
-        {roleLabels[user.role]}
-      </Link>
-      <Button onClick={handleLogout} variant="outline">
-        <LogOut size={16} aria-hidden="true" />
-        Logout
-      </Button>
-    </>
+    <AccountMenu onLogout={handleLogout} user={user} />
   ) : (
     <>
       <Link
@@ -112,20 +109,22 @@ export function SiteHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-300 bg-surface/95 backdrop-blur-xl">
+    <header className="sticky top-0 z-[60] border-b border-slate-300 bg-surface/95 backdrop-blur-xl">
       <div className="mx-auto flex h-[4.5rem] w-full max-w-[90rem] items-center justify-between px-4 sm:px-6 lg:px-10">
         <Link className="flex items-center gap-2.5 font-bold text-slate-950" href="/">
           <Building size={23} strokeWidth={1.7} aria-hidden="true" />
           <span className="text-xl">RentNest</span>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
           {navLinks.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname.startsWith(item.href);
+            const Icon = navIcons[item.label as keyof typeof navIcons];
+            const routePath = item.href.split("#")[0];
+            const isActive = !item.href.includes("#") && pathname.startsWith(routePath);
 
             return (
               <Link
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "inline-flex h-10 items-center gap-2 border-b border-transparent px-3 text-sm font-medium text-slate-600 transition hover:border-slate-400 hover:text-slate-950",
                   isActive && "border-slate-950 text-slate-950",
@@ -140,7 +139,7 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           <ThemeToggle />
           {authActions}
         </div>
@@ -148,7 +147,7 @@ export function SiteHeader() {
         <button
           aria-expanded={isOpen}
           aria-label="Toggle navigation"
-          className={buttonClasses({ variant: "outline", size: "icon", className: "md:hidden" })}
+          className={buttonClasses({ variant: "outline", size: "icon", className: "lg:hidden" })}
           onClick={() => setIsOpen((current) => !current)}
           type="button"
         >
@@ -157,14 +156,20 @@ export function SiteHeader() {
       </div>
 
       {isOpen ? (
-        <div className="border-t border-slate-300 bg-surface px-4 py-4 md:hidden">
+        <div className="border-t border-slate-300 bg-surface px-4 py-4 lg:hidden">
           <nav className="grid gap-2" aria-label="Mobile navigation">
             {navLinks.map((item) => {
-              const Icon = item.icon;
+              const Icon = navIcons[item.label as keyof typeof navIcons];
+              const routePath = item.href.split("#")[0];
+              const isActive = !item.href.includes("#") && pathname.startsWith(routePath);
 
               return (
                 <Link
-                  className="flex h-10 items-center gap-2 border-b border-slate-200 px-1 text-sm font-semibold text-slate-700 hover:text-slate-950"
+                  aria-current={isActive ? "page" : undefined}
+                  className={cn(
+                    "flex h-10 items-center gap-2 border-b border-slate-200 px-1 text-sm font-semibold text-slate-700 hover:text-slate-950",
+                    isActive && "border-slate-950 text-slate-950",
+                  )}
                   href={item.href}
                   key={item.href}
                   onClick={() => setIsOpen(false)}
@@ -178,20 +183,12 @@ export function SiteHeader() {
           <div className="mt-4 grid gap-2">
             <ThemeToggle showLabel />
             {isAuthenticated && user ? (
-              <>
-                <Link
-                  className={buttonClasses({ variant: "outline" })}
-                  href={dashboardPath}
-                  onClick={() => setIsOpen(false)}
-                >
-                  <LayoutDashboard size={16} aria-hidden="true" />
-                  {roleLabels[user.role]} dashboard
-                </Link>
-                <Button onClick={handleLogout} variant="outline">
-                  <LogOut size={16} aria-hidden="true" />
-                  Logout
-                </Button>
-              </>
+              <AccountMenu
+                mobile
+                onLogout={handleLogout}
+                onNavigate={() => setIsOpen(false)}
+                user={user}
+              />
             ) : (
               <>
                 <Link
