@@ -136,11 +136,13 @@ export type PaginationMeta = {
 };
 
 export type PropertyFilters = {
+  search?: string;
   location?: string;
   minPrice?: number;
   maxPrice?: number;
   type?: string;
   amenities?: string;
+  sort?: "newest" | "oldest" | "rent_asc" | "rent_desc";
   page?: number;
   limit?: number;
 };

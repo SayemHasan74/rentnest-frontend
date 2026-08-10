@@ -40,9 +40,11 @@ const getPositiveNumberParam = (
 };
 
 const buildPropertyFilters = (searchParams: SearchParams): PropertyFilters => ({
+  search: getStringParam(searchParams, "search") || undefined,
   location: getStringParam(searchParams, "location") || undefined,
   type: getStringParam(searchParams, "type") || undefined,
   amenities: getStringParam(searchParams, "amenities") || undefined,
+  sort: (getStringParam(searchParams, "sort") || "newest") as PropertyFilters["sort"],
   minPrice: getPositiveNumberParam(searchParams, "minPrice"),
   maxPrice: getPositiveNumberParam(searchParams, "maxPrice"),
   page: getPositiveNumberParam(searchParams, "page", 1),
@@ -72,11 +74,13 @@ export default async function PropertiesPage({
   const filters = buildPropertyFilters(resolvedSearchParams);
   const { categories, hasCategoryError, propertyResult } = await getBrowseData(filters);
   const filterValues = {
+    search: getStringParam(resolvedSearchParams, "search"),
     location: getStringParam(resolvedSearchParams, "location"),
     type: getStringParam(resolvedSearchParams, "type"),
     minPrice: getStringParam(resolvedSearchParams, "minPrice"),
     maxPrice: getStringParam(resolvedSearchParams, "maxPrice"),
     amenities: getStringParam(resolvedSearchParams, "amenities"),
+    sort: (getStringParam(resolvedSearchParams, "sort") || "newest") as NonNullable<PropertyFilters["sort"]>,
     limit:
       getStringParam(resolvedSearchParams, "limit") ||
       defaultPropertyFilterValues.limit,

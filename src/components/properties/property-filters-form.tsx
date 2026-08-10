@@ -3,26 +3,30 @@
 import { SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useState } from "react";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import type { Category } from "@/types/rentnest";
 
 type FilterValues = {
+  search: string;
   location: string;
   type: string;
   minPrice: string;
   maxPrice: string;
   amenities: string;
+  sort: "newest" | "oldest" | "rent_asc" | "rent_desc";
   limit: string;
 };
 
 const defaultValues: FilterValues = {
+  search: "",
   location: "",
   type: "",
   minPrice: "",
   maxPrice: "",
   amenities: "",
+  sort: "newest",
   limit: "9",
 };
 
@@ -50,19 +54,6 @@ export function PropertyFiltersForm({
 }) {
   const router = useRouter();
   const [filterValues, setFilterValues] = useState(values);
-  const initialFilterValues = useRef(JSON.stringify(values));
-
-  useEffect(() => {
-    if (JSON.stringify(filterValues) === initialFilterValues.current) {
-      return;
-    }
-
-    const timeout = window.setTimeout(() => {
-      router.replace(buildFilterUrl(filterValues));
-    }, 450);
-
-    return () => window.clearTimeout(timeout);
-  }, [filterValues, router]);
 
   const updateFilter = (name: keyof FilterValues, value: string) => {
     setFilterValues((current) => ({ ...current, [name]: value }));
@@ -84,6 +75,17 @@ export function PropertyFiltersForm({
       </div>
 
       <div className="mt-5 grid gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="search">Search listings</Label>
+          <Input
+            id="search"
+            name="search"
+            onChange={(event) => updateFilter("search", event.target.value)}
+            placeholder="Title, description, area, or type"
+            value={filterValues.search}
+          />
+        </div>
+
         <div className="grid gap-2">
           <Label htmlFor="location">Location</Label>
           <Input
@@ -150,6 +152,22 @@ export function PropertyFiltersForm({
             value={filterValues.amenities}
           />
           <p className="text-xs text-slate-500">Separate multiple amenities with commas.</p>
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="sort">Sort by</Label>
+          <select
+            className="h-10 w-full rounded-md border border-slate-400 bg-surface px-3 text-sm text-slate-950 outline-none transition focus:border-primary focus:ring-2 focus:ring-emerald-100"
+            id="sort"
+            name="sort"
+            onChange={(event) => updateFilter("sort", event.target.value as FilterValues["sort"])}
+            value={filterValues.sort}
+          >
+            <option value="newest">Newest listed</option>
+            <option value="oldest">Oldest listed</option>
+            <option value="rent_asc">Rent: low to high</option>
+            <option value="rent_desc">Rent: high to low</option>
+          </select>
         </div>
 
         <div className="grid gap-2">

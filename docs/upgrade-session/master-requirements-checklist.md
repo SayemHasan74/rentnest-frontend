@@ -82,11 +82,11 @@ Status meanings:
 
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
-| EXPLORE-01 | Search bar. | PARTIAL | Location input exists, but there is no broad property search. | 7 |
-| EXPLORE-02 | Filtering using at least 2 fields. | VERIFIED | Location, type, price, and amenities are supported. | 7, 16 |
-| EXPLORE-03 | Sorting options. | MISSING | Backend always orders by newest; no UI selector exists. | 7 |
-| EXPLORE-04 | Pagination or infinite scroll. | VERIFIED | Previous/next pagination exists. | 7, 16 |
-| EXPLORE-05 | Filtering is fully functional. | VERIFIED | Filters are sent to validated backend queries and preserve pagination state. | 7, 16 |
+| EXPLORE-01 | Search bar. | VERIFIED | Part 07 adds broad search across title, description, location, address, and category. | 7 |
+| EXPLORE-02 | Filtering using at least 2 fields. | VERIFIED | Location, type, price, amenities, and broad search are supported through one query submission. | 7, 16 |
+| EXPLORE-03 | Sorting options. | VERIFIED | Part 07 adds newest, oldest, rent low-to-high, and rent high-to-low sort options with validated backend ordering. | 7 |
+| EXPLORE-04 | Pagination or infinite scroll. | VERIFIED | Previous/next pagination preserves all active search, filter, and sort parameters. | 7, 16 |
+| EXPLORE-05 | Filtering is fully functional. | VERIFIED | The explicit Update now action applies search, filters, and sort atomically and resets to page 1; server validation and query handling are tested. | 7, 16 |
 
 ## 6. Authentication System
 
