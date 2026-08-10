@@ -6,6 +6,8 @@ import type {
   Category,
   CategoryPayload,
   ConfirmPaymentPayload,
+  ContactSubmission,
+  ContactSubmissionPayload,
   CreatePaymentPayload,
   CreatePaymentResponse,
   CreateRentalPayload,
@@ -215,6 +217,14 @@ export const api = {
       apiRequest<Review>("/reviews", {
         method: "POST",
         token,
+        body,
+      }),
+  },
+
+  contact: {
+    create: (body: ContactSubmissionPayload) =>
+      apiRequest<ContactSubmission>("/contact", {
+        method: "POST",
         body,
       }),
   },

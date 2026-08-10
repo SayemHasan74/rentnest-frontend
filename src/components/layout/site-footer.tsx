@@ -13,6 +13,9 @@ import {
 const footerLinks = [
   { href: "/home", label: "Home" },
   { href: "/properties", label: "Browse properties" },
+  { href: "/about", label: "About RentNest" },
+  { href: "/help", label: "Help & support" },
+  { href: "/contact", label: "Contact us" },
   { href: "/auth/login", label: "Login" },
   { href: "/auth/register", label: "Register" },
 ];

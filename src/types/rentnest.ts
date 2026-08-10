@@ -265,3 +265,15 @@ export type CategoryPayload = {
 };
 
 export type UpdateCategoryPayload = Partial<CategoryPayload>;
+
+export type ContactSubmissionPayload = {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+};
+
+export type ContactSubmission = ContactSubmissionPayload & {
+  id: string;
+  createdAt: string;
+};

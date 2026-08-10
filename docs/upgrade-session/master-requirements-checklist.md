@@ -19,7 +19,7 @@ Status meanings:
 | UI-02 | Support light and dark mode with proper contrast. | VERIFIED | Semantic light/dark themes, system detection, persistence, a responsive toggle, pre-hydration initialization, contrast calculations, and browser QA are recorded in `part-02-design-system.md`. | 2 |
 | UI-03 | Maintain consistent layout, spacing, and alignment throughout. | PARTIAL | Shared spacing and control primitives were standardized in Part 02; later feature pages and final whole-site QA remain. | 2, 16 |
 | UI-04 | Keep cards and components consistent in size, border radius, and visual style. | PARTIAL | Shared cards, badges, fields, buttons, and skeletons now use the same radius/surface system; property-card and dashboard-specific work remains in Parts 6 and 11. | 2, 6, 11 |
-| UI-05 | Forms include validation, error messages, success states, and loaders. | PARTIAL | Implemented forms vary; not every required form exists or has every state. | 4, 9, 10, 12-14, 16 |
+| UI-05 | Forms include validation, error messages, success states, and loaders. | PARTIAL | Part 04 contact form has all four states; remaining forms still need consistent coverage. | 4, 9, 10, 12-14, 16 |
 | UI-06 | Fully responsive for mobile, tablet, and desktop. | PARTIAL | Part 02 passed representative 390px, 768px, and 1440px browser checks without horizontal overflow; every later feature still requires the same gate. | 2-16 |
 | UI-07 | No placeholder or dummy content. | MISSING | Live data contains test/dummy names and descriptions. | 15 |
 
@@ -115,7 +115,7 @@ Status meanings:
 
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
-| PAGE-01 | At least 2-3 additional pages such as About, Contact, Blog, Help, Privacy, or Terms. | MISSING | None of the suggested supporting pages currently exists. | 4 |
+| PAGE-01 | At least 2-3 additional pages such as About, Contact, Blog, Help, Privacy, or Terms. | VERIFIED | Part 04 adds responsive About, Contact, and Help & Support pages, all linked from the footer. | 4 |
 
 ## 9. UX and Responsiveness
 
@@ -133,12 +133,12 @@ Status meanings:
 
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
-| FORM-01 | Client-side required-field and format validation. | PARTIAL | Several forms validate, but coverage and consistency are incomplete. | 4, 9, 10, 12-14, 16 |
-| FORM-02 | Server-side validation. | VERIFIED | Existing write endpoints use Zod validation. New forms will require schemas. | 4, 9, 10, 13-15 |
-| FORM-03 | Proper error and success messages. | PARTIAL | Major workflows have feedback; every form is not yet covered. | 4, 9, 10, 12-14, 16 |
-| FORM-04 | Loading state via spinner or disabled button. | PARTIAL | Major asynchronous forms have loading states; final all-form verification remains. | 4, 9, 10, 12-14, 16 |
-| FORM-05 | Proper label usage. | PARTIAL | Most fields use labels; some composite controls need improvement. | 4, 9, 10, 12-14, 16 |
-| FORM-06 | Accessible inputs with labels connected to inputs. | PARTIAL | Standard inputs are connected; all controls have not passed a full accessibility audit. | 4, 9, 10, 12-14, 16 |
+| FORM-01 | Client-side required-field and format validation. | PARTIAL | Part 04 contact form validates required fields, email format, and minimum text lengths; other forms remain to be standardized. | 4, 9, 10, 12-14, 16 |
+| FORM-02 | Server-side validation. | VERIFIED | Existing write endpoints use Zod validation; Part 04 adds a tested Zod schema for contact submissions. | 4, 9, 10, 13-15 |
+| FORM-03 | Proper error and success messages. | PARTIAL | Part 04 contact form provides accessible client/server error feedback and a success confirmation; every form is not yet covered. | 4, 9, 10, 12-14, 16 |
+| FORM-04 | Loading state via spinner or disabled button. | PARTIAL | Part 04 contact form disables its submit button and shows a spinner while sending; final all-form verification remains. | 4, 9, 10, 12-14, 16 |
+| FORM-05 | Proper label usage. | PARTIAL | Part 04 contact controls have visible labels; some composite controls elsewhere need improvement. | 4, 9, 10, 12-14, 16 |
+| FORM-06 | Accessible inputs with labels connected to inputs. | PARTIAL | Part 04 labels use `htmlFor`, inputs use matching IDs, and invalid controls expose `aria-invalid` and error descriptions; all controls have not passed a full accessibility audit. | 4, 9, 10, 12-14, 16 |
 
 ### Required forms
 
@@ -146,7 +146,7 @@ Status meanings:
 | --- | --- | --- | --- | --- |
 | FORM-07 | Login form. | VERIFIED | Implemented. | 9, 16 |
 | FORM-08 | Registration form. | VERIFIED | Implemented. | 9, 16 |
-| FORM-09 | Contact form. | MISSING | No contact page or API exists. | 4 |
+| FORM-09 | Contact form. | VERIFIED | Public Contact page validates client-side, persists through `POST /api/contact`, validates server-side, and provides loading, error, and success states. | 4 |
 | FORM-10 | Create-item form. | VERIFIED | Landlord property creation form exists. | 13, 16 |
 | FORM-11 | Edit-item form. | VERIFIED | Landlord property editing exists. | 13, 16 |
 | FORM-12 | Profile-update form. | MISSING | No profile form exists. | 10 |
