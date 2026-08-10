@@ -17,10 +17,10 @@ Status meanings:
 | --- | --- | --- | --- | --- |
 | UI-01 | Use a maximum of 3 primary colors plus an optional neutral color. | VERIFIED | Part 02 defines neutral, emerald, amber, and red semantic scales; blue and purple visual utilities were removed from the active UI. | 2 |
 | UI-02 | Support light and dark mode with proper contrast. | VERIFIED | Semantic light/dark themes, system detection, persistence, a responsive toggle, pre-hydration initialization, contrast calculations, and browser QA are recorded in `part-02-design-system.md`. | 2 |
-| UI-03 | Maintain consistent layout, spacing, and alignment throughout. | PARTIAL | Shared spacing and control primitives were standardized in Part 02; later feature pages and final whole-site QA remain. | 2, 16 |
+| UI-03 | Maintain consistent layout, spacing, and alignment throughout. | PARTIAL | Parts 02 and 05 standardize shared spacing and use the same container, surface, border, and radius system across the expanded homepage; later feature pages and final whole-site QA remain. | 2, 5, 16 |
 | UI-04 | Keep cards and components consistent in size, border radius, and visual style. | PARTIAL | Shared cards, badges, fields, buttons, and skeletons now use the same radius/surface system; property-card and dashboard-specific work remains in Parts 6 and 11. | 2, 6, 11 |
 | UI-05 | Forms include validation, error messages, success states, and loaders. | PARTIAL | Part 04 contact form has all four states; remaining forms still need consistent coverage. | 4, 9, 10, 12-14, 16 |
-| UI-06 | Fully responsive for mobile, tablet, and desktop. | PARTIAL | Part 02 passed representative 390px, 768px, and 1440px browser checks without horizontal overflow; every later feature still requires the same gate. | 2-16 |
+| UI-06 | Fully responsive for mobile, tablet, and desktop. | PARTIAL | Parts 02, 04, and 05 passed representative 390px, 768px, and 1440px browser checks without horizontal overflow; every later feature still requires the same gate. | 2-16 |
 | UI-07 | No placeholder or dummy content. | MISSING | Live data contains test/dummy names and descriptions. | 15 |
 
 ## 2. Home / Landing Page
@@ -40,15 +40,15 @@ Status meanings:
 
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
-| HOME-07 | Hero height limited to 60-70% of the screen. | MISSING | Current landing hero uses approximately 86vh minus header height. | 5 |
-| HOME-08 | Hero includes an interactive slider, animation, or CTA. | VERIFIED | CTAs and animated home ticker exist. | 5, 16 |
-| HOME-09 | Clear visual flow to the next section. | VERIFIED | Hero leads into a structured journey section. | 5, 16 |
+| HOME-07 | Hero height limited to 60-70% of the screen. | VERIFIED | Part 05 constrains the `/home` hero to `65svh`; browser QA measured 549px / 844px on mobile and 585px / 900px on desktop. | 5 |
+| HOME-08 | Hero includes an interactive slider, animation, or CTA. | VERIFIED | Role-aware hero CTAs and the animated, linked live-listing ticker provide interactive progression. | 5, 16 |
+| HOME-09 | Clear visual flow to the next section. | VERIFIED | The hero transitions directly into a semantic live-listing summary and neighborhood discovery section. | 5, 16 |
 
 ### Sections and footer
 
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
-| HOME-10 | Minimum 8 meaningful homepage sections. | MISSING | `/home` has four top-level sections plus a ticker; `/` has three sections. | 5 |
+| HOME-10 | Minimum 8 meaningful homepage sections. | VERIFIED | `/home` now has eight semantic sections: hero, live listing summary, neighborhoods, process, role benefits, featured homes, help, and final CTA. | 5 |
 | HOME-11 | Fully functional footer. | VERIFIED | The responsive footer includes brand context, application routes, project sources, maintainer contact details, social links, and copyright information. | 3 |
 | HOME-12 | Footer contains only working links. | VERIFIED | Internal routes pass the production build and the GitHub, portfolio, and Facebook destinations returned HTTP 200 during Part 03 verification. | 3, 16 |
 | HOME-13 | Footer includes contact information and social links. | VERIFIED | The maintainer's publicly published name, email, Dhaka location, GitHub, portfolio, and Facebook links are included; no contact value was invented. | 3, 4 |
@@ -122,7 +122,7 @@ Status meanings:
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
 | UX-01 | No lorem ipsum or placeholder content. | MISSING | Live database exposes dummy/test entries. | 4, 5, 15 |
-| UX-02 | Fully responsive across all devices. | PARTIAL | The Part 02 home, listing, navigation, filters, cards, and dashboard samples passed mobile/tablet/desktop QA; complete post-feature verification remains. | 2-16 |
+| UX-02 | Fully responsive across all devices. | PARTIAL | Parts 02, 04, and 05 passed representative mobile/tablet/desktop QA; complete post-feature verification remains. | 2-16 |
 | UX-03 | Proper spacing and alignment. | PARTIAL | Part 02 standardized shared radii, control heights, card padding, surfaces, and focus states; final all-page visual QA remains. | 2, 16 |
 | UX-04 | All buttons and links are clickable. | NEEDS_QA | Existing primary flows work, but an exhaustive interactive audit remains. | 3-16 |
 | UX-05 | Dark mode maintains proper contrast. | VERIFIED | Dark mode passed representative browser QA and sampled foreground/background ratios ranged from 8.89:1 to 18.38:1. | 2, 16 |

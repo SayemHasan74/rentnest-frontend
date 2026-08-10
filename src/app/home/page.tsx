@@ -3,9 +3,12 @@ import Link from "next/link";
 import {
   ArrowRight,
   Building2,
+  CircleDollarSign,
   FileCheck2,
+  HeartHandshake,
   KeyRound,
   Search,
+  ShieldCheck,
 } from "lucide-react";
 import { HomeHeroActions } from "@/components/home/home-hero-actions";
 import { PropertyCard } from "@/components/properties/property-card";
@@ -52,6 +55,42 @@ const steps = [
     number: "03",
     title: "Move in",
   },
+];
+
+const roleBenefits = [
+  {
+    description:
+      "Compare property details and keep rental requests and payment history in one place.",
+    icon: Search,
+    title: "For tenants",
+  },
+  {
+    description:
+      "Publish a listing, set its availability, and respond to every rental request clearly.",
+    icon: Building2,
+    title: "For landlords",
+  },
+  {
+    description:
+      "Maintain a reliable marketplace through user, category, and property review tools.",
+    icon: ShieldCheck,
+    title: "For administrators",
+  },
+];
+
+const helpTopics = [
+  [
+    "Can I browse before registering?",
+    "Yes. Property browsing and property details are public. Create a tenant account when you are ready to send a rental request.",
+  ],
+  [
+    "How do landlords manage availability?",
+    "Landlords can add properties, update their availability, and review incoming requests from the landlord dashboard.",
+  ],
+  [
+    "Where can I get help?",
+    "Visit Help & Support for practical guidance, or contact RentNest with a question about the marketplace.",
+  ],
 ];
 
 const getHomeData = async () => {
@@ -113,8 +152,8 @@ export default async function HomePage() {
         </div>
       ) : null}
 
-      <section className="border-b border-slate-300 bg-surface">
-        <div className="mx-auto w-full max-w-[90rem] px-4 py-14 sm:px-6 sm:py-16 lg:px-10 lg:py-24">
+      <section className="h-[65svh] overflow-hidden border-b border-slate-300 bg-surface">
+        <div className="mx-auto flex h-full w-full max-w-[90rem] flex-col justify-center px-4 py-8 sm:px-6 sm:py-10 lg:px-10">
           <div className="max-w-4xl">
             <p className="text-xs font-semibold uppercase text-slate-500">
               RentNest · Dhaka
@@ -129,14 +168,14 @@ export default async function HomePage() {
             <HomeHeroActions />
           </div>
 
-          <div className="mt-14 grid max-w-3xl grid-cols-2 border-y border-slate-300 sm:grid-cols-3">
+          <div className="mt-8 hidden max-w-3xl grid-cols-3 border-y border-slate-300 sm:grid">
             {[
               [formatNumber(totalProperties), "Available listings"],
               [formatNumber(categories.length), "Property types"],
               [formatNumber(neighborhoods.filter((item) => item.count > 0).length), "Active areas"],
             ].map(([value, label], index) => (
               <div
-                className={`py-5 pr-5 ${index > 0 ? "border-l border-slate-300 pl-5" : ""} ${index === 2 ? "col-span-2 border-t border-slate-300 sm:col-span-1 sm:border-t-0" : ""}`}
+                className={`py-4 pr-4 ${index > 0 ? "border-l border-slate-300 pl-4" : ""}`}
                 key={label}
               >
                 <p className="text-3xl font-semibold text-slate-950">{value}</p>
@@ -147,7 +186,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div
+      <section
         aria-label="Live RentNest listing summary"
         className="home-ticker overflow-hidden border-b border-inverse bg-inverse py-3 text-inverse-foreground"
       >
@@ -172,7 +211,7 @@ export default async function HomePage() {
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       <section className="border-b border-slate-300 bg-slate-50">
         <div className="mx-auto w-full max-w-[90rem] px-4 py-12 sm:px-6 lg:px-10 lg:py-16">
@@ -244,6 +283,39 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="border-b border-slate-300 bg-slate-50">
+        <div className="mx-auto w-full max-w-[90rem] px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
+          <div className="max-w-2xl">
+            <p className="text-xs font-semibold uppercase text-slate-500">
+              One marketplace, three clear roles
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold leading-tight text-slate-950 sm:text-4xl">
+              Built around the people who make a rental work.
+            </h2>
+          </div>
+          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+            {roleBenefits.map((benefit) => {
+              const Icon = benefit.icon;
+
+              return (
+                <article
+                  className="rounded-md border border-slate-300 bg-surface p-6 shadow-sm"
+                  key={benefit.title}
+                >
+                  <Icon className="text-emerald-700" size={25} strokeWidth={1.7} aria-hidden="true" />
+                  <h3 className="mt-6 text-xl font-semibold text-slate-950">
+                    {benefit.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">
+                    {benefit.description}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto w-full max-w-[90rem] px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
         <div className="flex flex-col justify-between gap-5 border-b border-slate-300 pb-6 sm:flex-row sm:items-end">
           <div>
@@ -277,6 +349,61 @@ export default async function HomePage() {
             </p>
           </div>
         )}
+      </section>
+
+      <section className="border-y border-slate-300 bg-surface">
+        <div className="mx-auto grid w-full max-w-[90rem] gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[0.7fr_1.3fr] lg:px-10 lg:py-20">
+          <div>
+            <p className="text-xs font-semibold uppercase text-slate-500">
+              Help when you need it
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold leading-tight text-slate-950 sm:text-4xl">
+              A few useful answers before you begin.
+            </h2>
+            <Link className={buttonClasses({ variant: "outline", className: "mt-6" })} href="/help">
+              Visit Help & Support
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="divide-y divide-slate-300 border-y border-slate-300">
+            {helpTopics.map(([question, answer]) => (
+              <article className="py-6" key={question}>
+                <h3 className="font-semibold text-slate-950">{question}</h3>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{answer}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-slate-50">
+        <div className="mx-auto w-full max-w-[90rem] px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
+          <div className="rounded-md bg-black px-6 py-10 text-white sm:px-10 sm:py-14">
+            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+              <div>
+                <div className="flex items-center gap-3 text-white/70">
+                  <HeartHandshake size={22} aria-hidden="true" />
+                  <CircleDollarSign size={22} aria-hidden="true" />
+                </div>
+                <h2 className="mt-5 max-w-2xl text-3xl font-semibold leading-tight sm:text-4xl">
+                  Find the place that fits your next chapter.
+                </h2>
+                <p className="mt-4 max-w-xl text-sm leading-6 text-white/70">
+                  Explore current rentals across Dhaka, then create an account when you are ready to take the next step.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Link className={buttonClasses({ size: "lg" })} href="/properties">
+                  Explore rentals
+                  <ArrowRight size={17} aria-hidden="true" />
+                </Link>
+                <Link className={buttonClasses({ variant: "outline", size: "lg", className: "border-white/50 text-white hover:border-white hover:bg-white/10 hover:text-white" })} href="/auth/register">
+                  Create an account
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   );
