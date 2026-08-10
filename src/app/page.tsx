@@ -90,7 +90,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="border-b border-slate-300 bg-white">
+      <section className="border-b border-slate-300 bg-surface">
         <div className="mx-auto w-full max-w-[90rem] px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
           <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr]">
             <div>
@@ -122,23 +122,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="bg-slate-950 text-white">
+      <section className="bg-inverse text-inverse-foreground">
         <div className="mx-auto grid w-full max-w-[90rem] gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1fr] lg:px-10 lg:py-24">
           <div>
             <Building2 size={28} strokeWidth={1.5} aria-hidden="true" />
-            <h2 className="mt-6 max-w-xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
+            <h2 className="mt-6 max-w-xl text-3xl font-semibold leading-tight text-inverse-foreground sm:text-5xl">
               Built for both sides of the front door.
             </h2>
           </div>
-          <div className="grid gap-5 border-t border-white/25 pt-6 text-sm leading-6 text-slate-300 sm:grid-cols-2">
+          <div className="grid gap-5 border-t border-inverse-foreground/25 pt-6 text-sm leading-6 text-inverse-muted sm:grid-cols-2">
             <div>
-              <CheckCircle2 size={18} className="text-emerald-400" aria-hidden="true" />
-              <h3 className="mt-4 font-semibold text-white">For tenants</h3>
+              <CheckCircle2 size={18} className="text-inverse-foreground" aria-hidden="true" />
+              <h3 className="mt-4 font-semibold text-inverse-foreground">For tenants</h3>
               <p className="mt-2">Browse, request, pay securely, and review completed rentals.</p>
             </div>
             <div>
-              <CheckCircle2 size={18} className="text-emerald-400" aria-hidden="true" />
-              <h3 className="mt-4 font-semibold text-white">For landlords</h3>
+              <CheckCircle2 size={18} className="text-inverse-foreground" aria-hidden="true" />
+              <h3 className="mt-4 font-semibold text-inverse-foreground">For landlords</h3>
               <p className="mt-2">Publish listings, manage availability, and decide requests quickly.</p>
             </div>
           </div>

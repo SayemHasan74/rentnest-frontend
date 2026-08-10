@@ -148,7 +148,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
   return (
     <div className="mx-auto w-full max-w-lg">
-      <div className="border-t border-slate-950 bg-white px-0 py-8 sm:px-8">
+      <div className="border-t border-slate-950 bg-surface px-0 py-8 sm:px-8">
         <div>
           <p className="text-xs font-semibold uppercase text-slate-500">
             {isRegister ? "Create account" : "Welcome back"}
@@ -227,10 +227,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                 <div className="grid grid-cols-2 gap-2">
                   {(["TENANT", "LANDLORD"] as const).map((role) => (
                     <button
-                      className={`h-10 rounded-sm border px-3 text-sm font-semibold transition ${
+                      className={`h-10 rounded-md border px-3 text-sm font-semibold transition ${
                         values.role === role
-                          ? "border-black bg-black text-white"
-                          : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-slate-300 bg-surface text-slate-700 hover:bg-slate-50"
                       }`}
                       key={role}
                       onClick={() => updateValue("role", role)}

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function UnauthorizedPage() {
   return (
     <main className="bg-slate-50 px-4 py-16 sm:px-6 lg:px-8">
-      <section className="mx-auto max-w-xl rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm">
+      <section className="mx-auto max-w-xl rounded-md border border-slate-200 bg-surface p-8 text-center shadow-sm">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-red-50 text-red-700">
           <ShieldAlert size={24} aria-hidden="true" />
         </div>

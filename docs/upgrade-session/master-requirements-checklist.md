@@ -15,12 +15,12 @@ Status meanings:
 
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
-| UI-01 | Use a maximum of 3 primary colors plus an optional neutral color. | PARTIAL | A mostly neutral editorial palette exists, but it is not governed by documented semantic tokens. | 2 |
-| UI-02 | Support light and dark mode with proper contrast. | MISSING | No theme switcher or dark theme exists. | 2 |
-| UI-03 | Maintain consistent layout, spacing, and alignment throughout. | PARTIAL | Shared widths and spacing exist, but page and dashboard patterns are not fully standardized. | 2, 16 |
-| UI-04 | Keep cards and components consistent in size, border radius, and visual style. | PARTIAL | Shared `Card` primitives exist, but property and dashboard content use several inconsistent patterns. | 2, 6, 11 |
+| UI-01 | Use a maximum of 3 primary colors plus an optional neutral color. | VERIFIED | Part 02 defines neutral, emerald, amber, and red semantic scales; blue and purple visual utilities were removed from the active UI. | 2 |
+| UI-02 | Support light and dark mode with proper contrast. | VERIFIED | Semantic light/dark themes, system detection, persistence, a responsive toggle, pre-hydration initialization, contrast calculations, and browser QA are recorded in `part-02-design-system.md`. | 2 |
+| UI-03 | Maintain consistent layout, spacing, and alignment throughout. | PARTIAL | Shared spacing and control primitives were standardized in Part 02; later feature pages and final whole-site QA remain. | 2, 16 |
+| UI-04 | Keep cards and components consistent in size, border radius, and visual style. | PARTIAL | Shared cards, badges, fields, buttons, and skeletons now use the same radius/surface system; property-card and dashboard-specific work remains in Parts 6 and 11. | 2, 6, 11 |
 | UI-05 | Forms include validation, error messages, success states, and loaders. | PARTIAL | Implemented forms vary; not every required form exists or has every state. | 4, 9, 10, 12-14, 16 |
-| UI-06 | Fully responsive for mobile, tablet, and desktop. | PARTIAL | Existing layouts are responsive, but complete breakpoint testing is not yet recorded. | 2-16 |
+| UI-06 | Fully responsive for mobile, tablet, and desktop. | PARTIAL | Part 02 passed representative 390px, 768px, and 1440px browser checks without horizontal overflow; every later feature still requires the same gate. | 2-16 |
 | UI-07 | No placeholder or dummy content. | MISSING | Live data contains test/dummy names and descriptions. | 15 |
 
 ## 2. Home / Landing Page
@@ -122,10 +122,10 @@ Status meanings:
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
 | UX-01 | No lorem ipsum or placeholder content. | MISSING | Live database exposes dummy/test entries. | 4, 5, 15 |
-| UX-02 | Fully responsive across all devices. | PARTIAL | Mobile containment exists, but comprehensive breakpoint verification remains. | 2-16 |
-| UX-03 | Proper spacing and alignment. | PARTIAL | Generally structured; design-system and final visual QA remain. | 2, 16 |
+| UX-02 | Fully responsive across all devices. | PARTIAL | The Part 02 home, listing, navigation, filters, cards, and dashboard samples passed mobile/tablet/desktop QA; complete post-feature verification remains. | 2-16 |
+| UX-03 | Proper spacing and alignment. | PARTIAL | Part 02 standardized shared radii, control heights, card padding, surfaces, and focus states; final all-page visual QA remains. | 2, 16 |
 | UX-04 | All buttons and links are clickable. | NEEDS_QA | Existing primary flows work, but an exhaustive interactive audit remains. | 3-16 |
-| UX-05 | Dark mode maintains proper contrast. | MISSING | Dark mode is absent. | 2, 16 |
+| UX-05 | Dark mode maintains proper contrast. | VERIFIED | Dark mode passed representative browser QA and sampled foreground/background ratios ranged from 8.89:1 to 18.38:1. | 2, 16 |
 
 ## 10. Forms Handling
 
@@ -193,7 +193,7 @@ Status meanings:
 | --- | --- | --- | --- | --- |
 | CODE-01 | Clean and organized folder structure. | VERIFIED | Frontend and backend use clear feature/module separation. | 15 |
 | CODE-02 | Reusable components. | VERIFIED | Shared layout, UI, property, and dashboard components exist. | 2, 6, 11, 15 |
-| CODE-03 | Custom hooks for React. | MISSING | No dedicated custom hook files exist. | 15 |
+| CODE-03 | Custom hooks for React. | VERIFIED | Part 02 adds the reusable `useTheme` hook through the shared theme provider. | 2, 15 |
 | CODE-04 | Proper environment-variable usage. | PARTIAL | Env examples exist, but backend has development fallback secrets that must be production-safe. | 15 |
 | CODE-05 | No console logs in production. | MISSING | Backend server lifecycle uses `console.log`; seed logs are also present. | 15 |
 | CODE-06 | Meaningful commit messages. | VERIFIED | Recent histories use descriptive `feat`, `fix`, and `docs` messages. | 1-16 |

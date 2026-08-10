@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { Button, buttonClasses } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
   AUTH_SESSION_EVENT,
   clearAuthSession,
@@ -111,7 +112,7 @@ export function SiteHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-300 bg-white/95 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-slate-300 bg-surface/95 backdrop-blur-xl">
       <div className="mx-auto flex h-[4.5rem] w-full max-w-[90rem] items-center justify-between px-4 sm:px-6 lg:px-10">
         <Link className="flex items-center gap-2.5 font-bold text-slate-950" href="/">
           <Building size={23} strokeWidth={1.7} aria-hidden="true" />
@@ -139,7 +140,10 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">{authActions}</div>
+        <div className="hidden items-center gap-2 md:flex">
+          <ThemeToggle />
+          {authActions}
+        </div>
 
         <button
           aria-expanded={isOpen}
@@ -153,7 +157,7 @@ export function SiteHeader() {
       </div>
 
       {isOpen ? (
-        <div className="border-t border-slate-300 bg-white px-4 py-4 md:hidden">
+        <div className="border-t border-slate-300 bg-surface px-4 py-4 md:hidden">
           <nav className="grid gap-2" aria-label="Mobile navigation">
             {navLinks.map((item) => {
               const Icon = item.icon;
@@ -172,6 +176,7 @@ export function SiteHeader() {
             })}
           </nav>
           <div className="mt-4 grid gap-2">
+            <ThemeToggle showLabel />
             {isAuthenticated && user ? (
               <>
                 <Link

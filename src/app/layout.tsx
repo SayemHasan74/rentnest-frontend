@@ -5,6 +5,8 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { BackendWarmup } from "@/components/layout/backend-warmup";
 import { NetworkStatusToast } from "@/components/layout/network-status-toast";
 import { SessionVerifier } from "@/components/layout/session-verifier";
+import { ThemeProvider } from "@/components/theme/theme-provider";
+import { themeInitializationScript } from "@/lib/theme";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,15 +32,24 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="light"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: themeInitializationScript }}
+        />
+      </head>
       <body className="flex min-h-full flex-col">
-        <BackendWarmup />
-        <NetworkStatusToast />
-        <SessionVerifier />
-        <SiteHeader />
-        <div className="flex-1">{children}</div>
-        <SiteFooter />
+        <ThemeProvider>
+          <BackendWarmup />
+          <NetworkStatusToast />
+          <SessionVerifier />
+          <SiteHeader />
+          <div className="flex-1">{children}</div>
+          <SiteFooter />
+        </ThemeProvider>
       </body>
     </html>
   );

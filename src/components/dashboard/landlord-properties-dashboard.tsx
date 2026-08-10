@@ -443,7 +443,7 @@ function AddPropertyForm({
         <div className="grid gap-2">
           <Label htmlFor={`${formId}-category`}>Category</Label>
           <select
-            className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+            className="h-10 w-full rounded-md border border-slate-300 bg-surface px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100"
             disabled={categories.length === 0}
             id={`${formId}-category`}
             onChange={(event) => updateValue("categoryId", event.target.value)}
@@ -799,7 +799,7 @@ function LandlordRequestCard({
       ) : null}
 
       {request.status === "APPROVED" ? (
-        <div className="mt-4 flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700">
+        <div className="mt-4 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
           <CalendarClock size={16} aria-hidden="true" />
           Waiting for tenant payment.
         </div>
@@ -923,7 +923,7 @@ export function LandlordPropertiesDashboard() {
           ["COMPLETED", "REJECTED", "CANCELLED"].includes(request.status),
         ),
         title: "Request history",
-        tone: "border-slate-500 bg-white",
+        tone: "border-slate-500 bg-surface",
       },
     ],
     [visibleRequests],
@@ -1170,7 +1170,7 @@ export function LandlordPropertiesDashboard() {
     <main className="bg-slate-50">
       <Toast message={actionMessage} tone="success" />
       <Toast message={actionError} tone="error" />
-      <section className="border-b border-slate-300 bg-white">
+      <section className="border-b border-slate-300 bg-surface">
         <div className="mx-auto w-full max-w-[90rem] px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
           <p className="text-xs font-semibold uppercase text-slate-500">
             Landlord dashboard
@@ -1209,7 +1209,7 @@ export function LandlordPropertiesDashboard() {
 
         <nav
           aria-label="Landlord dashboard sections"
-          className="grid border border-slate-300 bg-white sm:grid-cols-3"
+          className="grid border border-slate-300 bg-surface sm:grid-cols-3"
         >
           {[
             { href: "#add-property", label: "Add property", number: "01" },
@@ -1217,7 +1217,7 @@ export function LandlordPropertiesDashboard() {
             { href: "#rental-requests", label: "Rental requests", number: "03" },
           ].map((item) => (
             <a
-              className="flex min-h-14 items-center gap-3 border-b border-slate-300 px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:text-white last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0"
+              className="flex min-h-14 items-center gap-3 border-b border-slate-300 px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-inverse hover:text-inverse-foreground last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0"
               href={item.href}
               key={item.href}
             >

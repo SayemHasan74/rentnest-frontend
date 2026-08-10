@@ -85,7 +85,7 @@ export default async function PropertyDetailsPage({
 
   return (
     <main className="bg-slate-50">
-      <section className="border-b border-slate-300 bg-white">
+      <section className="border-b border-slate-300 bg-surface">
         <div className="mx-auto w-full max-w-[90rem] px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
           <Link
             className="border-b border-slate-950 pb-1 text-sm font-semibold text-slate-950"

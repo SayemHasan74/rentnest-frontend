@@ -120,3 +120,49 @@ test("homepage ticker moves from right to left", () => {
     /from\s*\{\s*transform: translateX\(0\);[\s\S]*to\s*\{\s*transform: translateX\(-50%\);/,
   );
 });
+
+test("theme is selected before hydration and remains persistent", () => {
+  const layout = readFileSync("src/app/layout.tsx", "utf8");
+  const themeLibrary = readFileSync("src/lib/theme.ts", "utf8");
+  const themeProvider = readFileSync(
+    "src/components/theme/theme-provider.tsx",
+    "utf8",
+  );
+
+  assert.match(layout, /suppressHydrationWarning/);
+  assert.match(layout, /themeInitializationScript/);
+  assert.match(layout, /<ThemeProvider>/);
+  assert.match(themeLibrary, /rentnest-theme/);
+  assert.match(themeLibrary, /prefers-color-scheme: dark/);
+  assert.match(themeLibrary, /document\.documentElement\.dataset\.theme = theme/);
+  assert.match(themeProvider, /window\.localStorage\.setItem/);
+  assert.match(themeProvider, /window\.addEventListener\("storage"/);
+});
+
+test("light and dark modes share semantic, three-color design tokens", () => {
+  const styles = readFileSync("src/app/globals.css", "utf8");
+  const badge = readFileSync("src/components/ui/badge.tsx", "utf8");
+  const button = readFileSync("src/components/ui/button.tsx", "utf8");
+
+  assert.match(styles, /\[data-theme="light"\]/);
+  assert.match(styles, /\[data-theme="dark"\]/);
+  assert.match(styles, /--color-primary: var\(--rn-primary\)/);
+  assert.match(styles, /--color-surface: var\(--rn-surface\)/);
+  assert.match(styles, /--color-inverse-foreground/);
+  assert.doesNotMatch(styles, /--rn-(blue|purple)-/);
+  assert.doesNotMatch(badge, /(?:bg|text|ring)-(?:blue|purple)-/);
+  assert.match(button, /bg-primary text-primary-foreground/);
+});
+
+test("theme controls are available in desktop and mobile navigation", () => {
+  const header = readFileSync("src/components/layout/site-header.tsx", "utf8");
+  const toggle = readFileSync(
+    "src/components/theme/theme-toggle.tsx",
+    "utf8",
+  );
+
+  assert.match(header, /<ThemeToggle \/>/);
+  assert.match(header, /<ThemeToggle showLabel \/>/);
+  assert.match(toggle, /aria-label=\{`Switch to \$\{nextTheme\} mode`\}/);
+  assert.match(toggle, /title=\{`Switch to \$\{nextTheme\} mode`\}/);
+});

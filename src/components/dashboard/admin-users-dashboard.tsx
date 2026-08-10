@@ -165,7 +165,7 @@ function AdminUsersTable({
             <th className="px-4 py-3 text-right font-semibold" scope="col">Action</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-200 bg-white">
+        <tbody className="divide-y divide-slate-200 bg-surface">
           {users.map((user) => {
             const nextStatus: UserStatus = user.status === "ACTIVE" ? "BANNED" : "ACTIVE";
             const isSelf = currentAdminId === user.id;
@@ -797,7 +797,7 @@ export function AdminUsersDashboard() {
     <main className="bg-slate-50">
       <Toast message={actionMessage || categoryMessage} tone="success" />
       <Toast message={error || refreshError} tone="error" />
-      <section className="border-b border-slate-300 bg-white">
+      <section className="border-b border-slate-300 bg-surface">
         <div className="mx-auto w-full max-w-[90rem] px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
           <p className="text-xs font-semibold uppercase text-slate-500">Admin dashboard</p>
           <div className="mt-4 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
@@ -855,7 +855,7 @@ export function AdminUsersDashboard() {
               <div className="grid gap-2">
                 <Label htmlFor="admin-role-filter">Role</Label>
                 <select
-                  className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100"
+                  className="h-10 w-full rounded-md border border-slate-300 bg-surface px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100"
                   id="admin-role-filter"
                   onChange={(event) =>
                     setFilters((currentFilters) => ({
@@ -874,7 +874,7 @@ export function AdminUsersDashboard() {
               <div className="grid gap-2">
                 <Label htmlFor="admin-status-filter">Status</Label>
                 <select
-                  className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100"
+                  className="h-10 w-full rounded-md border border-slate-300 bg-surface px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100"
                   id="admin-status-filter"
                   onChange={(event) =>
                     setFilters((currentFilters) => ({

@@ -94,7 +94,7 @@ export default async function PropertiesPage({
 
   return (
     <main className="bg-slate-50">
-      <section className="border-b border-slate-300 bg-white">
+      <section className="border-b border-slate-300 bg-surface">
         <div className="mx-auto w-full max-w-[90rem] px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
           <p className="text-xs font-semibold uppercase text-slate-500">Available rentals</p>
           <div className="mt-4 flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
@@ -147,7 +147,7 @@ export default async function PropertiesPage({
           ) : null}
 
           {hasError ? (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-6">
+            <div className="rounded-md border border-red-200 bg-red-50 p-6">
               <div className="flex gap-3 text-red-700">
                 <AlertCircle className="mt-0.5 shrink-0" size={18} aria-hidden="true" />
                 <div>
@@ -179,7 +179,7 @@ export default async function PropertiesPage({
           ) : null}
 
           {propertyData && propertyData.properties.length === 0 ? (
-            <div className="border-y border-slate-300 bg-white p-10 text-center">
+            <div className="border-y border-slate-300 bg-surface p-10 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-slate-100 text-slate-600">
                 <HomeIcon size={24} aria-hidden="true" />
               </div>

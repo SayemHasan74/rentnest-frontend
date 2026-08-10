@@ -118,11 +118,11 @@ export function PaymentResult({ status }: { status: "success" | "cancel" }) {
 
   return (
     <main className="bg-slate-50 px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-xl border-y border-slate-950 bg-white p-8 text-center">
+      <div className="mx-auto max-w-xl border-y border-slate-950 bg-surface p-8 text-center">
         <Icon
           className={
             isVerifying
-              ? "mx-auto animate-spin text-blue-700"
+              ? "mx-auto animate-spin text-emerald-700"
               : hasError
                 ? "mx-auto text-amber-600"
                 : isSuccess

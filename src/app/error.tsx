@@ -12,7 +12,7 @@ export default function ErrorPage({
 }) {
   return (
     <main className="bg-slate-50 px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-xl rounded-lg border border-red-200 bg-white p-8 text-center shadow-sm">
+      <div className="mx-auto max-w-xl rounded-md border border-red-200 bg-surface p-8 text-center shadow-sm">
         <AlertCircle className="mx-auto text-red-600" size={36} aria-hidden="true" />
         <h1 className="mt-5 text-2xl font-bold text-slate-950">
           Something went wrong

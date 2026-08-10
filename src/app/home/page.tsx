@@ -113,7 +113,7 @@ export default async function HomePage() {
         </div>
       ) : null}
 
-      <section className="border-b border-slate-300 bg-white">
+      <section className="border-b border-slate-300 bg-surface">
         <div className="mx-auto w-full max-w-[90rem] px-4 py-14 sm:px-6 sm:py-16 lg:px-10 lg:py-24">
           <div className="max-w-4xl">
             <p className="text-xs font-semibold uppercase text-slate-500">
@@ -149,7 +149,7 @@ export default async function HomePage() {
 
       <div
         aria-label="Live RentNest listing summary"
-        className="home-ticker overflow-hidden border-b border-slate-950 bg-slate-950 py-3 text-white"
+        className="home-ticker overflow-hidden border-b border-inverse bg-inverse py-3 text-inverse-foreground"
       >
         <div className="home-ticker-track flex w-max items-center">
           {[0, 1].map((copyIndex) => (
@@ -160,13 +160,13 @@ export default async function HomePage() {
             >
               {tickerItems.map((item) => (
                 <Link
-                  className="flex items-center whitespace-nowrap text-xs font-semibold uppercase text-white/85 transition-colors hover:text-white"
+                  className="flex items-center whitespace-nowrap text-xs font-semibold uppercase text-inverse-foreground/85 transition-colors hover:text-inverse-foreground"
                   href={item.href}
                   key={`${copyIndex}-${item.href}-${item.label}`}
                   tabIndex={copyIndex === 1 ? -1 : undefined}
                 >
                   <span className="px-5 sm:px-7">{item.label}</span>
-                  <span className="text-white/35" aria-hidden="true">◆</span>
+                  <span className="text-inverse-muted" aria-hidden="true">◆</span>
                 </Link>
               ))}
             </div>
@@ -193,15 +193,15 @@ export default async function HomePage() {
           <div className="mt-7 grid grid-cols-2 border-l border-t border-slate-300 sm:grid-cols-3 lg:grid-cols-6">
             {neighborhoods.map((neighborhood, index) => (
               <Link
-                className={`group min-h-28 border-r border-b border-slate-300 bg-white p-4 transition-colors hover:bg-slate-950 hover:text-white ${neighborhood.count === 0 ? "text-slate-400" : "text-slate-950"}`}
+                className={`group min-h-28 border-r border-b border-slate-300 bg-surface p-4 transition-colors hover:bg-inverse hover:text-inverse-foreground ${neighborhood.count === 0 ? "text-slate-400" : "text-slate-950"}`}
                 href={`/properties?location=${encodeURIComponent(neighborhood.name)}&page=1`}
                 key={neighborhood.name}
               >
-                <span className="text-xs text-slate-400 group-hover:text-slate-400">
+                <span className="text-xs text-slate-400 group-hover:text-inverse-muted">
                   0{index + 1}
                 </span>
                 <h3 className="mt-5 font-semibold">{neighborhood.name}</h3>
-                <p className="mt-1 text-xs text-slate-500 group-hover:text-slate-300">
+                <p className="mt-1 text-xs text-slate-500 group-hover:text-inverse-muted">
                   {formatNumber(neighborhood.count)} {neighborhood.count === 1 ? "listing" : "listings"}
                 </p>
               </Link>
@@ -210,7 +210,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-slate-300 bg-white">
+      <section className="border-b border-slate-300 bg-surface">
         <div className="mx-auto grid w-full max-w-[90rem] gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[0.55fr_1.45fr] lg:px-10 lg:py-20">
           <div>
             <p className="text-xs font-semibold uppercase text-slate-500">
@@ -267,7 +267,7 @@ export default async function HomePage() {
             ))}
           </div>
         ) : (
-          <div className="mt-8 border-y border-slate-300 bg-white py-12 text-center">
+          <div className="mt-8 border-y border-slate-300 bg-surface py-12 text-center">
             <Building2 className="mx-auto text-slate-400" size={28} aria-hidden="true" />
             <p className="mt-4 font-semibold text-slate-950">
               Properties are being refreshed.

@@ -5,7 +5,7 @@ import { buttonClasses } from "@/components/ui/button";
 export default function NotFound() {
   return (
     <main className="bg-slate-50 px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-xl rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm">
+      <div className="mx-auto max-w-xl rounded-md border border-slate-200 bg-surface p-8 text-center shadow-sm">
         <SearchX className="mx-auto text-emerald-700" size={42} aria-hidden="true" />
         <p className="mt-5 text-sm font-semibold text-emerald-700">404 error</p>
         <h1 className="mt-2 text-3xl font-bold text-slate-950">Page not found</h1>

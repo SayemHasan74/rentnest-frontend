@@ -14,24 +14,24 @@ type DashboardSectionProps = {
 
 const toneClasses = {
   dark: {
-    section: "border-slate-950 bg-white",
-    header: "border-slate-950 bg-slate-950 text-white",
-    description: "text-slate-300",
-    icon: "border-white/30 bg-white text-slate-950",
+    section: "border-inverse bg-surface",
+    header: "border-inverse bg-inverse text-inverse-foreground",
+    description: "text-inverse-muted",
+    icon: "border-inverse-foreground/30 bg-inverse-foreground text-inverse",
     index: "text-slate-400",
   },
   light: {
-    section: "border-slate-300 bg-white",
-    header: "border-slate-300 bg-white text-slate-950",
+    section: "border-slate-300 bg-surface",
+    header: "border-slate-300 bg-surface text-slate-950",
     description: "text-slate-600",
-    icon: "border-slate-950 bg-slate-950 text-white",
+    icon: "border-inverse bg-inverse text-inverse-foreground",
     index: "text-slate-500",
   },
   muted: {
     section: "border-slate-400 bg-slate-100",
     header: "border-slate-400 bg-slate-200 text-slate-950",
     description: "text-slate-600",
-    icon: "border-slate-950 bg-white text-slate-950",
+    icon: "border-slate-950 bg-surface text-slate-950",
     index: "text-slate-500",
   },
 } as const;

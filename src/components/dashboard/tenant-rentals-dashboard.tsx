@@ -227,7 +227,7 @@ function RentalRequestItem({
       ) : null}
 
       {canPay ? (
-        <div className="mt-4 flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700">
+        <div className="mt-4 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
           <ExternalLink size={16} aria-hidden="true" />
           Approved for payment. Pay now opens secure Stripe checkout.
         </div>
@@ -305,18 +305,18 @@ function ReviewPanel({
 
   if (request.review) {
     return (
-      <div className="mt-4 rounded-md border border-purple-200 bg-purple-50 p-4">
+      <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-4">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge className="gap-1.5" tone="purple">
+          <Badge className="gap-1.5" tone="amber">
             <Star size={14} fill="currentColor" aria-hidden="true" />
             Reviewed {request.review.rating}/5
           </Badge>
-          <span className="text-xs font-medium text-purple-700">
+          <span className="text-xs font-medium text-amber-700">
             {formatDate(request.review.createdAt)}
           </span>
         </div>
         {request.review.comment ? (
-          <p className="mt-3 text-sm leading-6 text-purple-800">
+          <p className="mt-3 text-sm leading-6 text-amber-800">
             {request.review.comment}
           </p>
         ) : null}
@@ -478,7 +478,7 @@ export function TenantRentalsDashboard() {
           ["COMPLETED", "REJECTED", "CANCELLED"].includes(request.status),
         ),
         title: "Rental history",
-        tone: "border-slate-500 bg-white",
+        tone: "border-slate-500 bg-surface",
       },
     ],
     [visibleRequests],
@@ -527,7 +527,7 @@ export function TenantRentalsDashboard() {
   return (
     <main className="bg-slate-50">
       <Toast message={refreshError} tone="error" />
-      <section className="border-b border-slate-300 bg-white">
+      <section className="border-b border-slate-300 bg-surface">
         <div className="mx-auto w-full max-w-[90rem] px-4 py-10 sm:px-6 lg:px-10 lg:py-14">
           <p className="text-xs font-semibold uppercase text-slate-500">Tenant dashboard</p>
           <div className="mt-4 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
@@ -564,14 +564,14 @@ export function TenantRentalsDashboard() {
 
         <nav
           aria-label="Tenant dashboard sections"
-          className="grid border border-slate-300 bg-white sm:grid-cols-2"
+          className="grid border border-slate-300 bg-surface sm:grid-cols-2"
         >
           {[
             { href: "#my-requests", label: "My rental requests", number: "01" },
             { href: "#payment-history", label: "Payment history", number: "02" },
           ].map((item) => (
             <a
-              className="flex min-h-14 items-center gap-3 border-b border-slate-300 px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-950 hover:text-white last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0"
+              className="flex min-h-14 items-center gap-3 border-b border-slate-300 px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-inverse hover:text-inverse-foreground last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0"
               href={item.href}
               key={item.href}
             >

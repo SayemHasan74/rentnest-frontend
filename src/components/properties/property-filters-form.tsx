@@ -98,7 +98,7 @@ export function PropertyFiltersForm({
         <div className="grid gap-2">
           <Label htmlFor="type">Property type</Label>
           <select
-            className="h-10 w-full rounded-sm border border-slate-400 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
+            className="h-10 w-full rounded-md border border-slate-400 bg-surface px-3 text-sm text-slate-950 outline-none transition focus:border-primary focus:ring-2 focus:ring-emerald-100"
             id="type"
             name="type"
             onChange={(event) => updateFilter("type", event.target.value)}
@@ -155,7 +155,7 @@ export function PropertyFiltersForm({
         <div className="grid gap-2">
           <Label htmlFor="limit">Listings per page</Label>
           <select
-            className="h-10 w-full rounded-sm border border-slate-400 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
+            className="h-10 w-full rounded-md border border-slate-400 bg-surface px-3 text-sm text-slate-950 outline-none transition focus:border-primary focus:ring-2 focus:ring-emerald-100"
             id="limit"
             name="limit"
             onChange={(event) => updateFilter("limit", event.target.value)}

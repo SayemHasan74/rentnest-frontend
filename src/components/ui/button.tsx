@@ -6,13 +6,13 @@ type ButtonSize = "sm" | "md" | "lg" | "icon";
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "border border-slate-950 bg-slate-950 text-white hover:bg-slate-800 focus-visible:outline-slate-950",
+    "border border-primary bg-primary text-primary-foreground hover:border-primary-hover hover:bg-primary-hover focus-visible:outline-primary",
   secondary:
-    "border border-slate-700 bg-slate-700 text-white hover:bg-slate-950 focus-visible:outline-slate-900",
+    "border border-inverse bg-inverse text-inverse-foreground hover:border-inverse-hover hover:bg-inverse-hover focus-visible:outline-inverse",
   outline:
-    "border border-slate-400 bg-transparent text-slate-950 hover:border-slate-950 hover:bg-slate-950 hover:text-white focus-visible:outline-slate-700",
+    "border border-slate-400 bg-transparent text-slate-950 hover:border-emerald-700 hover:bg-emerald-50 hover:text-emerald-700 focus-visible:outline-emerald-700",
   ghost:
-    "text-slate-700 hover:bg-slate-200 hover:text-slate-950 focus-visible:outline-slate-700",
+    "border border-transparent text-slate-700 hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-emerald-700",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -32,7 +32,7 @@ export const buttonClasses = ({
   className?: string;
 } = {}) =>
   cn(
-    "inline-flex items-center justify-center gap-2 rounded-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-50",
     variantClasses[variant],
     sizeClasses[size],
     className,
