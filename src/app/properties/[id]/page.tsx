@@ -14,6 +14,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { PropertyGallery } from "@/components/properties/property-gallery";
+import { PropertyCard } from "@/components/properties/property-card";
 import { RentalRequestPanel } from "@/components/properties/rental-request-panel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,6 +75,22 @@ const specItems = (property: Property) => [
   },
 ];
 
+const getRelatedProperties = async (property: Property) => {
+  const filters = property.category?.name
+    ? { type: property.category.name, limit: 4 }
+    : { location: property.location, limit: 4 };
+
+  try {
+    const result = await api.properties.list(filters);
+
+    return result.properties
+      .filter((candidate) => candidate.id !== property.id)
+      .slice(0, 3);
+  } catch {
+    return [];
+  }
+};
+
 export default async function PropertyDetailsPage({
   params,
 }: {
@@ -81,6 +98,7 @@ export default async function PropertyDetailsPage({
 }) {
   const { id } = await params;
   const property = await getProperty(id);
+  const relatedProperties = await getRelatedProperties(property);
   const reviews = property.reviews ?? [];
 
   return (
@@ -251,6 +269,32 @@ export default async function PropertyDetailsPage({
             </Card>
           </aside>
         </div>
+
+        {relatedProperties.length > 0 ? (
+          <section className="mt-14 border-t border-slate-300 pt-10 lg:mt-20 lg:pt-14">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-xs font-semibold uppercase text-slate-500">
+                  Keep exploring
+                </p>
+                <h2 className="mt-2 text-3xl font-semibold text-slate-950 sm:text-4xl">
+                  More {property.category?.name ?? "rental"} homes to consider
+                </h2>
+              </div>
+              <Link
+                className="border-b border-slate-950 pb-1 text-sm font-semibold text-slate-950"
+                href={property.category?.name ? `/properties?type=${encodeURIComponent(property.category.name)}` : "/properties"}
+              >
+                Browse all properties
+              </Link>
+            </div>
+            <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {relatedProperties.map((relatedProperty) => (
+                <PropertyCard key={relatedProperty.id} property={relatedProperty} />
+              ))}
+            </div>
+          </section>
+        ) : null}
       </section>
     </main>
   );

@@ -71,12 +71,12 @@ Status meanings:
 
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
-| DETAIL-01 | Details page is publicly accessible. | VERIFIED | `/properties/[id]` does not require authentication. | 8, 16 |
-| DETAIL-02 | Show multiple images or media when applicable. | PARTIAL | Gallery supports arrays, but live records can repeat a single image. | 8, 15 |
+| DETAIL-01 | Details page is publicly accessible. | VERIFIED | `/properties/[id]` remains public and rendered without authentication. | 8, 16 |
+| DETAIL-02 | Show multiple images or media when applicable. | VERIFIED | Part 08 displays the supplied primary image plus up to four supplied previews; a single-image listing correctly uses one full-width image without duplication. | 8, 15 |
 | DETAIL-03 | Separate description/overview section. | VERIFIED | Property overview is present. | 8, 16 |
 | DETAIL-04 | Separate key information/specifications section. | VERIFIED | Bedrooms, bathrooms, area, status, and amenities are separated. | 8, 16 |
 | DETAIL-05 | Separate reviews/ratings section when applicable. | VERIFIED | Reviews are included. | 8, 16 |
-| DETAIL-06 | Separate related-items section when applicable. | MISSING | No related property section exists. | 8 |
+| DETAIL-06 | Separate related-items section when applicable. | VERIFIED | Part 08 adds up to three real same-category related listings, excluding the active property. | 8 |
 
 ## 5. Listing / Explore Page
 

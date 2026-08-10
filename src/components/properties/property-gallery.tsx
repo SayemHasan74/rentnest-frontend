@@ -12,12 +12,11 @@ export function PropertyGallery({
 }) {
   const galleryImages = images.length > 0 ? images : [fallbackImage];
   const [primaryImage, ...secondaryImages] = galleryImages;
-  const previewImages =
-    secondaryImages.length > 0 ? secondaryImages.slice(0, 4) : galleryImages.slice(0, 1);
+  const previewImages = secondaryImages.slice(0, 4);
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[1.4fr_0.6fr]">
-      <div className="relative aspect-[16/10] overflow-hidden bg-slate-200">
+    <div className={`grid gap-3 ${previewImages.length > 0 ? "lg:grid-cols-[1.4fr_0.6fr]" : ""}`}>
+      <div className="relative aspect-[16/10] overflow-hidden rounded-md bg-slate-200">
         <Image
           alt={title}
           className="object-cover"
@@ -27,22 +26,24 @@ export function PropertyGallery({
           src={primaryImage}
         />
       </div>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
-        {previewImages.map((image, index) => (
-          <div
-            className="relative aspect-[16/10] overflow-hidden bg-slate-200 lg:aspect-auto"
-            key={`${image}-${index}`}
-          >
-            <Image
-              alt={`${title} preview ${index + 1}`}
-              className="object-cover"
-              fill
-              sizes="(min-width: 1024px) 30vw, 50vw"
-              src={image}
-            />
-          </div>
-        ))}
-      </div>
+      {previewImages.length > 0 ? (
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
+          {previewImages.map((image, index) => (
+            <div
+              className="relative aspect-[16/10] overflow-hidden rounded-md bg-slate-200 lg:aspect-auto"
+              key={`${image}-${index}`}
+            >
+              <Image
+                alt={`${title} preview ${index + 1}`}
+                className="object-cover"
+                fill
+                sizes="(min-width: 1024px) 30vw, 50vw"
+                src={image}
+              />
+            </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
