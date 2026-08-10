@@ -18,7 +18,7 @@ Feature-specific forms, all-page responsive certification, property-card content
 
 ## Implemented design system
 
-`src/app/globals.css` now defines two semantic themes instead of a fixed light palette. The visual palette is limited to:
+`src/app/globals.css` now defines two semantic themes instead of a fixed light palette. The dark theme uses navy-blue and blue-grey neutrals; emerald is reserved for brand actions and semantic feedback rather than page surfaces. The visual palette is limited to:
 
 | Family | Purpose |
 | --- | --- |
@@ -65,10 +65,10 @@ Representative WCAG contrast calculations:
 | Light primary button text / button | 7.68:1 |
 | Light inverse foreground / inverse surface | 18.93:1 |
 | Light error text / error surface | 5.91:1 |
-| Dark body text / page background | 17.55:1 |
-| Dark muted text / surface | 9.76:1 |
+| Dark body text / page background | 17.09:1 |
+| Dark muted text / surface | 11.95:1 |
 | Dark primary button text / button | 8.89:1 |
-| Dark inverse foreground / inverse surface | 18.38:1 |
+| Dark inverse foreground / inverse surface | 17.06:1 |
 | Dark error text / error surface | 9.33:1 |
 
 All sampled normal-text pairs exceed WCAG AA's 4.5:1 threshold.
