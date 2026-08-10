@@ -131,7 +131,7 @@ export default async function PropertiesPage({
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-[90rem] gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[18rem_1fr] lg:px-10 lg:py-14">
+      <section className="mx-auto grid w-full max-w-[90rem] gap-8 px-4 py-10 sm:px-6 xl:grid-cols-[18rem_1fr] xl:px-10 xl:py-14">
         <aside>
           <PropertyFiltersForm
             categories={categories as Category[]}
@@ -162,7 +162,7 @@ export default async function PropertiesPage({
 
           {propertyData && propertyData.properties.length > 0 ? (
             <>
-              <div className="grid gap-x-5 gap-y-10 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {propertyData.properties.map((property, index) => (
                   <PropertyCard
                     key={property.id}

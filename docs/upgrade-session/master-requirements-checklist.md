@@ -59,13 +59,13 @@ Status meanings:
 | --- | --- | --- | --- | --- |
 | CARD-01 | Each card includes an image. | VERIFIED | Property cards use Next Image with a fallback. | 6, 16 |
 | CARD-02 | Each card includes a title. | VERIFIED | Property title is rendered and linked. | 6, 16 |
-| CARD-03 | Each card includes a short description. | MISSING | Property cards do not render descriptions. | 6 |
+| CARD-03 | Each card includes a short description. | VERIFIED | Part 06 renders a two-line, real property-description preview on every card. | 6 |
 | CARD-04 | Each card includes meta information. | VERIFIED | Price, location, beds, baths, area, category, and amenities are shown. | 6, 16 |
 | CARD-05 | Each card includes a View Details button/link. | VERIFIED | A View details link is rendered. | 6, 16 |
-| CARD-06 | Cards have the same height and width. | PARTIAL | Grid widths are consistent, but content height is not explicitly controlled. | 6 |
-| CARD-07 | Cards share border radius and layout. | PARTIAL | Layout is shared, but card/radius treatment differs from other card systems. | 2, 6 |
-| CARD-08 | Desktop displays at least 3 cards per row. | PARTIAL | Three columns begin at `xl`; smaller desktop widths use two. | 6 |
-| CARD-09 | Show a skeleton loader while data loads. | VERIFIED | Route-level six-card skeleton exists. | 6, 16 |
+| CARD-06 | Cards have the same height and width. | VERIFIED | Part 06 uses a fixed 38rem card height and equal grid columns; browser QA measured three equal 608px cards at desktop. | 6 |
+| CARD-07 | Cards share border radius and layout. | VERIFIED | Part 06 gives every public listing card the shared medium radius, surface, border, image ratio, metadata order, and action placement. | 2, 6 |
+| CARD-08 | Desktop displays at least 3 cards per row. | VERIFIED | The public listing grid uses three equal columns from the large desktop breakpoint; browser QA confirmed three 330px cards at 1440px. | 6 |
+| CARD-09 | Show a skeleton loader while data loads. | VERIFIED | Part 06 adds a route-level, six-card loading skeleton that matches the completed card dimensions. | 6, 16 |
 
 ## 4. Details Page
 

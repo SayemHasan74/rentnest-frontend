@@ -333,7 +333,7 @@ export default async function HomePage() {
         </div>
 
         {featuredProperties.length > 0 ? (
-          <div className="mt-8 grid gap-x-6 gap-y-10 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {featuredProperties.map((property: Property, index: number) => (
               <PropertyCard key={property.id} priority={index === 0} property={property} />
             ))}
