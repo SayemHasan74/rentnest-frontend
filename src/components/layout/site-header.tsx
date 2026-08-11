@@ -68,11 +68,14 @@ export function SiteHeader() {
   const isAuthenticated = Boolean(token && user);
   const dashboardPath = user ? getRoleDashboardPath(user.role) : "/dashboard";
   const primaryRoleLink = user ? getPrimaryRoleLink(user.role) : null;
-  const navLinks = [
-    ...publicNavigationLinks,
-    ...(isAuthenticated ? [{ href: dashboardPath, label: "Dashboard" }] : []),
-    ...(isAuthenticated && primaryRoleLink ? [primaryRoleLink] : []),
-  ];
+  const navLinks =
+    pathname === "/"
+      ? []
+      : [
+          ...publicNavigationLinks,
+          ...(isAuthenticated ? [{ href: dashboardPath, label: "Dashboard" }] : []),
+          ...(isAuthenticated && primaryRoleLink ? [primaryRoleLink] : []),
+        ];
 
   useEffect(() => {
     if (isAuthenticated && token && user) {
