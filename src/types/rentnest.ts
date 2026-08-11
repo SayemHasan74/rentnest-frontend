@@ -66,6 +66,12 @@ export type LoginPayload = {
   password: string;
 };
 
+export type ProfileUpdatePayload = {
+  name: string;
+  phone: string | null;
+  address: string | null;
+};
+
 export type Category = {
   id: string;
   name: string;

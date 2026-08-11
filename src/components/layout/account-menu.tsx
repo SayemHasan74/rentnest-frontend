@@ -37,6 +37,7 @@ const linkIcons = {
   "Manage users": UsersRound,
   "Manage categories": ShieldCheck,
   "Review properties": Building2,
+  Profile: UserRound,
 } as const;
 
 export function AccountMenu({

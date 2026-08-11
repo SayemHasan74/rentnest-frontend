@@ -104,11 +104,11 @@ Status meanings:
 | DASH-01 | Multiple roles such as User/Admin/Manager. | VERIFIED | Tenant, Landlord, and Admin roles exist in frontend and backend. | 11-14, 16 |
 | DASH-02 | User sidebar has at least 4 menu items/pages. | MISSING | Tenant dashboard currently exposes two section links. | 11, 12 |
 | DASH-03 | Admin sidebar has at least 6 menu items/pages. | MISSING | No admin sidebar or six-page navigation exists. | 11, 14 |
-| DASH-04 | Dashboard navbar has profile icon/dropdown with Profile and Logout. | MISSING | No dashboard-specific profile dropdown exists. | 10, 11 |
+| DASH-04 | Dashboard navbar has profile icon/dropdown with Profile and Logout. | VERIFIED | Part 10 adds Profile to the existing icon-based responsive account dropdown, which is present in the shared dashboard shell alongside Logout and role-aware actions. | 10, 11 |
 | DASH-05 | Dashboard includes overview cards. | VERIFIED | Tenant, landlord, and admin dashboards have API-derived statistic cards. | 12-14, 16 |
 | DASH-06 | Dashboard includes charts backed by real dynamic data. | MISSING | No charts or chart dependency exists. | 11-14 |
 | DASH-07 | Dashboard includes data tables. | PARTIAL | Admin users and tenant payments are tables; other datasets are cards. | 11-14 |
-| DASH-08 | Editable profile page. | MISSING | No profile route or update API exists. | 10 |
+| DASH-08 | Editable profile page. | VERIFIED | Part 10 adds protected `/dashboard/profile` with a validated name, phone, and address form backed by authenticated `PATCH /api/auth/me`. | 10 |
 | DASH-09 | All dashboard tables support filtering and pagination. | MISSING | Only admin users have both; other datasets do not. | 11-14 |
 
 ## 8. Additional Pages
@@ -133,12 +133,12 @@ Status meanings:
 
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
-| FORM-01 | Client-side required-field and format validation. | PARTIAL | Parts 04 and 09 validate required fields, email format, minimum lengths, and auth optional-field limits; the remaining dashboard forms still need standardization. | 4, 9, 10, 12-14, 16 |
-| FORM-02 | Server-side validation. | VERIFIED | Existing write endpoints use Zod validation; Part 09 adds direct login/registration schema regression coverage. | 4, 9, 10, 13-15 |
-| FORM-03 | Proper error and success messages. | PARTIAL | Part 09 adds accessible authentication error messages and a demo-credential success notice; every form is not yet covered. | 4, 9, 10, 12-14, 16 |
-| FORM-04 | Loading state via spinner or disabled button. | PARTIAL | Parts 04 and 09 disable submission and show an inline spinner with action-specific copy; final all-form verification remains. | 4, 9, 10, 12-14, 16 |
-| FORM-05 | Proper label usage. | PARTIAL | Part 09 connects auth labels and uses a semantic role legend; some composite controls elsewhere need improvement. | 4, 9, 10, 12-14, 16 |
-| FORM-06 | Accessible inputs with labels connected to inputs. | PARTIAL | Part 09 auth inputs now expose matching labels, invalid state, and error descriptions; all controls have not passed a full accessibility audit. | 4, 9, 10, 12-14, 16 |
+| FORM-01 | Client-side required-field and format validation. | PARTIAL | Parts 04, 09, and 10 validate required fields, email format, minimum lengths, and profile contact limits; the remaining dashboard forms still need standardization. | 4, 9, 10, 12-14, 16 |
+| FORM-02 | Server-side validation. | VERIFIED | Existing write endpoints use Zod validation; Part 10 adds a tested validation schema for authenticated profile updates. | 4, 9, 10, 13-15 |
+| FORM-03 | Proper error and success messages. | PARTIAL | Part 10 adds accessible profile save success and error feedback; every form is not yet covered. | 4, 9, 10, 12-14, 16 |
+| FORM-04 | Loading state via spinner or disabled button. | PARTIAL | Part 10 disables profile submission and shows a spinner with saving feedback; final all-form verification remains. | 4, 9, 10, 12-14, 16 |
+| FORM-05 | Proper label usage. | PARTIAL | Part 10 profile controls have visible labels; some composite controls elsewhere need improvement. | 4, 9, 10, 12-14, 16 |
+| FORM-06 | Accessible inputs with labels connected to inputs. | PARTIAL | Part 10 profile inputs now expose connected labels, invalid state, and error descriptions; all controls have not passed a full accessibility audit. | 4, 9, 10, 12-14, 16 |
 
 ### Required forms
 
@@ -149,7 +149,7 @@ Status meanings:
 | FORM-09 | Contact form. | VERIFIED | Public Contact page validates client-side, persists through `POST /api/contact`, validates server-side, and provides loading, error, and success states. | 4 |
 | FORM-10 | Create-item form. | VERIFIED | Landlord property creation form exists. | 13, 16 |
 | FORM-11 | Edit-item form. | VERIFIED | Landlord property editing exists. | 13, 16 |
-| FORM-12 | Profile-update form. | MISSING | No profile form exists. | 10 |
+| FORM-12 | Profile-update form. | VERIFIED | Part 10 provides an authenticated, editable profile form with client/server validation, accessible feedback, and save state. | 10 |
 
 ## 11. Backend Requirements
 

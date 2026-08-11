@@ -13,6 +13,7 @@ import type {
   CreateRentalPayload,
   CreateReviewPayload,
   LoginPayload,
+  ProfileUpdatePayload,
   Payment,
   Property,
   PropertyFilters,
@@ -140,6 +141,12 @@ export const api = {
     me: (token: string) =>
       apiRequest<User>("/auth/me", {
         token,
+      }),
+    updateProfile: (token: string, body: ProfileUpdatePayload) =>
+      apiRequest<User>("/auth/me", {
+        method: "PATCH",
+        token,
+        body,
       }),
   },
 

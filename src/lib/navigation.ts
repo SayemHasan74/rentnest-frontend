@@ -15,18 +15,21 @@ export const accountNavigationLinks: Record<UserRole, ShellLink[]> = {
     { href: "/dashboard/tenant", label: "Dashboard overview" },
     { href: "/dashboard/tenant#my-requests", label: "My rental requests" },
     { href: "/dashboard/tenant#payment-history", label: "Payment history" },
+    { href: "/dashboard/profile", label: "Profile" },
   ],
   LANDLORD: [
     { href: "/dashboard/landlord", label: "Dashboard overview" },
     { href: "/dashboard/landlord#add-property", label: "Add a property" },
     { href: "/dashboard/landlord#my-properties", label: "My properties" },
     { href: "/dashboard/landlord#rental-requests", label: "Rental requests" },
+    { href: "/dashboard/profile", label: "Profile" },
   ],
   ADMIN: [
     { href: "/dashboard/admin", label: "Dashboard overview" },
     { href: "/dashboard/admin#users", label: "Manage users" },
     { href: "/dashboard/admin#categories", label: "Manage categories" },
     { href: "/dashboard/admin#properties", label: "Review properties" },
+    { href: "/dashboard/profile", label: "Profile" },
   ],
 };
 
