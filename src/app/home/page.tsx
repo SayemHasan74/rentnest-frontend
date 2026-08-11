@@ -7,8 +7,11 @@ import {
   FileCheck2,
   HeartHandshake,
   KeyRound,
+  MapPin,
+  MoveRight,
   Search,
   ShieldCheck,
+  Sparkles,
 } from "lucide-react";
 import { HomeHeroActions } from "@/components/home/home-hero-actions";
 import { PropertyCard } from "@/components/properties/property-card";
@@ -117,6 +120,7 @@ const getHomeData = async () => {
 export default async function HomePage() {
   const { categories, errorMessage, properties, totalProperties } = await getHomeData();
   const featuredProperties = properties.slice(0, 3);
+  const heroProperty = featuredProperties[0];
   const neighborhoods = neighborhoodNames.map((name) => ({
     count: properties.filter((property) =>
       property.location.toLowerCase().includes(name.toLowerCase()),
@@ -152,36 +156,76 @@ export default async function HomePage() {
         </div>
       ) : null}
 
-      <section className="h-[65svh] overflow-hidden border-b border-slate-300 bg-surface">
-        <div className="mx-auto flex h-full w-full max-w-[90rem] flex-col justify-center px-4 py-8 sm:px-6 sm:py-10 lg:px-10">
-          <div className="max-w-4xl">
-            <p className="text-xs font-semibold uppercase text-slate-500">
-              RentNest · Dhaka
-            </p>
-            <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight text-slate-950 sm:text-6xl lg:text-7xl">
-              Every neighborhood tells a different story.
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-              Find a home across Dhaka, compare the essentials, and connect
-              directly with landlords through one clear rental process.
-            </p>
-            <HomeHeroActions />
+      <section className="home-editorial-hero overflow-hidden">
+        <div className="mx-auto grid min-h-[42rem] w-full max-w-[90rem] gap-10 px-4 py-6 sm:px-6 lg:min-h-[40rem] lg:grid-cols-[1.05fr_.95fr] lg:gap-16 lg:px-10 lg:py-10">
+          <div className="flex flex-col justify-between py-6 lg:py-10">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
+                <Sparkles size={14} aria-hidden="true" />
+                Thoughtful rentals, Dhaka
+              </div>
+              <h1 className="mt-7 max-w-3xl text-5xl font-semibold leading-[0.98] tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">
+                Your next address should feel like a yes.
+              </h1>
+              <p className="mt-7 max-w-xl text-base leading-7 text-white/70 sm:text-lg">
+                A calmer way to find a rental: thoughtful homes, clear details,
+                and a direct path from first look to move-in.
+              </p>
+              <HomeHeroActions inverted />
+              <div className="mt-9 flex flex-wrap gap-2" aria-label="Popular neighborhoods">
+                {neighborhoods.slice(0, 4).map((neighborhood) => (
+                  <Link
+                    className="group inline-flex items-center gap-2 rounded-full border border-white/15 px-3.5 py-2 text-xs font-medium text-white/75 transition hover:border-white/45 hover:bg-white/10 hover:text-white"
+                    href={`/properties?location=${encodeURIComponent(neighborhood.name)}&page=1`}
+                    key={neighborhood.name}
+                  >
+                    {neighborhood.name}
+                    <MoveRight className="transition-transform group-hover:translate-x-0.5" size={14} aria-hidden="true" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-12 grid max-w-xl grid-cols-3 border-t border-white/15 pt-5 sm:mt-8">
+              {[
+                [formatNumber(totalProperties), "homes to explore"],
+                [formatNumber(categories.length), "ways to live"],
+                [formatNumber(neighborhoods.filter((item) => item.count > 0).length), "active areas"],
+              ].map(([value, label], index) => (
+                <div className={index > 0 ? "border-l border-white/15 pl-4" : ""} key={label}>
+                  <p className="text-2xl font-semibold tracking-[-0.04em] text-white sm:text-3xl">{value}</p>
+                  <p className="mt-1 text-xs leading-5 text-white/55">{label}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-8 hidden max-w-3xl grid-cols-3 border-y border-slate-300 sm:grid">
-            {[
-              [formatNumber(totalProperties), "Available listings"],
-              [formatNumber(categories.length), "Property types"],
-              [formatNumber(neighborhoods.filter((item) => item.count > 0).length), "Active areas"],
-            ].map(([value, label], index) => (
-              <div
-                className={`py-4 pr-4 ${index > 0 ? "border-l border-slate-300 pl-4" : ""}`}
-                key={label}
-              >
-                <p className="text-3xl font-semibold text-slate-950">{value}</p>
-                <p className="mt-1 text-xs font-medium text-slate-500">{label}</p>
+          <div className="home-editorial-visual relative min-h-80 overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/25 lg:min-h-full">
+            <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5 text-xs font-medium text-white/80">
+              <span className="rounded-full bg-black/30 px-3 py-1.5 backdrop-blur-sm">Featured today</span>
+              <span className="rounded-full bg-white/15 px-3 py-1.5 backdrop-blur-sm">RentNest edit</span>
+            </div>
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7">
+              <div className="max-w-sm rounded-xl border border-white/15 bg-[#0d172a]/80 p-5 text-white shadow-xl backdrop-blur-md">
+                <div className="flex items-center gap-2 text-xs font-medium text-white/60">
+                  <MapPin size={14} aria-hidden="true" />
+                  {heroProperty?.location ?? "Dhaka, Bangladesh"}
+                </div>
+                <h2 className="mt-3 text-xl font-semibold tracking-[-0.03em] sm:text-2xl">
+                  {heroProperty?.title ?? "A home chosen with care"}
+                </h2>
+                <div className="mt-5 flex items-center justify-between gap-4 border-t border-white/15 pt-4">
+                  <span className="text-sm text-white/65">From {heroProperty ? formatNumber(Number(heroProperty.rentAmount)) : "—"} BDT / month</span>
+                  <Link
+                    aria-label="View featured property"
+                    className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-950 transition hover:scale-105"
+                    href={heroProperty ? `/properties/${heroProperty.id}` : "/properties"}
+                  >
+                    <ArrowRight size={16} aria-hidden="true" />
+                  </Link>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>

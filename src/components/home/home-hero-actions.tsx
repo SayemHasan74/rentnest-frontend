@@ -24,7 +24,7 @@ const subscribeToAuthSession = (callback: () => void) => {
 const getUserSnapshot = () => JSON.stringify(getStoredUser());
 const getServerUserSnapshot = () => "null";
 
-export function HomeHeroActions() {
+export function HomeHeroActions({ inverted = false }: { inverted?: boolean }) {
   const userSnapshot = useSyncExternalStore(
     subscribeToAuthSession,
     getUserSnapshot,
@@ -39,7 +39,13 @@ export function HomeHeroActions() {
         <ArrowRight size={17} aria-hidden="true" />
       </Link>
       <Link
-        className={buttonClasses({ variant: "outline", size: "lg" })}
+        className={buttonClasses({
+          variant: "outline",
+          size: "lg",
+          className: inverted
+            ? "border-white/35 bg-transparent text-white hover:border-white hover:bg-white/10 hover:text-white"
+            : undefined,
+        })}
         href={action.href}
       >
         {action.label}

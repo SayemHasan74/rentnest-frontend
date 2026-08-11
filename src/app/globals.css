@@ -235,6 +235,18 @@ select {
   will-change: transform;
 }
 
+.home-editorial-hero {
+  background: #0d172a;
+}
+
+.home-editorial-visual {
+  background-image:
+    linear-gradient(180deg, rgba(8, 15, 28, 0.05) 20%, rgba(8, 15, 28, 0.92) 100%),
+    url("https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1500&q=85");
+  background-position: center;
+  background-size: cover;
+}
+
 .home-ticker:hover .home-ticker-track,
 .home-ticker:focus-within .home-ticker-track {
   animation-play-state: paused;
