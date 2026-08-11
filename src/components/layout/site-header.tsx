@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import {
   Building,
   ClipboardList,
-  Home,
   LayoutDashboard,
   LogIn,
   Menu,
@@ -31,7 +30,7 @@ import { cn } from "@/lib/utils";
 import type { User } from "@/types/rentnest";
 
 const navIcons = {
-  Home,
+  "Explore rentals": Search,
   Properties: Search,
   Dashboard: LayoutDashboard,
   "My rental requests": ClipboardList,

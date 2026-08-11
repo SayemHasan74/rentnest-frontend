@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 const footerLinks = [
-  { href: "/home", label: "Home" },
+  { href: "/home", label: "Explore rentals" },
   { href: "/properties", label: "Browse properties" },
   { href: "/about", label: "About RentNest" },
   { href: "/help", label: "Help & support" },
@@ -54,7 +54,7 @@ export function SiteFooter() {
     <footer className="border-t border-black bg-black text-white">
       <div className="mx-auto grid w-full max-w-[90rem] gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.35fr_0.8fr_0.9fr_1fr] lg:px-10">
         <div>
-          <Link className="flex items-center gap-2.5 text-xl font-bold text-white" href="/home">
+          <Link className="flex items-center gap-2.5 text-xl font-bold text-white" href="/">
             <Building size={23} strokeWidth={1.7} aria-hidden="true" />
             <span>RentNest</span>
           </Link>
