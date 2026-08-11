@@ -121,8 +121,9 @@ export function SiteHeader() {
             <span>RentNest</span>
           </Link>
           <form action="/properties" className="hidden min-w-0 max-w-2xl flex-1 overflow-hidden rounded-xl border border-slate-300 bg-surface md:flex">
-            <label className="flex min-w-0 flex-1 flex-col justify-center border-r border-slate-300 px-4 py-2"><span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">Location</span><input className="min-w-0 bg-transparent text-sm text-slate-950 outline-none" defaultValue="Dhaka, all areas" name="location" /></label>
-            <label className="flex flex-1 flex-col justify-center border-r border-slate-300 px-4 py-2"><span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">Budget</span><select className="bg-transparent text-sm text-slate-950 outline-none" defaultValue=""><option value="">Any budget</option><option value="15000">From ৳15k</option><option value="40000">From ৳40k</option></select></label>
+            <label className="flex min-w-0 flex-1 flex-col justify-center border-r border-slate-300 px-4 py-2"><span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">Location</span><input className="min-w-0 bg-transparent text-sm text-slate-950 outline-none" name="location" placeholder="Dhaka, all areas" /></label>
+            <label className="flex flex-1 flex-col justify-center border-r border-slate-300 px-4 py-2"><span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">Budget</span><select className="bg-transparent text-sm text-slate-950 outline-none" defaultValue="" name="maxPrice"><option value="">Any budget</option><option value="30000">Up to ৳30k</option><option value="50000">Up to ৳50k</option><option value="80000">Up to ৳80k</option><option value="120000">Up to ৳120k</option></select></label>
+            <input name="page" type="hidden" value="1" />
             <button className="inline-flex items-center gap-2 bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover" type="submit"><Search size={15} aria-hidden="true" />Search</button>
           </form>
           <div className="ml-auto flex items-center gap-2"><ThemeToggle />{authActions}</div>

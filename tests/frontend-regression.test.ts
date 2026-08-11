@@ -48,6 +48,20 @@ test("the authenticated home route is protected on the server and after session 
   assert.match(verifier, /window\.location\.pathname === "\/home"/);
 });
 
+test("authenticated home uses real routes, activity data, map, and device favorites", () => {
+  const home = readFileSync("src/components/home/home-explorer.tsx", "utf8");
+  const header = readFileSync("src/components/layout/site-header.tsx", "utf8");
+
+  assert.match(header, /action="\/properties"/);
+  assert.match(header, /name="maxPrice"/);
+  assert.match(home, /openstreetmap\.org\/export\/embed\.html/);
+  assert.match(home, /api\.rentals\.listMine/);
+  assert.match(home, /api\.landlord\.requests/);
+  assert.match(home, /api\.admin\.rentals/);
+  assert.match(home, /rentnest-favorite-properties/);
+  assert.doesNotMatch(home, /% match|14 new|Tours|Message/);
+});
+
 test("background API failures have visible UI feedback", () => {
   const propertyPage = readFileSync("src/app/properties/page.tsx", "utf8");
   const warmup = readFileSync("src/components/layout/backend-warmup.tsx", "utf8");
