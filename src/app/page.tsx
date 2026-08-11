@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -7,7 +6,10 @@ import {
   CheckCircle2,
   CreditCard,
   KeyRound,
+  MapPin,
+  MoveRight,
   Search,
+  Sparkles,
 } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
 
@@ -41,51 +43,46 @@ const journey = [
 export default function LandingPage() {
   return (
     <main>
-      <section className="relative min-h-[calc(86vh-4.5rem)] overflow-hidden bg-black text-white">
-        <Image
-          alt="Bright contemporary rental home interior"
-          className="object-cover"
-          fill
-          priority
-          sizes="100vw"
-          src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
-        />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative mx-auto flex min-h-[calc(86vh-4.5rem)] w-full max-w-[90rem] flex-col justify-end px-4 py-10 sm:px-6 sm:py-14 lg:px-10 lg:py-16">
-          <p className="text-xs font-semibold uppercase text-white/70">
-            Rentals, thoughtfully connected
-          </p>
-          <h1 className="mt-4 max-w-5xl text-5xl font-semibold leading-none text-white sm:text-7xl lg:text-8xl">
-            RentNest
-          </h1>
-          <div className="mt-6 grid max-w-5xl gap-6 border-t border-white/50 pt-6 md:grid-cols-[1fr_auto] md:items-end">
-            <p className="max-w-2xl text-base leading-7 text-white/85 sm:text-lg">
-              Find a home that fits your life, or place your property in front of
-              tenants ready to move.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                className={buttonClasses({
-                  size: "lg",
-                  className: "!border-white !bg-white !text-black hover:!bg-slate-200",
-                })}
-                href="/home"
-              >
-                Find a home
-                <ArrowRight size={18} aria-hidden="true" />
-              </Link>
-              <Link
-                className={buttonClasses({
-                  variant: "outline",
-                  size: "lg",
-                  className:
-                    "border-white/70 bg-transparent text-white hover:bg-white hover:text-black",
-                })}
-                href="/auth/register"
-              >
-                List a property
-              </Link>
+      <section className="home-editorial-hero overflow-hidden text-white">
+        <div className="mx-auto grid min-h-[calc(100svh-4.5rem)] w-full max-w-[90rem] gap-8 px-4 py-6 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:gap-16 lg:px-10 lg:py-10">
+          <div className="flex flex-col justify-between py-7 lg:py-12">
+            <div>
+              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
+                <Sparkles size={14} aria-hidden="true" /> Thoughtful rentals, Dhaka
+              </p>
+              <h1 className="mt-7 max-w-3xl text-5xl font-semibold leading-[0.98] tracking-[-0.06em] sm:text-7xl lg:text-8xl">
+                A home search with better instincts.
+              </h1>
+              <p className="mt-7 max-w-xl text-base leading-7 text-white/70 sm:text-lg">
+                Discover considered homes, understand the details, and make your next move with confidence.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link className={buttonClasses({ size: "lg" })} href="/home">
+                  Explore homes <ArrowRight size={18} aria-hidden="true" />
+                </Link>
+                <Link className={buttonClasses({ variant: "outline", size: "lg", className: "border-white/35 bg-transparent text-white hover:border-white hover:bg-white/10 hover:text-white" })} href="/auth/register">
+                  List your property
+                </Link>
+              </div>
+              <div className="mt-10 flex flex-wrap gap-2">
+                {["Gulshan", "Banani", "Dhanmondi", "Uttara"].map((area) => (
+                  <Link className="group inline-flex items-center gap-2 rounded-full border border-white/15 px-3.5 py-2 text-xs font-medium text-white/75 transition hover:border-white/45 hover:bg-white/10 hover:text-white" href={`/properties?location=${area}&page=1`} key={area}>
+                    {area}<MoveRight className="transition-transform group-hover:translate-x-0.5" size={14} aria-hidden="true" />
+                  </Link>
+                ))}
+              </div>
             </div>
+            <div className="mt-12 grid max-w-xl grid-cols-3 border-t border-white/15 pt-5">
+              {[['One place', 'to search'], ['Clear steps', 'to move in'], ['Three roles', 'one marketplace']].map(([value, label], index) => (
+                <div className={index > 0 ? "border-l border-white/15 pl-4" : ""} key={value}>
+                  <p className="text-lg font-semibold tracking-[-0.04em] sm:text-xl">{value}</p><p className="mt-1 text-xs text-white/55">{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="home-editorial-visual relative min-h-80 overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/25 lg:min-h-full">
+            <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5 text-xs font-medium text-white/80"><span className="rounded-full bg-black/30 px-3 py-1.5 backdrop-blur-sm">A calmer rental journey</span><span className="rounded-full bg-white/15 px-3 py-1.5 backdrop-blur-sm">RentNest</span></div>
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7"><div className="max-w-sm rounded-xl border border-white/15 bg-[#0d172a]/80 p-5 shadow-xl backdrop-blur-md"><p className="flex items-center gap-2 text-xs text-white/60"><MapPin size={14} aria-hidden="true" /> Dhaka, Bangladesh</p><p className="mt-3 text-2xl font-semibold tracking-[-0.04em]">A place to begin well.</p><Link className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-white hover:text-emerald-200" href="/properties">Browse current rentals <ArrowRight size={15} aria-hidden="true" /></Link></div></div>
           </div>
         </div>
       </section>
