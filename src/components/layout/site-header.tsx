@@ -128,6 +128,30 @@ export function SiteHeader() {
           </form>
           <div className="ml-auto flex items-center gap-2"><ThemeToggle />{authActions}</div>
         </div>
+        <nav className="overflow-x-auto border-t border-slate-300" aria-label="Main navigation">
+          <div className="mx-auto flex h-12 w-max min-w-full items-center justify-center gap-1 px-4 sm:px-7">
+            {navLinks.map((item) => {
+              const Icon = navIcons[item.label as keyof typeof navIcons];
+              const routePath = item.href.split("#")[0];
+              const isActive = !item.href.includes("#") && pathname.startsWith(routePath);
+
+              return (
+                <Link
+                  aria-current={isActive ? "page" : undefined}
+                  className={cn(
+                    "inline-flex h-12 shrink-0 items-center gap-2 border-b-2 border-transparent px-3 text-sm font-medium text-slate-500 transition hover:border-slate-400 hover:text-slate-950",
+                    isActive && "border-primary text-slate-950",
+                  )}
+                  href={item.href}
+                  key={item.href}
+                >
+                  {Icon ? <Icon size={17} aria-hidden="true" /> : null}
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
       </header>
     );
   }

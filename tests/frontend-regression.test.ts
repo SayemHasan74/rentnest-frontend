@@ -54,6 +54,7 @@ test("authenticated home uses real routes, activity data, map, and device favori
 
   assert.match(header, /action="\/properties"/);
   assert.match(header, /name="maxPrice"/);
+  assert.match(header, /pathname === "\/home"[\s\S]*aria-label="Main navigation"/);
   assert.match(home, /openstreetmap\.org\/export\/embed\.html/);
   assert.match(home, /api\.rentals\.listMine/);
   assert.match(home, /api\.landlord\.requests/);

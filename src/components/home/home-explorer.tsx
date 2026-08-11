@@ -156,7 +156,7 @@ export function HomeExplorer({ areaCounts, categories, properties, total }: Home
 
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <section className="sticky top-[4.5rem] z-50 flex gap-2 overflow-x-auto border-b border-slate-300 bg-background px-4 py-3 sm:px-7">
+      <section className="sticky top-[7.5rem] z-50 flex gap-2 overflow-x-auto border-b border-slate-300 bg-background px-4 py-3 sm:px-7">
         <Link className="shrink-0 rounded-full border border-primary bg-[color-mix(in_srgb,var(--rn-primary)_12%,transparent)] px-4 py-2 text-sm font-medium text-primary" href="/home">All homes</Link>
         {categories.slice(0, 4).map((category) => (
           <Link className="shrink-0 rounded-full border border-slate-300 bg-surface px-4 py-2 text-sm text-slate-600 hover:border-slate-400 hover:text-slate-950" href={`/properties?type=${encodeURIComponent(category.name)}&page=1`} key={category.id}>{category.name}</Link>
