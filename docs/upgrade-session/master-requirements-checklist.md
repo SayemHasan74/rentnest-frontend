@@ -168,7 +168,7 @@ Status meanings:
 | BACK-04 | Basic modular folder structure. | VERIFIED | Modules separate controllers, services, routes, schemas, middleware, config, and libraries. | 15 |
 | BACK-05 | API route separation. | VERIFIED | Nine route files are mounted through the API router. | 15 |
 | BACK-06 | Centralized error handling. | VERIFIED | `globalErrorHandler` handles AppError, Zod, Prisma, syntax, and general errors. | 15 |
-| BACK-07 | Proper HTTP status code usage. | PARTIAL | Controllers use explicit response codes, but a full endpoint-by-endpoint contract audit remains. | 15, 16 |
+| BACK-07 | Proper HTTP status code usage. | VERIFIED | Part 16 inspected every controller response path: creates return 201, reads/updates use the shared 200 default, validation failures return 400, unknown routes return 404, and unexpected errors return 500. | 15, 16 |
 
 ### Database
 
