@@ -235,8 +235,12 @@ select {
   will-change: transform;
 }
 
-.home-editorial-hero {
-  background: #0d172a;
+.home-page-editorial-hero {
+  background: var(--rn-surface);
+}
+
+.landing-editorial-hero {
+  background: #000;
 }
 
 .home-editorial-visual {

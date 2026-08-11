@@ -156,26 +156,26 @@ export default async function HomePage() {
         </div>
       ) : null}
 
-      <section className="home-editorial-hero overflow-hidden">
+      <section className="home-page-editorial-hero overflow-hidden">
         <div className="mx-auto grid min-h-[42rem] w-full max-w-[90rem] gap-10 px-4 py-6 sm:px-6 lg:min-h-[40rem] lg:grid-cols-[1.05fr_.95fr] lg:gap-16 lg:px-10 lg:py-10">
           <div className="flex flex-col justify-between py-6 lg:py-10">
             <div>
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                 <Sparkles size={14} aria-hidden="true" />
                 Thoughtful rentals, Dhaka
               </div>
-              <h1 className="mt-7 max-w-3xl text-5xl font-semibold leading-[0.98] tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">
+              <h1 className="mt-7 max-w-3xl text-5xl font-semibold leading-[0.98] tracking-[-0.055em] text-slate-950 sm:text-6xl lg:text-7xl">
                 Your next address should feel like a yes.
               </h1>
-              <p className="mt-7 max-w-xl text-base leading-7 text-white/70 sm:text-lg">
+              <p className="mt-7 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">
                 A calmer way to find a rental: thoughtful homes, clear details,
                 and a direct path from first look to move-in.
               </p>
-              <HomeHeroActions inverted />
+              <HomeHeroActions />
               <div className="mt-9 flex flex-wrap gap-2" aria-label="Popular neighborhoods">
                 {neighborhoods.slice(0, 4).map((neighborhood) => (
                   <Link
-                    className="group inline-flex items-center gap-2 rounded-full border border-white/15 px-3.5 py-2 text-xs font-medium text-white/75 transition hover:border-white/45 hover:bg-white/10 hover:text-white"
+                    className="group inline-flex items-center gap-2 rounded-full border border-slate-300 bg-surface px-3.5 py-2 text-xs font-medium text-slate-600 transition hover:border-slate-950 hover:bg-slate-950 hover:text-white"
                     href={`/properties?location=${encodeURIComponent(neighborhood.name)}&page=1`}
                     key={neighborhood.name}
                   >
@@ -186,15 +186,15 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="mt-12 grid max-w-xl grid-cols-3 border-t border-white/15 pt-5 sm:mt-8">
+            <div className="mt-12 grid max-w-xl grid-cols-3 border-t border-slate-300 pt-5 sm:mt-8">
               {[
                 [formatNumber(totalProperties), "homes to explore"],
                 [formatNumber(categories.length), "ways to live"],
                 [formatNumber(neighborhoods.filter((item) => item.count > 0).length), "active areas"],
               ].map(([value, label], index) => (
-                <div className={index > 0 ? "border-l border-white/15 pl-4" : ""} key={label}>
-                  <p className="text-2xl font-semibold tracking-[-0.04em] text-white sm:text-3xl">{value}</p>
-                  <p className="mt-1 text-xs leading-5 text-white/55">{label}</p>
+                <div className={index > 0 ? "border-l border-slate-300 pl-4" : ""} key={label}>
+                  <p className="text-2xl font-semibold tracking-[-0.04em] text-slate-950 sm:text-3xl">{value}</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-500">{label}</p>
                 </div>
               ))}
             </div>

@@ -43,7 +43,7 @@ const journey = [
 export default function LandingPage() {
   return (
     <main>
-      <section className="home-editorial-hero overflow-hidden text-white">
+      <section className="landing-editorial-hero overflow-hidden text-white">
         <div className="mx-auto grid min-h-[calc(100svh-4.5rem)] w-full max-w-[90rem] gap-8 px-4 py-6 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:gap-16 lg:px-10 lg:py-10">
           <div className="flex flex-col justify-between py-7 lg:py-12">
             <div>
