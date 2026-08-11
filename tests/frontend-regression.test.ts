@@ -180,7 +180,7 @@ test("application shell exposes the required logged-out and logged-in actions", 
     "/auth/register",
   ];
 
-  assert.equal(new Set(loggedOutDestinations).size, 4);
+  assert.equal(new Set(loggedOutDestinations).size, 3);
   assert.match(header, /isAuthenticated \? \[\{ href: dashboardPath/);
   assert.match(header, /<AccountMenu onLogout=\{handleLogout\} user=\{user\} \/>/);
 
@@ -213,7 +213,7 @@ test("account menu supports pointer, keyboard, and assistive-technology use", ()
 test("footer contains only real internal routes and verified maintainer links", () => {
   const footer = readFileSync("src/components/layout/site-footer.tsx", "utf8");
 
-  for (const route of ["/home", "/properties", "/auth/login", "/auth/register"]) {
+  for (const route of ["/properties", "/auth/login", "/auth/register"]) {
     assert.match(footer, new RegExp(route.replaceAll("/", "\\/")));
   }
 

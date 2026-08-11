@@ -6,7 +6,6 @@ export type ShellLink = {
 };
 
 export const publicNavigationLinks: ShellLink[] = [
-  { href: "/home", label: "Explore rentals" },
   { href: "/properties", label: "Properties" },
 ];
 

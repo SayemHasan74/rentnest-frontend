@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 
 const footerLinks = [
-  { href: "/home", label: "Explore rentals" },
   { href: "/properties", label: "Browse properties" },
   { href: "/about", label: "About RentNest" },
   { href: "/help", label: "Help & support" },

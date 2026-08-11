@@ -30,7 +30,6 @@ import { cn } from "@/lib/utils";
 import type { User } from "@/types/rentnest";
 
 const navIcons = {
-  "Explore rentals": Search,
   Properties: Search,
   Dashboard: LayoutDashboard,
   "My rental requests": ClipboardList,
