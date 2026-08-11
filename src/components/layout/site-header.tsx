@@ -109,6 +109,25 @@ export function SiteHeader() {
     </>
   );
 
+  if (pathname === "/home") {
+    return (
+      <header className="sticky top-0 z-[60] border-b border-slate-300 bg-background/90 backdrop-blur-xl">
+        <div className="mx-auto flex min-h-[4.5rem] w-full max-w-[1440px] items-center gap-4 px-4 sm:px-7">
+          <Link className="flex shrink-0 items-center gap-2 font-bold text-slate-950" href="/">
+            <Building size={22} className="rounded-md bg-primary p-1 text-primary-foreground" aria-hidden="true" />
+            <span>RentNest</span>
+          </Link>
+          <form action="/properties" className="hidden min-w-0 max-w-2xl flex-1 overflow-hidden rounded-xl border border-slate-300 bg-surface md:flex">
+            <label className="flex min-w-0 flex-1 flex-col justify-center border-r border-slate-300 px-4 py-2"><span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">Location</span><input className="min-w-0 bg-transparent text-sm text-slate-950 outline-none" defaultValue="Dhaka, all areas" name="location" /></label>
+            <label className="flex flex-1 flex-col justify-center border-r border-slate-300 px-4 py-2"><span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">Budget</span><select className="bg-transparent text-sm text-slate-950 outline-none" defaultValue=""><option value="">Any budget</option><option value="15000">From ৳15k</option><option value="40000">From ৳40k</option></select></label>
+            <button className="inline-flex items-center gap-2 bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover" type="submit"><Search size={15} aria-hidden="true" />Search</button>
+          </form>
+          <div className="ml-auto flex items-center gap-2"><ThemeToggle />{authActions}</div>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="sticky top-0 z-[60] border-b border-slate-300 bg-surface/95 backdrop-blur-xl">
       <div className="mx-auto flex h-[4.5rem] w-full max-w-[90rem] items-center justify-between px-4 sm:px-6 lg:px-10">

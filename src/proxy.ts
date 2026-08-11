@@ -44,6 +44,10 @@ export function proxy(request: NextRequest) {
     return createLoginRedirect(request);
   }
 
+  if (pathname === "/home" && (!token || !role)) {
+    return createLoginRedirect(request);
+  }
+
   const route = roleProtectedRoutes.find(({ prefix }) =>
     pathname.startsWith(prefix),
   );
@@ -56,5 +60,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/auth/:path*", "/dashboard/:path*"],
+  matcher: ["/auth/:path*", "/dashboard/:path*", "/home"],
 };

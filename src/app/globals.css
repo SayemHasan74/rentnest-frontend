@@ -55,37 +55,37 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --rn-background: #0b1220;
-  --rn-foreground: #f1f5f9;
-  --rn-surface: #111827;
-  --rn-primary: #34d399;
-  --rn-primary-hover: #5ee0aa;
-  --rn-primary-foreground: #082016;
-  --rn-inverse: #f8fafc;
-  --rn-inverse-hover: #e2e8f0;
-  --rn-inverse-foreground: #0f172a;
-  --rn-inverse-muted: #475569;
+  --rn-background: #0a0a0b;
+  --rn-foreground: #f3f2ee;
+  --rn-surface: #17181b;
+  --rn-primary: #3ecf8e;
+  --rn-primary-hover: #4fdb9e;
+  --rn-primary-foreground: #06150e;
+  --rn-inverse: #f3f2ee;
+  --rn-inverse-hover: #ffffff;
+  --rn-inverse-foreground: #0a0a0b;
+  --rn-inverse-muted: #6c6d73;
 
-  --rn-slate-50: #0b1220;
-  --rn-slate-100: #111827;
-  --rn-slate-200: #1e293b;
-  --rn-slate-300: #334155;
-  --rn-slate-400: #64748b;
-  --rn-slate-500: #94a3b8;
-  --rn-slate-600: #cbd5e1;
-  --rn-slate-700: #dbe4ee;
-  --rn-slate-800: #e7edf4;
-  --rn-slate-900: #f1f5f9;
-  --rn-slate-950: #f8fafc;
+  --rn-slate-50: #0a0a0b;
+  --rn-slate-100: #111214;
+  --rn-slate-200: #17181b;
+  --rn-slate-300: #242529;
+  --rn-slate-400: #6c6d73;
+  --rn-slate-500: #9b9ca2;
+  --rn-slate-600: #b9babf;
+  --rn-slate-700: #d1d1d4;
+  --rn-slate-800: #e3e3e5;
+  --rn-slate-900: #eeeeef;
+  --rn-slate-950: #f3f2ee;
 
-  --rn-emerald-50: #0d2a21;
-  --rn-emerald-100: #123b2d;
-  --rn-emerald-200: #1c5942;
-  --rn-emerald-400: #5ee0aa;
-  --rn-emerald-500: #41d49c;
-  --rn-emerald-600: #55dca6;
-  --rn-emerald-700: #7de6b9;
-  --rn-emerald-800: #a7f3d0;
+  --rn-emerald-50: #0c2218;
+  --rn-emerald-100: #123b2a;
+  --rn-emerald-200: #1d6747;
+  --rn-emerald-400: #4fdb9e;
+  --rn-emerald-500: #3ecf8e;
+  --rn-emerald-600: #3ecf8e;
+  --rn-emerald-700: #4fdb9e;
+  --rn-emerald-800: #70e5ae;
 
   --rn-amber-50: #30230d;
   --rn-amber-200: #664a17;
@@ -115,7 +115,8 @@
   --color-inverse-foreground: var(--rn-inverse-foreground);
   --color-inverse-muted: var(--rn-inverse-muted);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-fraunces);
+  --font-mono: var(--font-ibm-plex-mono);
 
   --color-slate-50: var(--rn-slate-50);
   --color-slate-100: var(--rn-slate-100);
@@ -237,10 +238,6 @@ select {
 
 .home-page-editorial-hero {
   background: var(--rn-surface);
-}
-
-.landing-editorial-hero {
-  background: #000;
 }
 
 .home-editorial-visual {

@@ -34,6 +34,18 @@ test("cross-role dashboard redirects are rejected", () => {
   );
 });
 
+test("the authenticated home route is protected on the server and after session expiry", () => {
+  const proxy = readFileSync("src/proxy.ts", "utf8");
+  const verifier = readFileSync(
+    "src/components/layout/session-verifier.tsx",
+    "utf8",
+  );
+
+  assert.match(proxy, /pathname === "\/home" && \(!token \|\| !role\)/);
+  assert.match(proxy, /matcher: \["\/auth\/:path\*", "\/dashboard\/:path\*", "\/home"\]/);
+  assert.match(verifier, /window\.location\.pathname === "\/home"/);
+});
+
 test("background API failures have visible UI feedback", () => {
   const propertyPage = readFileSync("src/app/properties/page.tsx", "utf8");
   const warmup = readFileSync("src/components/layout/backend-warmup.tsx", "utf8");

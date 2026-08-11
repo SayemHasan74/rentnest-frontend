@@ -26,7 +26,7 @@ export function SessionVerifier() {
         if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
           clearAuthSession();
 
-          if (window.location.pathname.startsWith("/dashboard")) {
+          if (window.location.pathname.startsWith("/dashboard") || window.location.pathname === "/home") {
             const from = encodeURIComponent(window.location.pathname);
             window.location.assign(`/auth/login?from=${from}`);
           }
