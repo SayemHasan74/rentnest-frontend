@@ -26,13 +26,17 @@
 - The backend response contract was audited across controllers and middleware: creation endpoints use 201, normal reads and updates use the shared 200 response default, malformed or validation input maps to 400, unmatched routes to 404, and unhandled errors to 500.
 - Backend source contains no production `console` calls. The frontend source has no Lorem Ipsum or placeholder listing copy.
 
-## Completion blockers outside repository authority
+## Post-audit live data remediation
 
-The project cannot honestly be called fully complete yet. The live production database currently shows sample and test content, including `Sample Tenant`, `Sample Landlord`, a `stripe-e2e-...@rentnest.test` account, and demo/test property titles. This keeps **UI-07** and **UX-01** unresolved. Removing or replacing those records requires all of the following:
+- Replaced all six publicly visible landlord listings with complete rental titles, locations, descriptions, pricing, amenities, and image URLs.
+- Updated the malformed Apartment category description and removed the unused `Banglo 23` category.
+- Verified on the live public `/properties` page that all six replacement listings render and the previous malformed titles do not appear there.
 
-1. Explicit authorization to modify production data.
-2. A confirmed, recoverable backup/export.
-3. Approved real replacement listings, categories, and account content.
+## Remaining completion blockers outside repository authority
+
+The project cannot honestly be called fully complete yet. The deployed administrative API still exposes historic test content, including `Sample Tenant`, `Sample Landlord`, a `stripe-e2e-...@rentnest.test` account, test rental messages, and one inactive test-landlord property. This keeps **UI-07** and **UX-01** partial. The UI offers no authorized delete/edit path for those users, rentals, payments, reviews, or the property owned by another landlord. Completing the cleanup requires either direct database access or a deployed, role-protected administrative cleanup workflow.
+
+The user has authorized production remediation without a backup. Remaining cleanup still requires direct database access or the administrative workflow above.
 
 **AUTH-03** also remains unresolved because Google/Facebook OAuth cannot be safely implemented without the provider client ID, secret, and approved production callback URL. The remaining whole-site visual and interaction rows stay partial or QA-needed because a final pass must be performed after the production content and OAuth configuration are supplied.
 

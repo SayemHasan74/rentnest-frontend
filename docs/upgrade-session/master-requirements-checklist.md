@@ -21,7 +21,7 @@ Status meanings:
 | UI-04 | Keep cards and components consistent in size, border radius, and visual style. | PARTIAL | Part 11 extends the shared surface, border, radius, focus, and responsive-control system to role-aware dashboard navigation; final dashboard content QA remains. | 2, 6, 11, 16 |
 | UI-05 | Forms include validation, error messages, success states, and loaders. | PARTIAL | Part 04 contact form has all four states; remaining forms still need consistent coverage. | 4, 9, 10, 12-14, 16 |
 | UI-06 | Fully responsive for mobile, tablet, and desktop. | PARTIAL | Parts 02, 04, and 05 passed representative 390px, 768px, and 1440px browser checks without horizontal overflow; every later feature still requires the same gate. | 2-16 |
-| UI-07 | No placeholder or dummy content. | MISSING | Live data contains test/dummy names and descriptions. | 15 |
+| UI-07 | No placeholder or dummy content. | PARTIAL | The six public listings and their category copy were replaced with complete, coherent rental content during live remediation. Historic test users, rentals, payments, reviews, and one inactive test-landlord property remain because the deployed API exposes no authorized deletion or edit path for them. | 15, 16 |
 
 ## 2. Home / Landing Page
 
@@ -121,7 +121,7 @@ Status meanings:
 
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
-| UX-01 | No lorem ipsum or placeholder content. | MISSING | Live database exposes dummy/test entries. | 4, 5, 15 |
+| UX-01 | No lorem ipsum or placeholder content. | PARTIAL | Public listing cards no longer expose the previous malformed/test property titles. Historic dashboard-only test records remain, pending direct database access or a deployed administrative cleanup workflow. | 4, 5, 15, 16 |
 | UX-02 | Fully responsive across all devices. | PARTIAL | Parts 02, 04, and 05 passed representative mobile/tablet/desktop QA; complete post-feature verification remains. | 2-16 |
 | UX-03 | Proper spacing and alignment. | PARTIAL | Part 02 standardized shared radii, control heights, card padding, surfaces, and focus states; final all-page visual QA remains. | 2, 16 |
 | UX-04 | All buttons and links are clickable. | NEEDS_QA | Existing primary flows work, but an exhaustive interactive audit remains. | 3-16 |
