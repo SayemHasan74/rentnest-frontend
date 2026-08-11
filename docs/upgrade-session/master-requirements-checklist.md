@@ -92,10 +92,10 @@ Status meanings:
 
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
-| AUTH-01 | Login and Registration pages. | VERIFIED | Both routes and forms exist. | 9, 16 |
-| AUTH-02 | Demo login button auto-fills credentials. | MISSING | Existing demo buttons immediately log in instead of only auto-filling. | 9 |
-| AUTH-03 | Social login with Google or Facebook. | MISSING | No social provider integration exists. | 9 |
-| AUTH-04 | Clean and professional authentication UI. | VERIFIED | Current authentication UI is structured, labelled, and responsive. | 9, 16 |
+| AUTH-01 | Login and Registration pages. | VERIFIED | Part 09 keeps both responsive routes and adds required-field, format, and optional-field validation plus accessible feedback. | 9, 16 |
+| AUTH-02 | Demo login button auto-fills credentials. | VERIFIED | Part 09 demo controls now fill the selected account credentials, announce the result, and wait for the user to select Login. | 9 |
+| AUTH-03 | Social login with Google or Facebook. | MISSING | Neither repository has a provider client ID, secret, callback, token-verification route, or approved OAuth redirect. This cannot be truthfully implemented until provider credentials and redirect configuration are supplied. | 9 |
+| AUTH-04 | Clean and professional authentication UI. | VERIFIED | Part 09 adds accessible status messages, error associations, radio semantics, and submission-specific loading copy while retaining the responsive layout. | 9, 16 |
 
 ## 7. Role-Based Dashboard
 
@@ -133,12 +133,12 @@ Status meanings:
 
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
-| FORM-01 | Client-side required-field and format validation. | PARTIAL | Part 04 contact form validates required fields, email format, and minimum text lengths; other forms remain to be standardized. | 4, 9, 10, 12-14, 16 |
-| FORM-02 | Server-side validation. | VERIFIED | Existing write endpoints use Zod validation; Part 04 adds a tested Zod schema for contact submissions. | 4, 9, 10, 13-15 |
-| FORM-03 | Proper error and success messages. | PARTIAL | Part 04 contact form provides accessible client/server error feedback and a success confirmation; every form is not yet covered. | 4, 9, 10, 12-14, 16 |
-| FORM-04 | Loading state via spinner or disabled button. | PARTIAL | Part 04 contact form disables its submit button and shows a spinner while sending; final all-form verification remains. | 4, 9, 10, 12-14, 16 |
-| FORM-05 | Proper label usage. | PARTIAL | Part 04 contact controls have visible labels; some composite controls elsewhere need improvement. | 4, 9, 10, 12-14, 16 |
-| FORM-06 | Accessible inputs with labels connected to inputs. | PARTIAL | Part 04 labels use `htmlFor`, inputs use matching IDs, and invalid controls expose `aria-invalid` and error descriptions; all controls have not passed a full accessibility audit. | 4, 9, 10, 12-14, 16 |
+| FORM-01 | Client-side required-field and format validation. | PARTIAL | Parts 04 and 09 validate required fields, email format, minimum lengths, and auth optional-field limits; the remaining dashboard forms still need standardization. | 4, 9, 10, 12-14, 16 |
+| FORM-02 | Server-side validation. | VERIFIED | Existing write endpoints use Zod validation; Part 09 adds direct login/registration schema regression coverage. | 4, 9, 10, 13-15 |
+| FORM-03 | Proper error and success messages. | PARTIAL | Part 09 adds accessible authentication error messages and a demo-credential success notice; every form is not yet covered. | 4, 9, 10, 12-14, 16 |
+| FORM-04 | Loading state via spinner or disabled button. | PARTIAL | Parts 04 and 09 disable submission and show an inline spinner with action-specific copy; final all-form verification remains. | 4, 9, 10, 12-14, 16 |
+| FORM-05 | Proper label usage. | PARTIAL | Part 09 connects auth labels and uses a semantic role legend; some composite controls elsewhere need improvement. | 4, 9, 10, 12-14, 16 |
+| FORM-06 | Accessible inputs with labels connected to inputs. | PARTIAL | Part 09 auth inputs now expose matching labels, invalid state, and error descriptions; all controls have not passed a full accessibility audit. | 4, 9, 10, 12-14, 16 |
 
 ### Required forms
 

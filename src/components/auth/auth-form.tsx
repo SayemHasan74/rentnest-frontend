@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { getErrorMessage } from "@/lib/errors";
@@ -20,7 +20,9 @@ import type { RegisterPayload } from "@/types/rentnest";
 
 type AuthMode = "login" | "register";
 
-type FieldErrors = Partial<Record<"name" | "email" | "password" | "role", string>>;
+type FieldErrors = Partial<
+  Record<"name" | "email" | "password" | "role" | "phone" | "address", string>
+>;
 
 const demoAccounts = [
   { label: "Tenant", email: "tenant@rentnest.com", password: "tenant123" },
@@ -43,6 +45,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const [values, setValues] = useState(getInitialRegisterValues);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState("");
+  const [formNotice, setFormNotice] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -61,16 +64,19 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     setValues((current) => ({ ...current, [name]: value }));
     setFieldErrors((current) => ({ ...current, [name]: undefined }));
     setFormError("");
+    setFormNotice("");
   };
 
   const validate = () => {
     const errors: FieldErrors = {};
+    const phone = values.phone?.trim() ?? "";
+    const address = values.address?.trim() ?? "";
 
     if (isRegister && values.name.trim().length < 2) {
       errors.name = "Name must be at least 2 characters.";
     }
 
-    if (!values.email.includes("@")) {
+    if (!/^\S+@\S+\.\S+$/.test(values.email.trim())) {
       errors.email = "Enter a valid email address.";
     }
 
@@ -80,6 +86,14 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
     if (isRegister && !["TENANT", "LANDLORD"].includes(values.role)) {
       errors.role = "Choose tenant or landlord.";
+    }
+
+    if (isRegister && phone && phone.length < 6) {
+      errors.phone = "Phone number must be at least 6 characters.";
+    }
+
+    if (isRegister && address.length > 255) {
+      errors.address = "Address must be 255 characters or fewer.";
     }
 
     setFieldErrors(errors);
@@ -104,6 +118,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
     setIsSubmitting(true);
     setFormError("");
+    setFormNotice("");
 
     try {
       if (isRegister) {
@@ -125,7 +140,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     }
   };
 
-  const handleDemoAccount = async (account: (typeof demoAccounts)[number]) => {
+  const handleDemoAccount = (account: (typeof demoAccounts)[number]) => {
     setValues((current) => ({
       ...current,
       email: account.email,
@@ -133,17 +148,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     }));
     setFieldErrors({});
     setFormError("");
-
-    if (!isRegister) {
-      setIsSubmitting(true);
-
-      try {
-        await loginAndRedirect(account.email, account.password);
-      } catch (error) {
-        setFormError(getErrorMessage(error));
-        setIsSubmitting(false);
-      }
-    }
+    setFormNotice(`${account.label} demo credentials filled. Select Login to continue.`);
   };
 
   return (
@@ -164,13 +169,28 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         </div>
 
         {formError ? (
-          <div className="mt-5 flex gap-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <div
+            aria-live="assertive"
+            className="mt-5 flex gap-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+            role="alert"
+          >
             <AlertCircle className="mt-0.5 shrink-0" size={16} aria-hidden="true" />
             <p>{formError}</p>
           </div>
         ) : null}
 
-        <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
+        {formNotice ? (
+          <div
+            aria-live="polite"
+            className="mt-5 flex gap-3 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"
+            role="status"
+          >
+            <CheckCircle2 className="mt-0.5 shrink-0" size={16} aria-hidden="true" />
+            <p>{formNotice}</p>
+          </div>
+        ) : null}
+
+        <form className="mt-6 grid gap-4" noValidate onSubmit={handleSubmit}>
           {isRegister ? (
             <div className="grid gap-2">
               <Label htmlFor="name">Full name</Label>
@@ -180,10 +200,15 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                 name="name"
                 onChange={(event) => updateValue("name", event.target.value)}
                 placeholder="Your name"
+                aria-describedby={fieldErrors.name ? "name-error" : undefined}
+                aria-invalid={Boolean(fieldErrors.name)}
+                required
                 value={values.name}
               />
               {fieldErrors.name ? (
-                <p className="text-xs font-medium text-red-600">{fieldErrors.name}</p>
+                <p className="text-xs font-medium text-red-600" id="name-error">
+                  {fieldErrors.name}
+                </p>
               ) : null}
             </div>
           ) : null}
@@ -197,10 +222,15 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
               onChange={(event) => updateValue("email", event.target.value)}
               placeholder="you@example.com"
               type="email"
+              aria-describedby={fieldErrors.email ? "email-error" : undefined}
+              aria-invalid={Boolean(fieldErrors.email)}
+              required
               value={values.email}
             />
             {fieldErrors.email ? (
-              <p className="text-xs font-medium text-red-600">{fieldErrors.email}</p>
+              <p className="text-xs font-medium text-red-600" id="email-error">
+                {fieldErrors.email}
+              </p>
             ) : null}
           </div>
 
@@ -213,18 +243,24 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
               onChange={(event) => updateValue("password", event.target.value)}
               placeholder="At least 6 characters"
               type="password"
+              aria-describedby={fieldErrors.password ? "password-error" : undefined}
+              aria-invalid={Boolean(fieldErrors.password)}
+              minLength={6}
+              required
               value={values.password}
             />
             {fieldErrors.password ? (
-              <p className="text-xs font-medium text-red-600">{fieldErrors.password}</p>
+              <p className="text-xs font-medium text-red-600" id="password-error">
+                {fieldErrors.password}
+              </p>
             ) : null}
           </div>
 
           {isRegister ? (
             <>
-              <div className="grid gap-2">
-                <Label>Role</Label>
-                <div className="grid grid-cols-2 gap-2">
+              <fieldset className="grid gap-2" aria-describedby={fieldErrors.role ? "role-error" : undefined}>
+                <legend className="text-sm font-semibold text-slate-800">Role</legend>
+                <div aria-label="Account role" className="grid grid-cols-2 gap-2" role="radiogroup">
                   {(["TENANT", "LANDLORD"] as const).map((role) => (
                     <button
                       className={`h-10 rounded-md border px-3 text-sm font-semibold transition ${
@@ -234,6 +270,8 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                       }`}
                       key={role}
                       onClick={() => updateValue("role", role)}
+                      aria-checked={values.role === role}
+                      role="radio"
                       type="button"
                     >
                       {role === "TENANT" ? "Tenant" : "Landlord"}
@@ -241,9 +279,11 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                   ))}
                 </div>
                 {fieldErrors.role ? (
-                  <p className="text-xs font-medium text-red-600">{fieldErrors.role}</p>
+                  <p className="text-xs font-medium text-red-600" id="role-error">
+                    {fieldErrors.role}
+                  </p>
                 ) : null}
-              </div>
+              </fieldset>
 
               <div className="grid gap-2">
                 <Label htmlFor="phone">Phone</Label>
@@ -253,8 +293,15 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                   name="phone"
                   onChange={(event) => updateValue("phone", event.target.value)}
                   placeholder="+8801700000000"
+                  aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
+                  aria-invalid={Boolean(fieldErrors.phone)}
                   value={values.phone}
                 />
+                {fieldErrors.phone ? (
+                  <p className="text-xs font-medium text-red-600" id="phone-error">
+                    {fieldErrors.phone}
+                  </p>
+                ) : null}
               </div>
 
               <div className="grid gap-2">
@@ -265,15 +312,29 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                   name="address"
                   onChange={(event) => updateValue("address", event.target.value)}
                   placeholder="Dhaka, Bangladesh"
+                  aria-describedby={fieldErrors.address ? "address-error" : undefined}
+                  aria-invalid={Boolean(fieldErrors.address)}
+                  maxLength={255}
                   value={values.address}
                 />
+                {fieldErrors.address ? (
+                  <p className="text-xs font-medium text-red-600" id="address-error">
+                    {fieldErrors.address}
+                  </p>
+                ) : null}
               </div>
             </>
           ) : null}
 
           <Button disabled={isSubmitting} type="submit">
             {isSubmitting ? <Loader2 className="animate-spin" size={16} aria-hidden="true" /> : null}
-            {isRegister ? "Create account" : "Login"}
+            {isSubmitting
+              ? isRegister
+                ? "Creating account..."
+                : "Logging in..."
+              : isRegister
+                ? "Create account"
+                : "Login"}
           </Button>
         </form>
 
@@ -288,7 +349,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                   className="flex items-center justify-between border-b border-slate-300 px-1 py-3 text-left text-sm transition hover:bg-slate-50"
                   disabled={isSubmitting}
                   key={account.email}
-                  onClick={() => void handleDemoAccount(account)}
+                  onClick={() => handleDemoAccount(account)}
                   type="button"
                 >
                   <span className="font-semibold text-slate-800">{account.label}</span>
