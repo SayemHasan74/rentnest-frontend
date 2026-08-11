@@ -7,7 +7,6 @@ import { FormEvent, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { getErrorMessage } from "@/lib/errors";
 import {
-  getRoleDashboardPath,
   getSafePostLoginPath,
   getStoredToken,
   getStoredUser,
@@ -57,7 +56,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     }
 
     syncAuthCookies(token, user);
-    window.location.replace(getRoleDashboardPath(user.role));
+    window.location.replace("/home");
   }, []);
 
   const updateValue = (name: keyof RegisterPayload, value: string) => {

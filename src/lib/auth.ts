@@ -146,7 +146,7 @@ export const getSafePostLoginPath = (role: UserRole, from: string | null) => {
   const dashboardPath = getRoleDashboardPath(role);
 
   if (!from || !from.startsWith("/") || from.startsWith("//")) {
-    return dashboardPath;
+    return "/home";
   }
 
   if (from === "/dashboard") {
@@ -159,7 +159,9 @@ export const getSafePostLoginPath = (role: UserRole, from: string | null) => {
       : dashboardPath;
   }
 
-  return from === "/" || from.startsWith("/properties") ? from : dashboardPath;
+  return from === "/" || from === "/home" || from.startsWith("/properties")
+    ? from
+    : dashboardPath;
 };
 
 export const canAccessRole = (userRole: UserRole | null, allowedRoles: UserRole[]) =>

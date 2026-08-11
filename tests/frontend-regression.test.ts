@@ -24,6 +24,8 @@ test("rent is displayed in Bangladeshi taka", () => {
 });
 
 test("cross-role dashboard redirects are rejected", () => {
+  assert.equal(getSafePostLoginPath("TENANT", null), "/home");
+  assert.equal(getSafePostLoginPath("TENANT", "/home"), "/home");
   assert.equal(
     getSafePostLoginPath("LANDLORD", "/dashboard/admin"),
     "/dashboard/landlord",
