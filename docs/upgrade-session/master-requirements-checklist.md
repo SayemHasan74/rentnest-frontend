@@ -194,8 +194,8 @@ Status meanings:
 | CODE-01 | Clean and organized folder structure. | VERIFIED | Frontend and backend use clear feature/module separation. | 15 |
 | CODE-02 | Reusable components. | VERIFIED | Shared layout, UI, property, and dashboard components exist. | 2, 6, 11, 15 |
 | CODE-03 | Custom hooks for React. | VERIFIED | Part 02 adds the reusable `useTheme` hook through the shared theme provider. | 2, 15 |
-| CODE-04 | Proper environment-variable usage. | PARTIAL | Env examples exist, but backend has development fallback secrets that must be production-safe. | 15 |
-| CODE-05 | No console logs in production. | MISSING | Backend server lifecycle uses `console.log`; seed logs are also present. | 15 |
+| CODE-04 | Proper environment-variable usage. | VERIFIED | Part 15 requires JWT, Stripe, and callback configuration in production while retaining non-production defaults only for local/test execution. | 15 |
+| CODE-05 | No console logs in production. | VERIFIED | Part 15 removes console logging from the server lifecycle and seed script; development lifecycle output is explicitly suppressed in production and seed output no longer exposes credentials. | 15 |
 | CODE-06 | Meaningful commit messages. | VERIFIED | Recent histories use descriptive `feat`, `fix`, and `docs` messages. | 1-16 |
 
 ## 13. Final Submission Requirements
