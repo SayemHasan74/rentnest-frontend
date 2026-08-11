@@ -29,6 +29,7 @@ export const accountNavigationLinks: Record<UserRole, ShellLink[]> = {
     { href: "/dashboard/admin#users", label: "Manage users" },
     { href: "/dashboard/admin#categories", label: "Manage categories" },
     { href: "/dashboard/admin#properties", label: "Review properties" },
+    { href: "/dashboard/admin#rental-activity", label: "Rental activity" },
     { href: "/dashboard/profile", label: "Profile" },
   ],
 };

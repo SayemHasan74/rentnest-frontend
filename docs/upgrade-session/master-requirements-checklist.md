@@ -18,7 +18,7 @@ Status meanings:
 | UI-01 | Use a maximum of 3 primary colors plus an optional neutral color. | VERIFIED | Part 02 defines neutral, emerald, amber, and red semantic scales; blue and purple visual utilities were removed from the active UI. | 2 |
 | UI-02 | Support light and dark mode with proper contrast. | VERIFIED | Semantic light/dark themes, system detection, persistence, a responsive toggle, pre-hydration initialization, contrast calculations, and browser QA are recorded in `part-02-design-system.md`. | 2 |
 | UI-03 | Maintain consistent layout, spacing, and alignment throughout. | PARTIAL | Parts 02 and 05 standardize shared spacing and use the same container, surface, border, and radius system across the expanded homepage; later feature pages and final whole-site QA remain. | 2, 5, 16 |
-| UI-04 | Keep cards and components consistent in size, border radius, and visual style. | PARTIAL | Shared cards, badges, fields, buttons, and skeletons now use the same radius/surface system; property-card and dashboard-specific work remains in Parts 6 and 11. | 2, 6, 11 |
+| UI-04 | Keep cards and components consistent in size, border radius, and visual style. | PARTIAL | Part 11 extends the shared surface, border, radius, focus, and responsive-control system to role-aware dashboard navigation; final dashboard content QA remains. | 2, 6, 11, 16 |
 | UI-05 | Forms include validation, error messages, success states, and loaders. | PARTIAL | Part 04 contact form has all four states; remaining forms still need consistent coverage. | 4, 9, 10, 12-14, 16 |
 | UI-06 | Fully responsive for mobile, tablet, and desktop. | PARTIAL | Parts 02, 04, and 05 passed representative 390px, 768px, and 1440px browser checks without horizontal overflow; every later feature still requires the same gate. | 2-16 |
 | UI-07 | No placeholder or dummy content. | MISSING | Live data contains test/dummy names and descriptions. | 15 |
@@ -102,8 +102,8 @@ Status meanings:
 | ID | Requirement | Baseline status | Evidence / gap | Planned part |
 | --- | --- | --- | --- | --- |
 | DASH-01 | Multiple roles such as User/Admin/Manager. | VERIFIED | Tenant, Landlord, and Admin roles exist in frontend and backend. | 11-14, 16 |
-| DASH-02 | User sidebar has at least 4 menu items/pages. | MISSING | Tenant dashboard currently exposes two section links. | 11, 12 |
-| DASH-03 | Admin sidebar has at least 6 menu items/pages. | MISSING | No admin sidebar or six-page navigation exists. | 11, 14 |
+| DASH-02 | User sidebar has at least 4 menu items/pages. | VERIFIED | Part 11 adds a responsive tenant sidebar with Dashboard overview, My rental requests, Payment history, and Profile. | 11, 12 |
+| DASH-03 | Admin sidebar has at least 6 menu items/pages. | VERIFIED | Part 11 adds a responsive admin sidebar with Dashboard overview, Manage users, Manage categories, Review properties, Rental activity, and Profile. | 11, 14 |
 | DASH-04 | Dashboard navbar has profile icon/dropdown with Profile and Logout. | VERIFIED | Part 10 adds Profile to the existing icon-based responsive account dropdown, which is present in the shared dashboard shell alongside Logout and role-aware actions. | 10, 11 |
 | DASH-05 | Dashboard includes overview cards. | VERIFIED | Tenant, landlord, and admin dashboards have API-derived statistic cards. | 12-14, 16 |
 | DASH-06 | Dashboard includes charts backed by real dynamic data. | MISSING | No charts or chart dependency exists. | 11-14 |

@@ -832,7 +832,7 @@ export function AdminUsersDashboard() {
           ))}
         </div>
 
-        <Card>
+        <Card className="scroll-mt-24" id="rental-activity">
           <CardHeader>
             <CardTitle>Filter users</CardTitle>
           </CardHeader>

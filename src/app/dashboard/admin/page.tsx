@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AdminUsersDashboard } from "@/components/dashboard/admin-users-dashboard";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard | RentNest",
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function AdminDashboardPage() {
-  return <AdminUsersDashboard />;
+  return (
+    <DashboardShell role="ADMIN">
+      <AdminUsersDashboard />
+    </DashboardShell>
+  );
 }

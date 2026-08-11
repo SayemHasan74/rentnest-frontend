@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { TenantRentalsDashboard } from "@/components/dashboard/tenant-rentals-dashboard";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function TenantDashboardPage() {
-  return <TenantRentalsDashboard />;
+  return (
+    <DashboardShell role="TENANT">
+      <TenantRentalsDashboard />
+    </DashboardShell>
+  );
 }
