@@ -69,6 +69,11 @@ type PropertyFormValues = {
 
 type PropertyFormErrors = Partial<Record<keyof PropertyFormValues, string>>;
 
+type InventoryFilters = {
+  search: string;
+  status: "" | PropertyStatus;
+};
+
 const propertyStatusTone: Record<PropertyStatus, "emerald" | "slate"> = {
   AVAILABLE: "emerald",
   UNAVAILABLE: "slate",
@@ -118,6 +123,47 @@ function PropertyStatusBadge({ status }: { status: PropertyStatus }) {
       <Icon size={14} aria-hidden="true" />
       {status}
     </Badge>
+  );
+}
+
+function LandlordPortfolioChart({
+  properties,
+  requests,
+}: {
+  properties: Property[];
+  requests: RentalRequest[];
+}) {
+  const activity = [
+    { label: "Available", value: properties.filter((property) => property.status === "AVAILABLE").length },
+    { label: "Unavailable", value: properties.filter((property) => property.status === "UNAVAILABLE").length },
+    { label: "Pending", value: requests.filter((request) => request.status === "PENDING").length },
+    { label: "Active", value: requests.filter((request) => request.status === "ACTIVE").length },
+  ];
+  const maximum = Math.max(1, ...activity.map((item) => item.value));
+
+  return (
+    <div aria-label="Landlord portfolio activity chart" className="grid gap-4" role="img">
+      <div className="grid h-44 grid-cols-4 items-end gap-3 border-b border-slate-300 px-2 sm:gap-5">
+        {activity.map((item) => (
+          <div className="flex h-full min-w-0 flex-col justify-end" key={item.label}>
+            <div
+              aria-label={`${item.label}: ${item.value}`}
+              className="min-h-1 rounded-t-md bg-primary transition-[height]"
+              style={{ height: `${Math.max(4, (item.value / maximum) * 100)}%` }}
+              title={`${item.label}: ${item.value}`}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-4 gap-3 text-center sm:gap-5">
+        {activity.map((item) => (
+          <div className="min-w-0" key={item.label}>
+            <p className="text-lg font-bold text-slate-950">{item.value}</p>
+            <p className="truncate text-xs font-medium text-slate-600">{item.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -828,6 +874,11 @@ export function LandlordPropertiesDashboard() {
   const [deletingPropertyId, setDeletingPropertyId] = useState<string | null>(null);
   const [updatingRequestId, setUpdatingRequestId] = useState<string | null>(null);
   const [completingRequestId, setCompletingRequestId] = useState<string | null>(null);
+  const [inventoryFilters, setInventoryFilters] = useState<InventoryFilters>({
+    search: "",
+    status: "",
+  });
+  const [inventoryPage, setInventoryPage] = useState(1);
   const cacheKey = user ? `landlord:${user.id}` : null;
 
   useEffect(() => {
@@ -953,6 +1004,31 @@ export function LandlordPropertiesDashboard() {
       { label: "Earnings", value: formatCurrency(earnings) },
     ];
   }, [visibleProperties, visibleRequests]);
+  const filteredProperties = useMemo(() => {
+    const search = inventoryFilters.search.trim().toLowerCase();
+
+    return visibleProperties.filter((property) => {
+      const matchesSearch =
+        !search ||
+        property.title.toLowerCase().includes(search) ||
+        property.location.toLowerCase().includes(search) ||
+        property.category?.name.toLowerCase().includes(search);
+      const matchesStatus = !inventoryFilters.status || property.status === inventoryFilters.status;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [inventoryFilters, visibleProperties]);
+  const inventoryPerPage = 5;
+  const inventoryTotalPages = Math.max(1, Math.ceil(filteredProperties.length / inventoryPerPage));
+  const paginatedProperties = filteredProperties.slice(
+    (inventoryPage - 1) * inventoryPerPage,
+    inventoryPage * inventoryPerPage,
+  );
+
+  const updateInventoryFilters = (nextFilters: InventoryFilters) => {
+    setInventoryFilters(nextFilters);
+    setInventoryPage(1);
+  };
 
   const handleToggleAvailability = async (property: Property) => {
     if (!token) {
@@ -1209,12 +1285,13 @@ export function LandlordPropertiesDashboard() {
 
         <nav
           aria-label="Landlord dashboard sections"
-          className="grid border border-slate-300 bg-surface sm:grid-cols-3"
+          className="grid border border-slate-300 bg-surface sm:grid-cols-4"
         >
           {[
-            { href: "#add-property", label: "Add property", number: "01" },
-            { href: "#my-properties", label: "My properties", number: "02" },
-            { href: "#rental-requests", label: "Rental requests", number: "03" },
+            { href: "#portfolio-activity", label: "Portfolio activity", number: "01" },
+            { href: "#add-property", label: "Add property", number: "02" },
+            { href: "#my-properties", label: "My properties", number: "03" },
+            { href: "#rental-requests", label: "Rental requests", number: "04" },
           ].map((item) => (
             <a
               className="flex min-h-14 items-center gap-3 border-b border-slate-300 px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-inverse hover:text-inverse-foreground last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0"
@@ -1228,10 +1305,22 @@ export function LandlordPropertiesDashboard() {
         </nav>
 
         <DashboardSection
+          description="A live view of listing availability and rental-request activity from your own portfolio."
+          icon={CalendarClock}
+          id="portfolio-activity"
+          index="01"
+          title="Portfolio activity"
+          tone="muted"
+        >
+          {isLoading ? <DashboardContentSkeleton label="Loading portfolio activity" /> : null}
+          {!isLoading && !error ? <LandlordPortfolioChart properties={visibleProperties} requests={visibleRequests} /> : null}
+        </DashboardSection>
+
+        <DashboardSection
           description="Publish a new rental with pricing, amenities, category, and image URLs."
           icon={PlusCircle}
           id="add-property"
-          index="01"
+          index="02"
           title="Create a listing"
           tone="dark"
         >
@@ -1260,7 +1349,7 @@ export function LandlordPropertiesDashboard() {
           description={`${visibleProperties.length} listing${visibleProperties.length === 1 ? "" : "s"}. Edit details, change availability, or remove a property.`}
           icon={Building2}
           id="my-properties"
-          index="02"
+          index="03"
           title="My properties"
           tone="light"
         >
@@ -1282,6 +1371,76 @@ export function LandlordPropertiesDashboard() {
               </div>
             ) : null}
 
+            {!isLoading && !error && visibleProperties.length > 0 ? (
+              <>
+                <div className="mb-5 grid gap-4 border-b border-slate-300 pb-5 sm:grid-cols-[minmax(0,1fr)_12rem]">
+                  <div className="grid gap-2">
+                    <Label htmlFor="landlord-inventory-search">Search inventory</Label>
+                    <Input
+                      id="landlord-inventory-search"
+                      onChange={(event) => updateInventoryFilters({ ...inventoryFilters, search: event.target.value })}
+                      placeholder="Title, location, or category"
+                      value={inventoryFilters.search}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="landlord-inventory-status">Listing status</Label>
+                    <select
+                      className="h-10 rounded-md border border-slate-400 bg-surface px-3 text-sm text-slate-950 outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100"
+                      id="landlord-inventory-status"
+                      onChange={(event) => updateInventoryFilters({ ...inventoryFilters, status: event.target.value as InventoryFilters["status"] })}
+                      value={inventoryFilters.status}
+                    >
+                      <option value="">All statuses</option>
+                      <option value="AVAILABLE">Available</option>
+                      <option value="UNAVAILABLE">Unavailable</option>
+                    </select>
+                  </div>
+                </div>
+
+                {filteredProperties.length === 0 ? (
+                  <p className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-600">No listings match the current filters.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[48rem] text-left text-sm">
+                      <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
+                        <tr>
+                          <th className="py-3 pr-4 font-semibold">Listing</th>
+                          <th className="py-3 pr-4 font-semibold">Category</th>
+                          <th className="py-3 pr-4 font-semibold">Rent</th>
+                          <th className="py-3 pr-4 font-semibold">Requests</th>
+                          <th className="py-3 pr-4 font-semibold">Status</th>
+                          <th className="py-3 font-semibold">Open</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        {paginatedProperties.map((property) => (
+                          <tr key={property.id}>
+                            <td className="py-3 pr-4 font-medium text-slate-950">{property.title}</td>
+                            <td className="py-3 pr-4 text-slate-700">{property.category?.name ?? "Rental"}</td>
+                            <td className="py-3 pr-4 text-slate-700">{formatCurrency(property.rentAmount)}</td>
+                            <td className="py-3 pr-4 text-slate-700">{property._count?.rentalRequests ?? 0}</td>
+                            <td className="py-3 pr-4"><PropertyStatusBadge status={property.status} /></td>
+                            <td className="py-3"><Link className="font-semibold text-emerald-800 underline underline-offset-4" href={`/properties/${property.id}`}>View</Link></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {filteredProperties.length > 0 ? (
+                  <div className="mt-5 flex flex-col justify-between gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center">
+                    <p className="text-sm text-slate-600">Page {inventoryPage} of {inventoryTotalPages}</p>
+                    <div className="flex gap-2">
+                      <Button disabled={inventoryPage <= 1} onClick={() => setInventoryPage((current) => Math.max(1, current - 1))} type="button" variant="outline">Previous</Button>
+                      <Button disabled={inventoryPage >= inventoryTotalPages} onClick={() => setInventoryPage((current) => Math.min(inventoryTotalPages, current + 1))} type="button" variant="outline">Next</Button>
+                    </div>
+                  </div>
+                ) : null}
+              </>
+            ) : null}
+
             {!isLoading && !error && visibleProperties.length === 0 ? (
               <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
                 <Building2 className="mx-auto text-slate-400" size={34} aria-hidden="true" />
@@ -1295,9 +1454,9 @@ export function LandlordPropertiesDashboard() {
               </div>
             ) : null}
 
-            {!isLoading && !error && visibleProperties.length > 0 ? (
+            {!isLoading && !error && paginatedProperties.length > 0 ? (
               <div className="grid gap-4">
-                {visibleProperties.map((property) => (
+                {paginatedProperties.map((property) => (
                   <LandlordPropertyCard
                     categories={categories}
                     deletingPropertyId={deletingPropertyId}
@@ -1318,7 +1477,7 @@ export function LandlordPropertiesDashboard() {
           description={`${visibleRequests.length} request${visibleRequests.length === 1 ? "" : "s"}. Review tenant details, payment state, and rental progress.`}
           icon={ClipboardList}
           id="rental-requests"
-          index="03"
+          index="04"
           title="Rental requests"
           tone="muted"
         >

@@ -106,10 +106,10 @@ Status meanings:
 | DASH-03 | Admin sidebar has at least 6 menu items/pages. | VERIFIED | Part 11 adds a responsive admin sidebar with Dashboard overview, Manage users, Manage categories, Review properties, Rental activity, and Profile. | 11, 14 |
 | DASH-04 | Dashboard navbar has profile icon/dropdown with Profile and Logout. | VERIFIED | Part 10 adds Profile to the existing icon-based responsive account dropdown, which is present in the shared dashboard shell alongside Logout and role-aware actions. | 10, 11 |
 | DASH-05 | Dashboard includes overview cards. | VERIFIED | Tenant, landlord, and admin dashboards have API-derived statistic cards. | 12-14, 16 |
-| DASH-06 | Dashboard includes charts backed by real dynamic data. | PARTIAL | Part 12 adds a tenant rental-status bar chart calculated from live rental-request data; landlord and admin chart coverage remains. | 12-14 |
-| DASH-07 | Dashboard includes data tables. | PARTIAL | Part 12 completes the tenant payment table; landlord and other admin datasets still need table coverage. | 11-14 |
+| DASH-06 | Dashboard includes charts backed by real dynamic data. | PARTIAL | Parts 12 and 13 add tenant and landlord charts calculated from live role-scoped data; admin chart coverage remains. | 12-14 |
+| DASH-07 | Dashboard includes data tables. | PARTIAL | Parts 12 and 13 complete tenant payment and landlord inventory tables; remaining admin datasets still need table coverage. | 11-14 |
 | DASH-08 | Editable profile page. | VERIFIED | Part 10 adds protected `/dashboard/profile` with a validated name, phone, and address form backed by authenticated `PATCH /api/auth/me`. | 10 |
-| DASH-09 | All dashboard tables support filtering and pagination. | PARTIAL | Part 12 adds client-side status/search filtering and pagination to the tenant payment table; landlord and remaining admin tables still need coverage. | 11-14 |
+| DASH-09 | All dashboard tables support filtering and pagination. | PARTIAL | Parts 12 and 13 add search/status filtering and pagination to tenant payment and landlord inventory tables; remaining admin tables still need coverage. | 11-14 |
 
 ## 8. Additional Pages
 
