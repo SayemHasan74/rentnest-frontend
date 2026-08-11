@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Building,
   ClipboardList,
+  House,
   LayoutDashboard,
   LogIn,
   Menu,
@@ -30,6 +31,7 @@ import { cn } from "@/lib/utils";
 import type { User } from "@/types/rentnest";
 
 const navIcons = {
+  Home: House,
   Properties: Search,
   Dashboard: LayoutDashboard,
   "My rental requests": ClipboardList,
@@ -71,6 +73,7 @@ export function SiteHeader() {
     pathname === "/"
       ? []
       : [
+          ...(isAuthenticated ? [{ href: "/home", label: "Home" }] : []),
           ...publicNavigationLinks,
           ...(isAuthenticated ? [{ href: dashboardPath, label: "Dashboard" }] : []),
           ...(isAuthenticated && primaryRoleLink ? [primaryRoleLink] : []),
