@@ -141,6 +141,41 @@ function UserStatusBadge({ status }: { status: UserStatus }) {
   );
 }
 
+function AdminRentalActivityChart({ rentals }: { rentals: RentalRequest[] }) {
+  const activity = [
+    { label: "Pending", value: rentals.filter((request) => request.status === "PENDING").length },
+    { label: "Approved", value: rentals.filter((request) => request.status === "APPROVED").length },
+    { label: "Active", value: rentals.filter((request) => request.status === "ACTIVE").length },
+    { label: "Completed", value: rentals.filter((request) => request.status === "COMPLETED").length },
+  ];
+  const maximum = Math.max(1, ...activity.map((item) => item.value));
+
+  return (
+    <div aria-label="Admin rental activity chart" className="grid gap-4" role="img">
+      <div className="grid h-44 grid-cols-4 items-end gap-3 border-b border-slate-300 px-2 sm:gap-5">
+        {activity.map((item) => (
+          <div className="flex h-full min-w-0 flex-col justify-end" key={item.label}>
+            <div
+              aria-label={`${item.label}: ${item.value}`}
+              className="min-h-1 rounded-t-md bg-primary transition-[height]"
+              style={{ height: `${Math.max(4, (item.value / maximum) * 100)}%` }}
+              title={`${item.label}: ${item.value}`}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-4 gap-3 text-center sm:gap-5">
+        {activity.map((item) => (
+          <div className="min-w-0" key={item.label}>
+            <p className="text-lg font-bold text-slate-950">{item.value}</p>
+            <p className="truncate text-xs font-medium text-slate-600">{item.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function AdminUsersTable({
   currentAdminId,
   onUpdateStatus,
@@ -833,6 +868,16 @@ export function AdminUsersDashboard() {
         </div>
 
         <Card className="scroll-mt-24" id="rental-activity">
+          <CardHeader>
+            <CardTitle>Rental activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? <DashboardContentSkeleton label="Loading rental activity" /> : null}
+            {!isLoading && !error ? <AdminRentalActivityChart rentals={visibleRentals} /> : null}
+          </CardContent>
+        </Card>
+
+        <Card>
           <CardHeader>
             <CardTitle>Filter users</CardTitle>
           </CardHeader>
