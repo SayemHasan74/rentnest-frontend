@@ -143,16 +143,16 @@ export function RentalRequestPanel({
   }
 
   return (
-    <form className="grid gap-4" onSubmit={handleSubmit}>
+    <form className="grid gap-4" noValidate onSubmit={handleSubmit}>
       {formError ? (
-        <div className="flex gap-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div aria-live="assertive" className="flex gap-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">
           <AlertCircle className="mt-0.5 shrink-0" size={16} aria-hidden="true" />
           <p>{formError}</p>
         </div>
       ) : null}
 
       {successMessage ? (
-        <div className="flex gap-3 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
+        <div aria-live="polite" className="flex gap-3 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700" role="status">
           <CheckCircle2 className="mt-0.5 shrink-0" size={16} aria-hidden="true" />
           <p>{successMessage}</p>
         </div>
@@ -161,6 +161,8 @@ export function RentalRequestPanel({
       <div className="grid gap-2">
         <Label htmlFor="moveInDate">Move-in date</Label>
         <Input
+          aria-describedby={fieldErrors.moveInDate ? "moveInDate-error" : undefined}
+          aria-invalid={Boolean(fieldErrors.moveInDate)}
           id="moveInDate"
           min={getTomorrowDate()}
           name="moveInDate"
@@ -172,13 +174,17 @@ export function RentalRequestPanel({
           value={moveInDate}
         />
         {fieldErrors.moveInDate ? (
-          <p className="text-xs font-medium text-red-600">{fieldErrors.moveInDate}</p>
+          <p className="text-xs font-medium text-red-600" id="moveInDate-error">
+            {fieldErrors.moveInDate}
+          </p>
         ) : null}
       </div>
 
       <div className="grid gap-2">
         <Label htmlFor="rentalMonths">Rental duration</Label>
         <Input
+          aria-describedby={fieldErrors.rentalMonths ? "rentalMonths-error" : undefined}
+          aria-invalid={Boolean(fieldErrors.rentalMonths)}
           id="rentalMonths"
           max="60"
           min="1"
@@ -191,7 +197,9 @@ export function RentalRequestPanel({
           value={rentalMonths}
         />
         {fieldErrors.rentalMonths ? (
-          <p className="text-xs font-medium text-red-600">{fieldErrors.rentalMonths}</p>
+          <p className="text-xs font-medium text-red-600" id="rentalMonths-error">
+            {fieldErrors.rentalMonths}
+          </p>
         ) : null}
       </div>
 

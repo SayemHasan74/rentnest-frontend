@@ -375,6 +375,13 @@ function AddPropertyForm({
   );
   const [fieldErrors, setFieldErrors] = useState<PropertyFormErrors>({});
 
+  const getErrorProps = (field: keyof PropertyFormValues) => ({
+    "aria-describedby": fieldErrors[field]
+      ? `${formId}-${field}-error`
+      : undefined,
+    "aria-invalid": Boolean(fieldErrors[field]),
+  });
+
   const updateValue = (field: keyof PropertyFormValues, value: string) => {
     setValues((currentValues) => ({
       ...currentValues,
@@ -471,24 +478,28 @@ function AddPropertyForm({
   };
 
   return (
-    <form className="grid gap-5" onSubmit={handleSubmit}>
+    <form className="grid gap-5" noValidate onSubmit={handleSubmit}>
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="grid gap-2">
           <Label htmlFor={`${formId}-title`}>Title</Label>
           <Input
+            {...getErrorProps("title")}
             id={`${formId}-title`}
             onChange={(event) => updateValue("title", event.target.value)}
             placeholder="Modern apartment near Gulshan"
             value={values.title}
           />
           {fieldErrors.title ? (
-            <p className="text-xs font-medium text-red-600">{fieldErrors.title}</p>
+            <p className="text-xs font-medium text-red-600" id={`${formId}-title-error`}>
+              {fieldErrors.title}
+            </p>
           ) : null}
         </div>
 
         <div className="grid gap-2">
           <Label htmlFor={`${formId}-category`}>Category</Label>
           <select
+            {...getErrorProps("categoryId")}
             className="h-10 w-full rounded-md border border-slate-300 bg-surface px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100"
             disabled={categories.length === 0}
             id={`${formId}-category`}
@@ -503,26 +514,32 @@ function AddPropertyForm({
             ))}
           </select>
           {fieldErrors.categoryId ? (
-            <p className="text-xs font-medium text-red-600">{fieldErrors.categoryId}</p>
+            <p className="text-xs font-medium text-red-600" id={`${formId}-categoryId-error`}>
+              {fieldErrors.categoryId}
+            </p>
           ) : null}
         </div>
 
         <div className="grid gap-2">
           <Label htmlFor={`${formId}-location`}>Location</Label>
           <Input
+            {...getErrorProps("location")}
             id={`${formId}-location`}
             onChange={(event) => updateValue("location", event.target.value)}
             placeholder="Dhaka"
             value={values.location}
           />
           {fieldErrors.location ? (
-            <p className="text-xs font-medium text-red-600">{fieldErrors.location}</p>
+            <p className="text-xs font-medium text-red-600" id={`${formId}-location-error`}>
+              {fieldErrors.location}
+            </p>
           ) : null}
         </div>
 
         <div className="grid gap-2">
           <Label htmlFor={`${formId}-address`}>Address</Label>
           <Input
+            {...getErrorProps("rentAmount")}
             id={`${formId}-address`}
             onChange={(event) => updateValue("address", event.target.value)}
             placeholder="House 12, Road 5"
@@ -541,7 +558,9 @@ function AddPropertyForm({
             value={values.rentAmount}
           />
           {fieldErrors.rentAmount ? (
-            <p className="text-xs font-medium text-red-600">{fieldErrors.rentAmount}</p>
+            <p className="text-xs font-medium text-red-600" id={`${formId}-rentAmount-error`}>
+              {fieldErrors.rentAmount}
+            </p>
           ) : null}
         </div>
 
@@ -549,6 +568,7 @@ function AddPropertyForm({
           <div className="grid gap-2">
             <Label htmlFor={`${formId}-bedrooms`}>Beds</Label>
             <Input
+              {...getErrorProps("bedrooms")}
               id={`${formId}-bedrooms`}
               max="20"
               min="1"
@@ -557,12 +577,15 @@ function AddPropertyForm({
               value={values.bedrooms}
             />
             {fieldErrors.bedrooms ? (
-              <p className="text-xs font-medium text-red-600">{fieldErrors.bedrooms}</p>
+              <p className="text-xs font-medium text-red-600" id={`${formId}-bedrooms-error`}>
+                {fieldErrors.bedrooms}
+              </p>
             ) : null}
           </div>
           <div className="grid gap-2">
             <Label htmlFor={`${formId}-bathrooms`}>Baths</Label>
             <Input
+              {...getErrorProps("bathrooms")}
               id={`${formId}-bathrooms`}
               max="20"
               min="1"
@@ -571,12 +594,15 @@ function AddPropertyForm({
               value={values.bathrooms}
             />
             {fieldErrors.bathrooms ? (
-              <p className="text-xs font-medium text-red-600">{fieldErrors.bathrooms}</p>
+              <p className="text-xs font-medium text-red-600" id={`${formId}-bathrooms-error`}>
+                {fieldErrors.bathrooms}
+              </p>
             ) : null}
           </div>
           <div className="grid gap-2">
             <Label htmlFor={`${formId}-area`}>Sqft</Label>
             <Input
+              {...getErrorProps("areaSqFt")}
               id={`${formId}-area`}
               min="1"
               onChange={(event) => updateValue("areaSqFt", event.target.value)}
@@ -584,7 +610,9 @@ function AddPropertyForm({
               value={values.areaSqFt}
             />
             {fieldErrors.areaSqFt ? (
-              <p className="text-xs font-medium text-red-600">{fieldErrors.areaSqFt}</p>
+              <p className="text-xs font-medium text-red-600" id={`${formId}-areaSqFt-error`}>
+                {fieldErrors.areaSqFt}
+              </p>
             ) : null}
           </div>
         </div>
@@ -593,6 +621,7 @@ function AddPropertyForm({
       <div className="grid gap-2">
         <Label htmlFor={`${formId}-description`}>Description</Label>
         <Textarea
+          {...getErrorProps("description")}
           id={`${formId}-description`}
           maxLength={2000}
           onChange={(event) => updateValue("description", event.target.value)}
@@ -600,14 +629,17 @@ function AddPropertyForm({
           value={values.description}
         />
         {fieldErrors.description ? (
-          <p className="text-xs font-medium text-red-600">{fieldErrors.description}</p>
+          <p className="text-xs font-medium text-red-600" id={`${formId}-description-error`}>
+            {fieldErrors.description}
+          </p>
         ) : null}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="grid gap-2">
           <Label htmlFor={`${formId}-amenities`}>Amenities</Label>
-          <Textarea
+        <Textarea
+          {...getErrorProps("images")}
             id={`${formId}-amenities`}
             onChange={(event) => updateValue("amenities", event.target.value)}
             placeholder="Parking, WiFi, Elevator"
@@ -622,8 +654,10 @@ function AddPropertyForm({
             placeholder="https://images.unsplash.com/..."
             value={values.images}
           />
-          {fieldErrors.images ? (
-            <p className="text-xs font-medium text-red-600">{fieldErrors.images}</p>
+        {fieldErrors.images ? (
+            <p className="text-xs font-medium text-red-600" id={`${formId}-images-error`}>
+              {fieldErrors.images}
+            </p>
           ) : null}
         </div>
       </div>
@@ -787,10 +821,12 @@ function LandlordRequestCard({
               Approve
             </Button>
           </div>
-          <form className="grid gap-3" onSubmit={handleReject}>
+          <form className="grid gap-3" noValidate onSubmit={handleReject}>
             <div className="grid gap-2">
               <Label htmlFor={`rejection-${request.id}`}>Rejection reason</Label>
               <Textarea
+                aria-describedby={fieldError ? `rejection-${request.id}-error` : undefined}
+                aria-invalid={Boolean(fieldError)}
                 id={`rejection-${request.id}`}
                 maxLength={500}
                 onChange={(event) => {
@@ -801,7 +837,14 @@ function LandlordRequestCard({
                 value={rejectionReason}
               />
               {fieldError ? (
-                <p className="text-xs font-medium text-red-600">{fieldError}</p>
+                <p
+                  aria-live="assertive"
+                  className="text-xs font-medium text-red-600"
+                  id={`rejection-${request.id}-error`}
+                  role="alert"
+                >
+                  {fieldError}
+                </p>
               ) : null}
             </div>
             <Button

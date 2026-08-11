@@ -412,11 +412,13 @@ function CategoryForm({
   };
 
   return (
-    <form className="grid gap-4" onSubmit={handleSubmit}>
+    <form className="grid gap-4" noValidate onSubmit={handleSubmit}>
       <div className="grid gap-4 lg:grid-cols-[1fr_2fr_auto]">
         <div className="grid gap-2">
           <Label htmlFor={`category-name-${submitLabel}`}>Name</Label>
           <Input
+            aria-describedby={fieldError ? `category-error-${submitLabel}` : undefined}
+            aria-invalid={Boolean(fieldError)}
             id={`category-name-${submitLabel}`}
             maxLength={80}
             onChange={(event) =>
@@ -432,6 +434,8 @@ function CategoryForm({
         <div className="grid gap-2">
           <Label htmlFor={`category-description-${submitLabel}`}>Description</Label>
           <Input
+            aria-describedby={fieldError ? `category-error-${submitLabel}` : undefined}
+            aria-invalid={Boolean(fieldError)}
             id={`category-description-${submitLabel}`}
             maxLength={500}
             onChange={(event) =>
@@ -456,7 +460,9 @@ function CategoryForm({
         </div>
       </div>
       {fieldError ? (
-        <p className="text-xs font-medium text-red-600">{fieldError}</p>
+        <p aria-live="assertive" className="text-xs font-medium text-red-600" id={`category-error-${submitLabel}`} role="alert">
+          {fieldError}
+        </p>
       ) : null}
     </form>
   );
