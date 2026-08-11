@@ -21,7 +21,7 @@ import { Button, buttonClasses } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
 import { DashboardContentSkeleton } from "@/components/ui/dashboard-content-skeleton";
-import { Label, Textarea } from "@/components/ui/input";
+import { Input, Label, Textarea } from "@/components/ui/input";
 import { Toast } from "@/components/ui/toast";
 import { api } from "@/lib/api";
 import { getStoredToken, getStoredUser } from "@/lib/auth-session";
@@ -38,6 +38,11 @@ type AuthSnapshot = {
 type TenantDashboardCache = {
   requests: RentalRequest[];
   payments: Payment[];
+};
+
+type PaymentFilters = {
+  search: string;
+  status: "" | PaymentStatus;
 };
 
 const statusTone: Record<RentalStatus, "slate" | "emerald" | "blue" | "amber" | "red" | "purple"> = {
@@ -117,6 +122,41 @@ function PaymentBadge({ status }: { status: PaymentStatus }) {
       <ReceiptText size={14} aria-hidden="true" />
       {status}
     </Badge>
+  );
+}
+
+function TenantActivityChart({ requests }: { requests: RentalRequest[] }) {
+  const activity = [
+    { label: "Pending", value: requests.filter((request) => request.status === "PENDING").length },
+    { label: "Approved", value: requests.filter((request) => request.status === "APPROVED").length },
+    { label: "Active", value: requests.filter((request) => request.status === "ACTIVE").length },
+    { label: "Completed", value: requests.filter((request) => request.status === "COMPLETED").length },
+  ];
+  const maximum = Math.max(1, ...activity.map((item) => item.value));
+
+  return (
+    <div aria-label="Rental request activity chart" className="grid gap-4" role="img">
+      <div className="grid h-44 grid-cols-4 items-end gap-3 border-b border-slate-300 px-2 sm:gap-5">
+        {activity.map((item) => (
+          <div className="flex h-full min-w-0 flex-col justify-end" key={item.label}>
+            <div
+              aria-label={`${item.label}: ${item.value}`}
+              className="min-h-1 rounded-t-md bg-primary transition-[height]"
+              style={{ height: `${Math.max(4, (item.value / maximum) * 100)}%` }}
+              title={`${item.label}: ${item.value}`}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-4 gap-3 text-center sm:gap-5">
+        {activity.map((item) => (
+          <div className="min-w-0" key={item.label}>
+            <p className="text-lg font-bold text-slate-950">{item.value}</p>
+            <p className="truncate text-xs font-medium text-slate-600">{item.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -393,6 +433,11 @@ export function TenantRentalsDashboard() {
   const [error, setError] = useState("");
   const [refreshError, setRefreshError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentFilters, setPaymentFilters] = useState<PaymentFilters>({
+    search: "",
+    status: "",
+  });
+  const [paymentPage, setPaymentPage] = useState(1);
   const cacheKey = user ? `tenant:${user.id}` : null;
 
   useEffect(() => {
@@ -515,6 +560,28 @@ export function TenantRentalsDashboard() {
       { label: "Paid rentals", value: paidRentalIds.size },
     ];
   }, [visiblePayments, visibleRequests]);
+  const filteredPayments = useMemo(() => {
+    const search = paymentFilters.search.trim().toLowerCase();
+
+    return visiblePayments.filter((payment) => {
+      const propertyTitle = payment.rentalRequest?.property.title.toLowerCase() ?? "";
+      const matchesSearch = !search || propertyTitle.includes(search) || payment.provider.toLowerCase().includes(search);
+      const matchesStatus = !paymentFilters.status || payment.status === paymentFilters.status;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [paymentFilters, visiblePayments]);
+  const paymentsPerPage = 5;
+  const paymentTotalPages = Math.max(1, Math.ceil(filteredPayments.length / paymentsPerPage));
+  const paginatedPayments = filteredPayments.slice(
+    (paymentPage - 1) * paymentsPerPage,
+    paymentPage * paymentsPerPage,
+  );
+
+  const updatePaymentFilters = (nextFilters: PaymentFilters) => {
+    setPaymentFilters(nextFilters);
+    setPaymentPage(1);
+  };
 
   const handleReviewCreated = (requestId: string, review: Review) => {
     setRequests((currentRequests) =>
@@ -580,6 +647,18 @@ export function TenantRentalsDashboard() {
             </a>
           ))}
         </nav>
+
+        <DashboardSection
+          description="A live breakdown of your rental-request statuses from your current dashboard data."
+          icon={CalendarClock}
+          id="rental-activity"
+          index="01"
+          title="Rental activity"
+          tone="muted"
+        >
+          {isLoading ? <DashboardContentSkeleton label="Loading rental activity" /> : null}
+          {!isLoading && !error ? <TenantActivityChart requests={visibleRequests} /> : null}
+        </DashboardSection>
 
         <DashboardSection
           description={`${visibleRequests.length} request${visibleRequests.length === 1 ? "" : "s"}. Follow approval, payment, rental, and review status in one place.`}
@@ -680,8 +759,40 @@ export function TenantRentalsDashboard() {
             ) : null}
 
             {!isLoading && !error && visiblePayments.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[44rem] text-left text-sm">
+              <>
+                <div className="mb-5 grid gap-4 border-b border-slate-300 pb-5 sm:grid-cols-[minmax(0,1fr)_12rem]">
+                  <div className="grid gap-2">
+                    <Label htmlFor="tenant-payment-search">Search payment history</Label>
+                    <Input
+                      id="tenant-payment-search"
+                      onChange={(event) => updatePaymentFilters({ ...paymentFilters, search: event.target.value })}
+                      placeholder="Property or provider"
+                      value={paymentFilters.search}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="tenant-payment-status">Payment status</Label>
+                    <select
+                      className="h-10 rounded-md border border-slate-400 bg-surface px-3 text-sm text-slate-950 outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100"
+                      id="tenant-payment-status"
+                      onChange={(event) => updatePaymentFilters({ ...paymentFilters, status: event.target.value as PaymentFilters["status"] })}
+                      value={paymentFilters.status}
+                    >
+                      <option value="">All statuses</option>
+                      <option value="PENDING">Pending</option>
+                      <option value="COMPLETED">Completed</option>
+                      <option value="FAILED">Failed</option>
+                      <option value="CANCELLED">Cancelled</option>
+                      <option value="REFUNDED">Refunded</option>
+                    </select>
+                  </div>
+                </div>
+
+                {filteredPayments.length === 0 ? (
+                  <p className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-600">No payment records match the current filters.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[44rem] text-left text-sm">
                   <thead className="border-b border-slate-200 text-xs uppercase text-slate-500">
                     <tr>
                       <th className="py-3 pr-4 font-semibold">Property</th>
@@ -692,7 +803,7 @@ export function TenantRentalsDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    {visiblePayments.map((payment) => (
+                    {paginatedPayments.map((payment) => (
                       <tr key={payment.id}>
                         <td className="py-3 pr-4 font-medium text-slate-950">
                           {payment.rentalRequest?.property.title ?? "Rental property"}
@@ -710,8 +821,20 @@ export function TenantRentalsDashboard() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
-              </div>
+                    </table>
+                  </div>
+                )}
+
+                {filteredPayments.length > 0 ? (
+                  <div className="mt-5 flex flex-col justify-between gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center">
+                    <p className="text-sm text-slate-600">Page {paymentPage} of {paymentTotalPages}</p>
+                    <div className="flex gap-2">
+                      <Button disabled={paymentPage <= 1} onClick={() => setPaymentPage((current) => Math.max(1, current - 1))} type="button" variant="outline">Previous</Button>
+                      <Button disabled={paymentPage >= paymentTotalPages} onClick={() => setPaymentPage((current) => Math.min(paymentTotalPages, current + 1))} type="button" variant="outline">Next</Button>
+                    </div>
+                  </div>
+                ) : null}
+              </>
             ) : null}
         </DashboardSection>
       </section>
