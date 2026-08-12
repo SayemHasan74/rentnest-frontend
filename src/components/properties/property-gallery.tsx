@@ -13,12 +13,17 @@ export function PropertyGallery({
   const galleryImages = images.length > 0 ? images : [fallbackImage];
   const [primaryImage, ...secondaryImages] = galleryImages;
   const previewImages = secondaryImages.slice(0, 4);
+  const imageCount = 1 + previewImages.length;
 
   return (
-    <div className={`grid gap-3 ${previewImages.length > 0 ? "lg:grid-cols-[1.4fr_0.6fr]" : ""}`}>
+    <div
+      aria-label={`${title} gallery with ${imageCount} ${imageCount === 1 ? "image" : "images"}`}
+      className={`grid gap-3 ${previewImages.length > 0 ? "lg:grid-cols-[1.4fr_0.6fr]" : ""}`}
+      role="group"
+    >
       <div className="relative aspect-[16/10] overflow-hidden rounded-md bg-slate-200">
         <Image
-          alt={title}
+          alt={`${title} primary view`}
           className="object-cover"
           fill
           priority
@@ -34,7 +39,7 @@ export function PropertyGallery({
               key={`${image}-${index}`}
             >
               <Image
-                alt={`${title} preview ${index + 1}`}
+                alt={`${title} gallery view ${index + 2}`}
                 className="object-cover"
                 fill
                 sizes="(min-width: 1024px) 30vw, 50vw"

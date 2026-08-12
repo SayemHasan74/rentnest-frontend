@@ -137,13 +137,24 @@ export default async function PropertyDetailsPage({
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_22rem]">
           <div className="grid gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Property overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="leading-7 text-slate-600">{property.description}</p>
-                <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <section aria-labelledby="property-overview-title">
+              <Card>
+                <CardHeader>
+                  <CardTitle id="property-overview-title">Property overview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="leading-7 text-slate-600">{property.description}</p>
+                </CardContent>
+              </Card>
+            </section>
+
+            <section aria-labelledby="property-specifications-title">
+              <Card>
+                <CardHeader>
+                  <CardTitle id="property-specifications-title">Key information</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   {specItems(property).map((item) => {
                     const Icon = item.icon;
 
@@ -160,69 +171,74 @@ export default async function PropertyDetailsPage({
                       </div>
                     );
                   })}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Amenities</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {property.amenities.length > 0 ? (
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {property.amenities.map((amenity) => (
-                      <div
-                        className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-200"
-                        key={amenity}
-                      >
-                        <CheckCircle2 size={16} className="text-emerald-700" aria-hidden="true" />
-                        {amenity}
-                      </div>
-                    ))}
                   </div>
-                ) : (
-                  <p className="text-sm text-slate-600">No amenities listed.</p>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </section>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Reviews</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {reviews.length > 0 ? (
-                  <div className="grid gap-4">
-                    {reviews.map((review) => (
-                      <article
-                        className="rounded-md border border-slate-200 p-4"
-                        key={review.id}
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="font-semibold text-slate-950">
-                            {review.tenant?.name ?? "Tenant"}
-                          </p>
-                          <p className="flex items-center gap-1 text-sm font-semibold text-amber-600">
-                            <Star size={15} fill="currentColor" aria-hidden="true" />
-                            {review.rating}/5
-                          </p>
+            <section aria-labelledby="property-amenities-title">
+              <Card>
+                <CardHeader>
+                  <CardTitle id="property-amenities-title">Amenities</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {property.amenities.length > 0 ? (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {property.amenities.map((amenity) => (
+                        <div
+                          className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-200"
+                          key={amenity}
+                        >
+                          <CheckCircle2 size={16} className="text-emerald-700" aria-hidden="true" />
+                          {amenity}
                         </div>
-                        {review.comment ? (
-                          <p className="mt-2 text-sm leading-6 text-slate-600">
-                            {review.comment}
-                          </p>
-                        ) : null}
-                      </article>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-slate-600">
-                    No reviews yet. Completed tenants can leave the first review.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-600">No amenities listed.</p>
+                  )}
+                </CardContent>
+              </Card>
+            </section>
+
+            <section aria-labelledby="property-reviews-title">
+              <Card>
+                <CardHeader>
+                  <CardTitle id="property-reviews-title">Reviews</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {reviews.length > 0 ? (
+                    <div className="grid gap-4">
+                      {reviews.map((review) => (
+                        <article
+                          className="rounded-md border border-slate-200 p-4"
+                          key={review.id}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="font-semibold text-slate-950">
+                              {review.tenant?.name ?? "Tenant"}
+                            </p>
+                            <p className="flex items-center gap-1 text-sm font-semibold text-amber-600">
+                              <Star size={15} fill="currentColor" aria-hidden="true" />
+                              {review.rating}/5
+                            </p>
+                          </div>
+                          {review.comment ? (
+                            <p className="mt-2 text-sm leading-6 text-slate-600">
+                              {review.comment}
+                            </p>
+                          ) : null}
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-600">
+                      No reviews yet. Completed tenants can leave the first review.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </section>
           </div>
 
           <aside className="grid gap-6 self-start lg:sticky lg:top-24">
