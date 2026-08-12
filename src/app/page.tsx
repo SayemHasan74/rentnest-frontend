@@ -179,19 +179,29 @@ export default async function LandingPage() {
           <div className="hidden justify-center md:flex">
             <div className="w-px bg-gradient-to-b from-slate-300 to-slate-400">
               <div className="h-[52px]" />
-              <aside className="relative ml-[-140px] w-[280px] rotate-[-4deg] rounded-2xl border border-slate-300 bg-surface px-7 pb-7 pt-8 shadow-2xl shadow-black/20">
-                <i className="absolute left-1/2 top-[-9px] h-4 w-4 -translate-x-1/2 rounded-full border border-slate-300 bg-background" />
-                <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-slate-400">Live marketplace snapshot</p>
-                {snapshotRows.length ? snapshotRows.map(([label, value]) => (
-                    <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-dashed border-slate-300 pt-3 first:border-t-0 first:pt-0" key={label}>
-                      <span className="text-xs text-slate-500">{label}</span><b className="text-right font-mono text-base font-semibold text-primary">{value}</b>
-                    </div>
-                  )) : (
-                    <p className="mt-4 border-t border-dashed border-slate-300 pt-4 text-xs leading-5 text-slate-500">
-                      Live listing totals are temporarily unavailable. Browse properties to try again.
-                    </p>
-                  )}
-              </aside>
+              <div className="relative ml-[-140px] w-[280px] rotate-[-4deg] drop-shadow-2xl">
+                <svg
+                  aria-hidden="true"
+                  className="relative -mb-px block h-[86px] w-full overflow-visible"
+                  preserveAspectRatio="none"
+                  viewBox="0 0 280 86"
+                >
+                  <path d="M 3 85 L 140 3 L 277 85 Z" fill="var(--rn-surface)" stroke="var(--rn-slate-300)" strokeWidth="1.5" />
+                </svg>
+                <i className="absolute left-1/2 top-[-8px] h-4 w-4 -translate-x-1/2 rounded-full border border-slate-300 bg-background" />
+                <aside className="relative w-full rounded-b-2xl border border-t-0 border-slate-300 bg-surface px-7 pb-7 pt-4 shadow-2xl shadow-black/20">
+                  <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-slate-400">Live marketplace snapshot</p>
+                  {snapshotRows.length ? snapshotRows.map(([label, value]) => (
+                      <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-dashed border-slate-300 pt-3 first:border-t-0 first:pt-0" key={label}>
+                        <span className="text-xs text-slate-500">{label}</span><b className="text-right font-mono text-base font-semibold text-primary">{value}</b>
+                      </div>
+                    )) : (
+                      <p className="mt-4 border-t border-dashed border-slate-300 pt-4 text-xs leading-5 text-slate-500">
+                        Live listing totals are temporarily unavailable. Browse properties to try again.
+                      </p>
+                    )}
+                </aside>
+              </div>
             </div>
           </div>
         </div>

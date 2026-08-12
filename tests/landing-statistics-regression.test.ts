@@ -44,3 +44,9 @@ test("public landing hero stays within the required viewport-height range", () =
   assert.match(landingPage, /aria-labelledby="landing-hero-title"/);
   assert.match(landingPage, /id="landing-hero-title"/);
 });
+
+test("live marketplace snapshot has a simple house-shaped roof", () => {
+  assert.match(landingPage, /M 3 85 L 140 3 L 277 85 Z/);
+  assert.match(landingPage, /rounded-b-2xl border border-t-0/);
+  assert.match(landingPage, /fill="var\(--rn-surface\)"/);
+});
