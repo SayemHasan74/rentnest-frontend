@@ -25,6 +25,12 @@ test("landing page handles an unavailable property API without dummy fallback to
   assert.match(landingPage, /Live catalogue insights will return/);
 });
 
+test("featured areas use real property images instead of gradient placeholders", () => {
+  assert.match(landingPage, /image: current\?\.image \?\? property\.images\[0\] \?\? null/);
+  assert.match(landingPage, /<Image/);
+  assert.doesNotMatch(landingPage, /areaGradients/);
+});
+
 test("landing page provides at least eight meaningful sections", () => {
   assert.ok((landingPage.match(/<section/g) ?? []).length >= 8);
   assert.match(landingPage, /A clearer rental path/);

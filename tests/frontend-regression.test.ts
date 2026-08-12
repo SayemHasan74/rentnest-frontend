@@ -210,6 +210,9 @@ test("application shell exposes the required logged-out and logged-in actions", 
   ];
 
   assert.ok(new Set(loggedOutDestinations).size >= 4);
+  assert.equal(publicNavigationLinks.some((link) => link.label === "Home"), false);
+  assert.match(header, /isAuthPage = pathname\.startsWith\("\/auth\/"\)/);
+  assert.match(header, /if \(isAuthPage\)/);
   assert.doesNotMatch(header, /pathname === "\/"\s*\? \[\]/);
   assert.match(header, /isAuthenticated \? \[\{ href: dashboardPath/);
   assert.match(header, /<AccountMenu onLogout=\{handleLogout\} user=\{user\} \/>/);

@@ -67,6 +67,7 @@ export function SiteHeader() {
     user: User | null;
   };
   const isAuthenticated = Boolean(token && user);
+  const isAuthPage = pathname.startsWith("/auth/");
   const dashboardPath = user ? getRoleDashboardPath(user.role) : "/dashboard";
   const primaryRoleLink = user ? getPrimaryRoleLink(user.role) : null;
   const navLinks = [
@@ -110,6 +111,19 @@ export function SiteHeader() {
       </Link>
     </>
   );
+
+  if (isAuthPage) {
+    return (
+      <header className="border-b border-slate-300 bg-surface">
+        <div className="mx-auto flex h-[4.5rem] w-full max-w-[90rem] items-center px-4 sm:px-6 lg:px-10">
+          <Link className="flex items-center gap-2.5 font-bold text-slate-950" href="/">
+            <Building size={23} strokeWidth={1.7} aria-hidden="true" />
+            <span className="text-xl">RentNest</span>
+          </Link>
+        </div>
+      </header>
+    );
+  }
 
   if (pathname === "/home") {
     return (

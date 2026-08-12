@@ -16,8 +16,6 @@ requests. Admins can manage users, listings, rentals, and categories.
 | Admin email | `admin@rentnest.com` |
 | Admin password | `admin123` |
 
-The video explanation link is submitted separately through the assignment form.
-
 ## Tech Stack
 
 - Next.js App Router

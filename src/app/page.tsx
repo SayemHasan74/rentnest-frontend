@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -20,13 +21,6 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 300;
-
-const areaGradients = [
-  "from-[#1e3a34]",
-  "from-[#2a2a1e]",
-  "from-[#1e2a3a]",
-  "from-[#2a1e2e]",
-];
 
 const roles = [
   {
@@ -76,21 +70,25 @@ const rentalSteps = [
 const getAreaName = (location: string) => location.split(",")[0]?.trim() || location;
 
 const getLandingStatistics = (properties: Property[]) => {
-  const areaCounts = new Map<string, number>();
+  const areaData = new Map<string, { count: number; image: string | null }>();
 
   properties.forEach((property) => {
     const area = getAreaName(property.location);
-    areaCounts.set(area, (areaCounts.get(area) ?? 0) + 1);
+    const current = areaData.get(area);
+    areaData.set(area, {
+      count: (current?.count ?? 0) + 1,
+      image: current?.image ?? property.images[0] ?? null,
+    });
   });
 
-  const areas = [...areaCounts.entries()]
-    .sort(([leftName, leftCount], [rightName, rightCount]) =>
-      rightCount - leftCount || leftName.localeCompare(rightName),
+  const areas = [...areaData.entries()]
+    .sort(([leftName, left], [rightName, right]) =>
+      right.count - left.count || leftName.localeCompare(rightName),
     )
-    .map(([name, count], index) => ({
+    .map(([name, area]) => ({
       name,
-      count,
-      className: areaGradients[index % areaGradients.length],
+      count: area.count,
+      image: area.image,
     }));
   const rents = properties.map((property) => Number(property.rentAmount));
   const totalRent = rents.reduce((total, rent) => total + rent, 0);
@@ -330,7 +328,16 @@ export default async function LandingPage() {
         <div className="mb-14 max-w-xl"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Featured areas</p><h2 className="mt-3 font-serif text-4xl font-medium leading-tight tracking-[-0.02em] text-slate-950 sm:text-5xl">Start where you already know you want to be.</h2></div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {featuredAreas.map((area) => (
-            <Link className={`relative flex h-64 items-end overflow-hidden rounded-2xl border border-slate-300 bg-gradient-to-br ${area.className} to-background p-6 text-white after:absolute after:inset-0 after:bg-gradient-to-t after:from-black/75 after:to-transparent`} href={`/properties?location=${area.name}&page=1`} key={area.name}>
+            <Link className="group relative flex h-64 items-end overflow-hidden rounded-2xl border border-slate-300 bg-slate-800 p-6 text-white after:absolute after:inset-0 after:bg-gradient-to-t after:from-black/80 after:via-black/20 after:to-transparent" href={`/properties?location=${area.name}&page=1`} key={area.name}>
+              {area.image ? (
+                <Image
+                  alt={`Rental property in ${area.name}`}
+                  className="object-cover transition duration-500 group-hover:scale-105"
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                  src={area.image}
+                />
+              ) : null}
               <span className="relative z-10"><b className="block font-serif text-2xl font-medium">{area.name}</b><small className="font-mono text-xs text-white/80">{formatNumber(area.count)} {area.count === 1 ? "listing" : "listings"}</small></span>
             </Link>
           ))}
