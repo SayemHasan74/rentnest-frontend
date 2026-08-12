@@ -3,7 +3,8 @@
 RentNest is a Next.js App Router frontend for a rental property marketplace.
 Tenants can browse properties, submit rental requests, pay after landlord
 approval, and leave reviews. Landlords can manage property listings and rental
-requests. Admins can manage users, listings, rentals, and categories.
+requests. Admins can manage users, listings, rentals, categories, and
+authenticated support conversations.
 
 ## Submission Details
 
@@ -74,7 +75,7 @@ npm run build
 /auth/login               Login with demo account shortcuts
 /auth/register            Tenant/landlord registration
 /about                    Public project information
-/contact                  Validated contact form
+/contact                  Contact form and authenticated support inbox
 /help                     Public help and support
 /privacy                  Privacy policy for local and social accounts
 /data-deletion            Account and social-data deletion instructions
@@ -103,6 +104,7 @@ Tenant:
 - Pay approved rentals through Stripe checkout.
 - See payment success/cancel feedback pages.
 - Review completed rentals.
+- Send support messages and receive admin replies in the internal support inbox.
 
 Landlord:
 - View owned properties.
@@ -115,6 +117,7 @@ Landlord:
 - Approve or reject pending requests with optimistic UI updates.
 - Complete active paid rentals.
 - View earnings from completed payments.
+- Send support messages and receive admin replies in the internal support inbox.
 
 Admin:
 - View and filter users in a responsive data table by role, status, and search.
@@ -123,6 +126,16 @@ Admin:
 - Monitor all properties.
 - Monitor rental activity and payment status.
 - Create, edit, and delete categories.
+- Search and filter support conversations, reply to users, and close or reopen conversations.
+
+Support messaging:
+- Logged-out visitors can complete the contact form without losing their work.
+- Selecting Continue to login stores the draft locally and redirects to authentication.
+- After password, Google, or Facebook login, RentNest returns to the contact page with every field restored.
+- The user reviews the restored draft and explicitly selects Send message before it is submitted.
+- Messages and replies are linked to authenticated accounts and stored as internal conversations.
+- User and admin inboxes track unread replies independently.
+- Replies are delivered inside RentNest, so no external email service is required.
 
 Shared UX:
 - Route-level loading skeletons.
@@ -162,6 +175,12 @@ GET  /api/payments/:id
 
 POST /api/reviews
 
+GET   /api/contact
+POST  /api/contact
+GET   /api/contact/:id
+POST  /api/contact/:id/messages
+PATCH /api/contact/:id/read
+
 GET    /api/landlord/properties
 POST   /api/landlord/properties
 PUT    /api/landlord/properties/:id
@@ -175,6 +194,8 @@ GET   /api/admin/users
 PATCH /api/admin/users/:id
 GET   /api/admin/properties
 GET   /api/admin/rentals
+GET   /api/admin/contact-submissions
+PATCH /api/admin/contact-submissions/:id/status
 POST  /api/categories
 PATCH /api/categories/:id
 DELETE /api/categories/:id
