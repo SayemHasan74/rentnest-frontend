@@ -31,3 +31,9 @@ test("landing page provides at least eight meaningful sections", () => {
   assert.match(landingPage, /From the live catalogue/);
   assert.match(landingPage, /featuredHomes = properties\.slice\(0, 3\)/);
 });
+
+test("public landing hero stays within the required viewport-height range", () => {
+  assert.match(landingPage, /h-\[65svh\]/);
+  assert.match(landingPage, /aria-labelledby="landing-hero-title"/);
+  assert.match(landingPage, /id="landing-hero-title"/);
+});

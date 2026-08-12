@@ -145,28 +145,28 @@ export default async function LandingPage() {
 
   return (
     <main className="overflow-hidden bg-background text-foreground">
-      <section className="relative overflow-hidden border-b border-slate-300">
+      <section className="relative h-[65svh] overflow-hidden border-b border-slate-300" aria-labelledby="landing-hero-title">
         <div className="pointer-events-none absolute inset-x-[-10%] top-[-20%] h-[38rem] bg-[radial-gradient(ellipse_at_top,color-mix(in_srgb,var(--rn-primary)_12%,transparent),transparent_60%)]" />
-        <div className="relative mx-auto grid w-full max-w-[1180px] gap-10 px-6 py-20 sm:px-8 lg:grid-cols-[1.1fr_.8fr] lg:items-center lg:gap-16 lg:py-24">
+        <div className="relative mx-auto grid h-full w-full max-w-[1180px] items-center gap-8 px-6 py-8 sm:px-8 md:grid-cols-[1.1fr_.8fr] md:gap-10 lg:gap-16">
           <div>
             <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 before:text-primary before:content-['✦']">
               Thoughtful rentals, Dhaka
             </p>
-            <h1 className="mt-6 max-w-3xl font-serif text-5xl font-medium leading-[1.02] tracking-[-0.03em] text-slate-950 sm:text-7xl">
+            <h1 className="mt-4 max-w-3xl font-serif text-4xl font-medium leading-[1.02] tracking-[-0.03em] text-slate-950 sm:text-6xl lg:mt-6 lg:text-7xl" id="landing-hero-title">
               A calmer way<br />to call Dhaka<br /><em className="font-normal text-primary">home.</em>
             </h1>
-            <p className="mt-6 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">
+            <p className="mt-4 max-w-xl text-sm leading-6 text-slate-600 sm:text-base lg:mt-6 lg:text-lg lg:leading-7">
               No cold calls, no guessing games. Verified listings, transparent pricing, and a process built so you always know what happens next.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link className={buttonClasses({ size: "lg", className: "rounded-full px-6" })} href="/properties">
+            <div className="mt-5 flex flex-wrap gap-3 lg:mt-8">
+              <Link className={buttonClasses({ className: "rounded-full px-5 sm:px-6" })} href="/properties">
                 Explore homes <ArrowRight size={18} aria-hidden="true" />
               </Link>
-              <Link className={buttonClasses({ variant: "outline", size: "lg", className: "rounded-full px-6" })} href="/auth/register">
+              <Link className={buttonClasses({ variant: "outline", className: "rounded-full px-5 sm:px-6" })} href="/auth/register">
                 List your property
               </Link>
             </div>
-            <div className="mt-10 flex flex-wrap gap-x-6 gap-y-3">
+            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 lg:mt-10 lg:gap-y-3">
               {["No broker spam", "Verified owners only", "Free to browse"].map((item) => (
                 <span className="flex items-center gap-2 text-xs text-slate-400" key={item}>
                   <i className="h-1.5 w-1.5 rounded-full bg-primary" />{item}
@@ -175,7 +175,7 @@ export default async function LandingPage() {
             </div>
           </div>
 
-          <div className="flex justify-center pt-5 lg:pt-0">
+          <div className="hidden justify-center md:flex">
             <div className="w-px bg-gradient-to-b from-slate-300 to-slate-400">
               <div className="h-[52px]" />
               <aside className="relative ml-[-140px] w-[280px] rotate-[-4deg] rounded-2xl border border-slate-300 bg-surface px-7 pb-7 pt-8 shadow-2xl shadow-black/20">
