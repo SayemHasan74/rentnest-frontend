@@ -36,6 +36,10 @@ export function proxy(request: NextRequest) {
   const roleCookie = request.cookies.get(AUTH_ROLE_COOKIE)?.value;
   const role = isUserRole(roleCookie) ? roleCookie : null;
 
+  if (pathname === "/" && token && role) {
+    return createRedirect(request, "/home");
+  }
+
   if (pathname === "/dashboard" && token && role) {
     return createRedirect(request, roleDashboardPaths[role]);
   }
@@ -60,5 +64,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/auth/:path*", "/dashboard/:path*", "/home"],
+  matcher: ["/", "/auth/:path*", "/dashboard/:path*", "/home"],
 };

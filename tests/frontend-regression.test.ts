@@ -44,8 +44,15 @@ test("the authenticated home route is protected on the server and after session 
   );
 
   assert.match(proxy, /pathname === "\/home" && \(!token \|\| !role\)/);
-  assert.match(proxy, /matcher: \["\/auth\/:path\*", "\/dashboard\/:path\*", "\/home"\]/);
+  assert.match(proxy, /matcher: \["\/", "\/auth\/:path\*", "\/dashboard\/:path\*", "\/home"\]/);
   assert.match(verifier, /window\.location\.pathname === "\/home"/);
+});
+
+test("authenticated visitors are redirected from the landing page to home", () => {
+  const proxy = readFileSync("src/proxy.ts", "utf8");
+
+  assert.match(proxy, /pathname === "\/" && token && role/);
+  assert.match(proxy, /createRedirect\(request, "\/home"\)/);
 });
 
 test("authenticated home uses real routes, activity data, map, and device favorites", () => {
