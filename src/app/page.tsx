@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
+  ClipboardCheck,
+  CreditCard,
+  Search,
   ShieldCheck,
 } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
@@ -40,6 +43,30 @@ const roles = [
     description:
       "Maintain a reliable marketplace with the tools to review users, listings, and activity at a glance.",
     items: ["Review marketplace activity", "Manage categories and users", "Keep listings trustworthy"],
+  },
+];
+
+const rentalSteps = [
+  {
+    number: "01",
+    title: "Search with context",
+    description:
+      "Compare live homes by area, monthly rent, property type, and the amenities that matter to you.",
+    icon: Search,
+  },
+  {
+    number: "02",
+    title: "Request the right home",
+    description:
+      "Open the full listing, review its specifications, and send your preferred move-in details directly to the landlord.",
+    icon: ClipboardCheck,
+  },
+  {
+    number: "03",
+    title: "Pay after approval",
+    description:
+      "Once a landlord approves the request, complete the rental payment through the protected Stripe checkout flow.",
+    icon: CreditCard,
   },
 ];
 
@@ -94,6 +121,7 @@ const getLandingProperties = async () => {
 export default async function LandingPage() {
   const properties = await getLandingProperties();
   const statistics = getLandingStatistics(properties);
+  const featuredHomes = properties.slice(0, 3);
   const featuredAreas = statistics.areas.slice(0, 4);
   const tickerAreas = statistics.areas.map((area) => area.name);
   const hasLiveStatistics = statistics.totalHomes > 0;
@@ -199,6 +227,39 @@ export default async function LandingPage() {
       </section>
 
       <section className="border-y border-slate-300 bg-slate-100">
+        <div className="mx-auto w-full max-w-[1180px] px-6 py-20 sm:px-8 lg:py-24">
+          <div className="grid gap-10 lg:grid-cols-[.75fr_1.25fr] lg:gap-16">
+            <div className="max-w-xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">A clearer rental path</p>
+              <h2 className="mt-3 font-serif text-4xl font-medium leading-tight tracking-[-0.02em] text-slate-950 sm:text-5xl">From first search to an approved home.</h2>
+              <p className="mt-5 text-base leading-7 text-slate-600">Three deliberate steps keep property details, landlord decisions, and payment status in one connected flow.</p>
+              <Link className={buttonClasses({ variant: "outline", className: "mt-7 rounded-full" })} href="/properties">
+                Start with live listings <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+            </div>
+            <ol className="border-t border-slate-300">
+              {rentalSteps.map((step) => {
+                const Icon = step.icon;
+
+                return (
+                  <li className="grid gap-4 border-b border-slate-300 py-7 sm:grid-cols-[3rem_1fr_auto] sm:items-start" key={step.number}>
+                    <span className="font-mono text-xs text-slate-400">{step.number}</span>
+                    <div>
+                      <h3 className="font-serif text-2xl font-medium text-slate-950">{step.title}</h3>
+                      <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{step.description}</p>
+                    </div>
+                    <span className="flex size-11 items-center justify-center rounded-full border border-slate-300 bg-surface text-primary">
+                      <Icon size={18} aria-hidden="true" />
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-slate-300 bg-slate-100">
         <div className="mx-auto grid w-full max-w-[1180px] sm:grid-cols-2 lg:grid-cols-4">
           {marketplaceStatistics.map(([number, label], index) => (
             <div className={`border-slate-300 px-8 py-12 ${index > 0 ? 'border-t sm:border-l sm:border-t-0' : ''} ${index === 2 ? 'lg:border-t-0' : ''}`} key={label}>
@@ -211,6 +272,42 @@ export default async function LandingPage() {
             </p>
           ) : null}
         </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-[1180px] px-6 py-20 sm:px-8 lg:py-24">
+        <div className="flex flex-col justify-between gap-5 border-b border-slate-300 pb-8 sm:flex-row sm:items-end">
+          <div className="max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">From the live catalogue</p>
+            <h2 className="mt-3 font-serif text-4xl font-medium leading-tight tracking-[-0.02em] text-slate-950 sm:text-5xl">A current look at homes on RentNest.</h2>
+          </div>
+          <Link className="inline-flex items-center gap-2 border-b border-slate-950 pb-1 text-sm font-semibold text-slate-950" href="/properties">
+            Browse every listing <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </div>
+        {featuredHomes.length ? (
+          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+            {featuredHomes.map((property, index) => (
+              <article className="group flex min-h-72 flex-col justify-between overflow-hidden rounded-2xl border border-slate-300 bg-surface p-6" key={property.id}>
+                <div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="font-mono text-xs text-slate-400">HOME / 0{index + 1}</span>
+                    <span className="rounded-full border border-slate-300 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">{property.category?.name ?? "Rental"}</span>
+                  </div>
+                  <h3 className="mt-10 font-serif text-2xl font-medium leading-tight text-slate-950">{property.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{getAreaName(property.location)} · {property.bedrooms} bed · {property.bathrooms} bath</p>
+                </div>
+                <div className="mt-8 flex items-end justify-between gap-4 border-t border-dashed border-slate-300 pt-5">
+                  <p><b className="block font-serif text-2xl font-medium text-primary">{formatCurrency(property.rentAmount)}</b><span className="text-xs text-slate-400">per month</span></p>
+                  <Link aria-label={`View ${property.title}`} className="flex size-11 items-center justify-center rounded-full border border-slate-300 text-slate-950 transition group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground" href={`/properties/${property.id}`}>
+                    <ArrowRight size={18} aria-hidden="true" />
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-8 text-sm text-slate-600">Live home previews will return when the property service is available.</p>
+        )}
       </section>
 
       <section className="mx-auto max-w-3xl px-6 py-20 text-center sm:px-8 lg:py-24">

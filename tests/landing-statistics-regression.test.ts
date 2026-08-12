@@ -23,3 +23,10 @@ test("landing page handles an unavailable property API without dummy fallback to
   assert.match(landingPage, /Live marketplace statistics are temporarily unavailable/);
   assert.match(landingPage, /Live catalogue insights will return/);
 });
+
+test("landing page provides at least eight meaningful sections", () => {
+  assert.ok((landingPage.match(/<section/g) ?? []).length >= 8);
+  assert.match(landingPage, /A clearer rental path/);
+  assert.match(landingPage, /From the live catalogue/);
+  assert.match(landingPage, /featuredHomes = properties\.slice\(0, 3\)/);
+});
