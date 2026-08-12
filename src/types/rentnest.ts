@@ -66,6 +66,14 @@ export type LoginPayload = {
   password: string;
 };
 
+export type GoogleLoginPayload = {
+  credential: string;
+};
+
+export type FacebookLoginPayload = {
+  accessToken: string;
+};
+
 export type ProfileUpdatePayload = {
   name: string;
   phone: string | null;

@@ -15,6 +15,8 @@ const footerLinks = [
   { href: "/about", label: "About RentNest" },
   { href: "/help", label: "Help & support" },
   { href: "/contact", label: "Contact us" },
+  { href: "/privacy", label: "Privacy policy" },
+  { href: "/data-deletion", label: "Data deletion" },
   { href: "/auth/login", label: "Login" },
   { href: "/auth/register", label: "Register" },
 ];

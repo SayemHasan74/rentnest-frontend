@@ -14,8 +14,9 @@ import {
   syncAuthCookies,
 } from "@/lib/auth-session";
 import { Button } from "@/components/ui/button";
+import { SocialLogin } from "@/components/auth/social-login";
 import { Input, Label, Textarea } from "@/components/ui/input";
-import type { RegisterPayload } from "@/types/rentnest";
+import type { AuthPayload, RegisterPayload } from "@/types/rentnest";
 
 type AuthMode = "login" | "register";
 
@@ -46,6 +47,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   const [formError, setFormError] = useState("");
   const [formNotice, setFormNotice] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSocialSubmitting, setIsSocialSubmitting] = useState(false);
 
   useEffect(() => {
     const token = getStoredToken();
@@ -99,13 +101,24 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     return Object.keys(errors).length === 0;
   };
 
-  const loginAndRedirect = async (email: string, password: string) => {
-    const auth = await api.auth.login({ email, password });
+  const completeAuthentication = (auth: AuthPayload) => {
     const from = searchParams.get("from");
     const nextPath = getSafePostLoginPath(auth.user.role, from);
 
+    setFormError("");
+    setFormNotice("Signed in successfully. Redirecting...");
     persistAuthSession(auth);
-    window.location.assign(nextPath);
+    window.setTimeout(() => window.location.assign(nextPath), 250);
+  };
+
+  const loginAndRedirect = async (email: string, password: string) => {
+    const auth = await api.auth.login({ email, password });
+    completeAuthentication(auth);
+  };
+
+  const handleSocialError = (error: unknown) => {
+    setFormNotice("");
+    setFormError(getErrorMessage(error));
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -129,6 +142,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           phone: values.phone?.trim() || undefined,
           address: values.address?.trim() || undefined,
         });
+        setFormNotice("Account created successfully. Signing you in...");
       }
 
       await loginAndRedirect(values.email.trim(), values.password);
@@ -336,6 +350,19 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                 : "Login"}
           </Button>
         </form>
+
+        <SocialLogin
+          disabled={isSubmitting || isSocialSubmitting}
+          onAuthenticated={completeAuthentication}
+          onError={handleSocialError}
+          onLoadingChange={setIsSocialSubmitting}
+        />
+
+        {isRegister ? (
+          <p className="mt-3 text-center text-xs leading-5 text-slate-500">
+            Google and Facebook create a tenant account. Landlords should use the registration form.
+          </p>
+        ) : null}
 
         {!isRegister ? (
           <div className="mt-5">

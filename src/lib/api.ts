@@ -12,6 +12,8 @@ import type {
   CreatePaymentResponse,
   CreateRentalPayload,
   CreateReviewPayload,
+  FacebookLoginPayload,
+  GoogleLoginPayload,
   LoginPayload,
   ProfileUpdatePayload,
   Payment,
@@ -135,6 +137,16 @@ export const api = {
       }),
     login: (body: LoginPayload) =>
       apiRequest<AuthPayload>("/auth/login", {
+        method: "POST",
+        body,
+      }),
+    googleLogin: (body: GoogleLoginPayload) =>
+      apiRequest<AuthPayload>("/auth/google", {
+        method: "POST",
+        body,
+      }),
+    facebookLogin: (body: FacebookLoginPayload) =>
+      apiRequest<AuthPayload>("/auth/facebook", {
         method: "POST",
         body,
       }),

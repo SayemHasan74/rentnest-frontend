@@ -32,6 +32,8 @@ Copy `.env.example` to `.env.local` for local development.
 
 ```env
 NEXT_PUBLIC_API_BASE_URL=https://rentnest-server.onrender.com/api
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-web-client-id
+NEXT_PUBLIC_FACEBOOK_APP_ID=your-facebook-app-id
 ```
 
 ## Demo Credentials
@@ -73,6 +75,11 @@ npm run build
 /properties/[id]          Property details, gallery, reviews, rental request
 /auth/login               Login with demo account shortcuts
 /auth/register            Tenant/landlord registration
+/about                    Public project information
+/contact                  Validated contact form
+/help                     Public help and support
+/privacy                  Privacy policy for local and social accounts
+/data-deletion            Account and social-data deletion instructions
 /dashboard                Role redirect
 /dashboard/tenant         Tenant rental requests, payments, reviews
 /dashboard/tenant/requests/[id]/pay
@@ -138,6 +145,8 @@ Integrated endpoints:
 ```text
 POST /api/auth/register
 POST /api/auth/login
+POST /api/auth/google
+POST /api/auth/facebook
 GET  /api/auth/me
 
 GET  /api/properties
@@ -178,6 +187,11 @@ DELETE /api/categories/:id
 Auth state is stored in `localStorage` for client API calls and in cookies for
 Next.js route protection. The middleware proxy protects dashboard routes and
 redirects users to their role dashboard.
+
+Google and Facebook buttons exchange a provider credential with the backend.
+The backend verifies that credential directly with the provider before issuing
+the same RentNest JWT used by password accounts. New social accounts are
+created as tenants; existing accounts are never linked by email automatically.
 
 ```text
 TENANT   -> /dashboard/tenant

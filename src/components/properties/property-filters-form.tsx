@@ -1,9 +1,9 @@
 "use client";
 
-import { SlidersHorizontal, X } from "lucide-react";
+import { AlertCircle, Loader2, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useTransition } from "react";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import type { Category } from "@/types/rentnest";
@@ -54,14 +54,41 @@ export function PropertyFiltersForm({
 }) {
   const router = useRouter();
   const [filterValues, setFilterValues] = useState(values);
+  const [formError, setFormError] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   const updateFilter = (name: keyof FilterValues, value: string) => {
     setFilterValues((current) => ({ ...current, [name]: value }));
+    setFormError("");
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    router.push(buildFilterUrl(filterValues));
+
+    const minPrice = filterValues.minPrice
+      ? Number(filterValues.minPrice)
+      : null;
+    const maxPrice = filterValues.maxPrice
+      ? Number(filterValues.maxPrice)
+      : null;
+
+    if (minPrice !== null && (!Number.isFinite(minPrice) || minPrice < 1)) {
+      setFormError("Minimum rent must be a positive number.");
+      return;
+    }
+
+    if (maxPrice !== null && (!Number.isFinite(maxPrice) || maxPrice < 1)) {
+      setFormError("Maximum rent must be a positive number.");
+      return;
+    }
+
+    if (minPrice !== null && maxPrice !== null && minPrice > maxPrice) {
+      setFormError("Minimum rent cannot be greater than maximum rent.");
+      return;
+    }
+
+    setFormError("");
+    startTransition(() => router.push(buildFilterUrl(filterValues)));
   };
 
   return (
@@ -75,6 +102,17 @@ export function PropertyFiltersForm({
       </div>
 
       <div className="mt-5 grid gap-4">
+        {formError ? (
+          <div
+            aria-live="assertive"
+            className="flex gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+            role="alert"
+          >
+            <AlertCircle className="mt-0.5 shrink-0" size={16} aria-hidden="true" />
+            <p>{formError}</p>
+          </div>
+        ) : null}
+
         <div className="grid gap-2">
           <Label htmlFor="search">Search listings</Label>
           <Input
@@ -187,7 +225,10 @@ export function PropertyFiltersForm({
       </div>
 
       <div className="mt-5 grid gap-2">
-        <Button type="submit">Update now</Button>
+        <Button disabled={isPending} type="submit">
+          {isPending ? <Loader2 className="animate-spin" size={16} aria-hidden="true" /> : null}
+          {isPending ? "Updating results..." : "Update now"}
+        </Button>
         <Link
           className={buttonClasses({ variant: "outline" })}
           href="/properties"
