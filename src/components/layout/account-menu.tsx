@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   UserRound,
   UsersRound,
+  MessagesSquare,
 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { buttonClasses } from "@/components/ui/button";
@@ -37,6 +38,8 @@ const linkIcons = {
   "Manage users": UsersRound,
   "Manage categories": ShieldCheck,
   "Review properties": Building2,
+  "Rental activity": ClipboardList,
+  "Support inbox": MessagesSquare,
   Profile: UserRound,
 } as const;
 

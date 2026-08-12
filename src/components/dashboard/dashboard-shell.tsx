@@ -6,6 +6,7 @@ import {
   CreditCard,
   LayoutDashboard,
   ListChecks,
+  MessagesSquare,
   Plus,
   ShieldCheck,
   UserRound,
@@ -31,6 +32,7 @@ const dashboardLinkIcons = {
   "Manage categories": ShieldCheck,
   "Review properties": Building2,
   "Rental activity": ListChecks,
+  "Support inbox": MessagesSquare,
   Profile: UserRound,
 } as const;
 

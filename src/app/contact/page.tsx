@@ -29,7 +29,7 @@ export default function ContactPage() {
         </aside>
         <div className="rounded-md border border-slate-300 bg-surface p-6 shadow-sm sm:p-8">
           <h2 className="text-2xl font-semibold text-slate-950">Send a message</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">All fields are required. We will use your email only to respond to this enquiry.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">All fields are required. Replies are delivered securely to your RentNest support inbox.</p>
           <div className="mt-7"><ContactForm /></div>
         </div>
       </section>

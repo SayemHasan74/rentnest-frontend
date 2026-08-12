@@ -159,7 +159,7 @@ export const getSafePostLoginPath = (role: UserRole, from: string | null) => {
       : dashboardPath;
   }
 
-  return from === "/" || from === "/home" || from.startsWith("/properties")
+  return from === "/" || from === "/home" || from.startsWith("/properties") || from.startsWith("/contact")
     ? from
     : dashboardPath;
 };

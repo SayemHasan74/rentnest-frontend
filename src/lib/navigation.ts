@@ -16,6 +16,7 @@ export const accountNavigationLinks: Record<UserRole, ShellLink[]> = {
     { href: "/dashboard/tenant", label: "Dashboard overview" },
     { href: "/dashboard/tenant#my-requests", label: "My rental requests" },
     { href: "/dashboard/tenant#payment-history", label: "Payment history" },
+    { href: "/contact#support-inbox", label: "Support inbox" },
     { href: "/dashboard/profile", label: "Profile" },
   ],
   LANDLORD: [
@@ -23,6 +24,7 @@ export const accountNavigationLinks: Record<UserRole, ShellLink[]> = {
     { href: "/dashboard/landlord#add-property", label: "Add a property" },
     { href: "/dashboard/landlord#my-properties", label: "My properties" },
     { href: "/dashboard/landlord#rental-requests", label: "Rental requests" },
+    { href: "/contact#support-inbox", label: "Support inbox" },
     { href: "/dashboard/profile", label: "Profile" },
   ],
   ADMIN: [
@@ -31,6 +33,7 @@ export const accountNavigationLinks: Record<UserRole, ShellLink[]> = {
     { href: "/dashboard/admin#categories", label: "Manage categories" },
     { href: "/dashboard/admin#properties", label: "Review properties" },
     { href: "/dashboard/admin#rental-activity", label: "Rental activity" },
+    { href: "/dashboard/admin#support-inbox", label: "Support inbox" },
     { href: "/dashboard/profile", label: "Profile" },
   ],
 };

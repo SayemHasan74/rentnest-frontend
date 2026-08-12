@@ -291,5 +291,28 @@ export type ContactSubmissionPayload = {
 
 export type ContactSubmission = ContactSubmissionPayload & {
   id: string;
+  userId: string | null;
+  status: "OPEN" | "CLOSED";
+  unreadForAdmin: boolean;
+  unreadForUser: boolean;
+  updatedAt: string;
+  user?: Pick<User, "id" | "name" | "email" | "role"> | null;
+  messages?: ContactMessage[];
   createdAt: string;
+};
+
+export type ContactMessage = {
+  id: string;
+  submissionId: string;
+  senderId: string;
+  senderRole: "USER" | "ADMIN";
+  message: string;
+  sender: Pick<User, "id" | "name" | "role">;
+  createdAt: string;
+};
+
+export type ContactInboxResponse = {
+  meta: PaginationMeta;
+  unread: number;
+  submissions: ContactSubmission[];
 };

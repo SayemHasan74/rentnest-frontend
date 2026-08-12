@@ -58,8 +58,9 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
     }
 
     syncAuthCookies(token, user);
-    window.location.replace("/home");
-  }, []);
+    const from = searchParams.get("from");
+    window.location.replace(getSafePostLoginPath(user.role, from));
+  }, [searchParams]);
 
   const updateValue = (name: keyof RegisterPayload, value: string) => {
     setValues((current) => ({ ...current, [name]: value }));
@@ -390,7 +391,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           {isRegister ? "Already have an account?" : "Need an account?"}{" "}
           <Link
             className="border-b border-slate-950 font-semibold text-slate-950"
-            href={isRegister ? "/auth/login" : "/auth/register"}
+            href={`${isRegister ? "/auth/login" : "/auth/register"}${searchParams.get("from") ? `?from=${encodeURIComponent(searchParams.get("from")!)}` : ""}`}
           >
             {isRegister ? "Login" : "Register"}
           </Link>

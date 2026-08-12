@@ -8,6 +8,7 @@ import type {
   ConfirmPaymentPayload,
   ContactSubmission,
   ContactSubmissionPayload,
+  ContactInboxResponse,
   CreatePaymentPayload,
   CreatePaymentResponse,
   CreateRentalPayload,
@@ -241,11 +242,18 @@ export const api = {
   },
 
   contact: {
-    create: (body: ContactSubmissionPayload) =>
+    create: (token: string, body: ContactSubmissionPayload) =>
       apiRequest<ContactSubmission>("/contact", {
         method: "POST",
+        token,
         body,
       }),
+    listMine: (token: string) => apiRequest<ContactSubmission[]>("/contact", { token }),
+    details: (token: string, id: string) => apiRequest<ContactSubmission>(`/contact/${id}`, { token }),
+    reply: (token: string, id: string, message: string) =>
+      apiRequest<ContactSubmission>(`/contact/${id}/messages`, { method: "POST", token, body: { message } }),
+    markRead: (token: string, id: string) =>
+      apiRequest<ContactSubmission>(`/contact/${id}/read`, { method: "PATCH", token }),
   },
 
   landlord: {
@@ -321,5 +329,9 @@ export const api = {
       apiRequest<RentalRequest[]>("/admin/rentals", {
         token,
       }),
+    contactSubmissions: (token: string, query?: { search?: string; status?: "OPEN" | "CLOSED"; page?: number; limit?: number }) =>
+      apiRequest<ContactInboxResponse>("/admin/contact-submissions", { token, query }),
+    updateContactStatus: (token: string, id: string, status: "OPEN" | "CLOSED") =>
+      apiRequest<ContactSubmission>(`/admin/contact-submissions/${id}/status`, { method: "PATCH", token, body: { status } }),
   },
 };
