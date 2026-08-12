@@ -18,6 +18,8 @@ export const metadata: Metadata = {
     "Verified rental homes, transparent pricing, and a clearer way to find your next place in Dhaka.",
 };
 
+export const revalidate = 300;
+
 const areaGradients = [
   "from-[#1e3a34]",
   "from-[#2a2a1e]",

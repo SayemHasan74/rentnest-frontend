@@ -5,6 +5,7 @@ import test from "node:test";
 const landingPage = readFileSync("src/app/page.tsx", "utf8");
 
 test("landing statistics come from the public property API", () => {
+  assert.match(landingPage, /export const revalidate = 300/);
   assert.match(landingPage, /api\.properties\.list\(\{ limit: 100 \}\)/);
   assert.match(landingPage, /getLandingStatistics\(properties\)/);
   assert.match(landingPage, /property\.reviews\?\.length/);
