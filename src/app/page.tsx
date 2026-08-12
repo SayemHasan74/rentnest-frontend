@@ -8,6 +8,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
+import { PropertyCard } from "@/components/properties/property-card";
 import { api } from "@/lib/api";
 import { formatCurrency, formatNumber } from "@/lib/format";
 import type { Property } from "@/types/rentnest";
@@ -287,24 +288,9 @@ export default async function LandingPage() {
           </Link>
         </div>
         {featuredHomes.length ? (
-          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {featuredHomes.map((property, index) => (
-              <article className="group flex min-h-72 flex-col justify-between overflow-hidden rounded-2xl border border-slate-300 bg-surface p-6" key={property.id}>
-                <div>
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="font-mono text-xs text-slate-400">HOME / 0{index + 1}</span>
-                    <span className="rounded-full border border-slate-300 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">{property.category?.name ?? "Rental"}</span>
-                  </div>
-                  <h3 className="mt-10 font-serif text-2xl font-medium leading-tight text-slate-950">{property.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-slate-600">{getAreaName(property.location)} · {property.bedrooms} bed · {property.bathrooms} bath</p>
-                </div>
-                <div className="mt-8 flex items-end justify-between gap-4 border-t border-dashed border-slate-300 pt-5">
-                  <p><b className="block font-serif text-2xl font-medium text-primary">{formatCurrency(property.rentAmount)}</b><span className="text-xs text-slate-400">per month</span></p>
-                  <Link aria-label={`View ${property.title}`} className="flex size-11 items-center justify-center rounded-full border border-slate-300 text-slate-950 transition group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground" href={`/properties/${property.id}`}>
-                    <ArrowRight size={18} aria-hidden="true" />
-                  </Link>
-                </div>
-              </article>
+              <PropertyCard key={property.id} priority={index === 0} property={property} />
             ))}
           </div>
         ) : (

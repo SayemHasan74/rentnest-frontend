@@ -32,6 +32,13 @@ test("landing page provides at least eight meaningful sections", () => {
   assert.match(landingPage, /featuredHomes = properties\.slice\(0, 3\)/);
 });
 
+test("landing featured homes use the complete, consistent listing card", () => {
+  assert.match(landingPage, /import \{ PropertyCard \}/);
+  assert.match(landingPage, /<PropertyCard key=\{property\.id\}/);
+  assert.match(landingPage, /sm:grid-cols-2 lg:grid-cols-3/);
+  assert.doesNotMatch(landingPage, /HOME \/ 0/);
+});
+
 test("public landing hero stays within the required viewport-height range", () => {
   assert.match(landingPage, /h-\[65svh\]/);
   assert.match(landingPage, /aria-labelledby="landing-hero-title"/);
