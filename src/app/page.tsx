@@ -5,6 +5,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
+import { api } from "@/lib/api";
+import { formatCurrency, formatNumber } from "@/lib/format";
+import type { Property } from "@/types/rentnest";
 
 export const metadata: Metadata = {
   title: "RentNest | A calmer way to call Dhaka home",
@@ -12,11 +15,11 @@ export const metadata: Metadata = {
     "Verified rental homes, transparent pricing, and a clearer way to find your next place in Dhaka.",
 };
 
-const areas = [
-  { name: "Gulshan", homes: "340 homes", className: "from-[#1e3a34]" },
-  { name: "Banani", homes: "212 homes", className: "from-[#2a2a1e]" },
-  { name: "Dhanmondi", homes: "198 homes", className: "from-[#1e2a3a]" },
-  { name: "Uttara", homes: "276 homes", className: "from-[#2a1e2e]" },
+const areaGradients = [
+  "from-[#1e3a34]",
+  "from-[#2a2a1e]",
+  "from-[#1e2a3a]",
+  "from-[#2a1e2e]",
 ];
 
 const roles = [
@@ -40,9 +43,76 @@ const roles = [
   },
 ];
 
-const tickerAreas = ["Gulshan", "Banani", "Dhanmondi", "Uttara", "Baridhara", "Mirpur"];
+const getAreaName = (location: string) => location.split(",")[0]?.trim() || location;
 
-export default function LandingPage() {
+const getLandingStatistics = (properties: Property[]) => {
+  const areaCounts = new Map<string, number>();
+
+  properties.forEach((property) => {
+    const area = getAreaName(property.location);
+    areaCounts.set(area, (areaCounts.get(area) ?? 0) + 1);
+  });
+
+  const areas = [...areaCounts.entries()]
+    .sort(([leftName, leftCount], [rightName, rightCount]) =>
+      rightCount - leftCount || leftName.localeCompare(rightName),
+    )
+    .map(([name, count], index) => ({
+      name,
+      count,
+      className: areaGradients[index % areaGradients.length],
+    }));
+  const rents = properties.map((property) => Number(property.rentAmount));
+  const totalRent = rents.reduce((total, rent) => total + rent, 0);
+
+  return {
+    availableHomes: properties.filter((property) => property.status === "AVAILABLE").length,
+    averageRent: properties.length ? Math.round(totalRent / properties.length) : 0,
+    areas,
+    highestRent: rents.length ? Math.max(...rents) : 0,
+    lowestRent: rents.length ? Math.min(...rents) : 0,
+    propertyTypes: new Set(
+      properties.map((property) => property.category?.name).filter(Boolean),
+    ).size,
+    ratings: properties.reduce(
+      (total, property) => total + (property.reviews?.length ?? 0),
+      0,
+    ),
+    totalHomes: properties.length,
+  };
+};
+
+const getLandingProperties = async () => {
+  try {
+    const response = await api.properties.list({ limit: 100 });
+    return response.properties;
+  } catch {
+    return [];
+  }
+};
+
+export default async function LandingPage() {
+  const properties = await getLandingProperties();
+  const statistics = getLandingStatistics(properties);
+  const featuredAreas = statistics.areas.slice(0, 4);
+  const tickerAreas = statistics.areas.map((area) => area.name);
+  const hasLiveStatistics = statistics.totalHomes > 0;
+  const snapshotRows = hasLiveStatistics
+    ? [
+        ["Available homes", formatNumber(statistics.availableHomes)],
+        ["Areas represented", formatNumber(statistics.areas.length)],
+        ["Average monthly rent", formatCurrency(statistics.averageRent)],
+      ]
+    : [];
+  const marketplaceStatistics = hasLiveStatistics
+    ? [
+        [formatNumber(statistics.totalHomes), "Public rental listings"],
+        [formatNumber(statistics.areas.length), "Areas represented"],
+        [formatNumber(statistics.propertyTypes), "Property types listed"],
+        [formatNumber(statistics.ratings), "Submitted ratings"],
+      ]
+    : [];
+
   return (
     <main className="overflow-hidden bg-background text-foreground">
       <section className="relative overflow-hidden border-b border-slate-300">
@@ -80,25 +150,31 @@ export default function LandingPage() {
               <div className="h-[52px]" />
               <aside className="relative ml-[-140px] w-[280px] rotate-[-4deg] rounded-2xl border border-slate-300 bg-surface px-7 pb-7 pt-8 shadow-2xl shadow-black/20">
                 <i className="absolute left-1/2 top-[-9px] h-4 w-4 -translate-x-1/2 rounded-full border border-slate-300 bg-background" />
-                <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-slate-400">Move-in snapshot</p>
-                {[['Verified homes', '2,400+'], ['Avg. owner reply', '4 min'], ['Neighborhoods', '12']].map(([label, value]) => (
-                  <div className="mt-4 flex items-baseline justify-between border-t border-dashed border-slate-300 pt-3 first:border-t-0 first:pt-0" key={label}>
-                    <span className="text-xs text-slate-500">{label}</span><b className="font-mono text-lg font-semibold text-primary">{value}</b>
-                  </div>
-                ))}
+                <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-slate-400">Live marketplace snapshot</p>
+                {snapshotRows.length ? snapshotRows.map(([label, value]) => (
+                    <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-dashed border-slate-300 pt-3 first:border-t-0 first:pt-0" key={label}>
+                      <span className="text-xs text-slate-500">{label}</span><b className="text-right font-mono text-base font-semibold text-primary">{value}</b>
+                    </div>
+                  )) : (
+                    <p className="mt-4 border-t border-dashed border-slate-300 pt-4 text-xs leading-5 text-slate-500">
+                      Live listing totals are temporarily unavailable. Browse properties to try again.
+                    </p>
+                  )}
               </aside>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="home-ticker border-b border-slate-300 bg-slate-100 py-4" aria-label="Featured Dhaka neighborhoods">
-        <div className="home-ticker-track flex w-max">
-          {[...tickerAreas, ...tickerAreas].map((area, index) => (
-            <span className="flex items-center gap-7 px-7 font-mono text-xs text-slate-400 after:text-primary after:content-['·']" key={`${area}-${index}`}>{area}</span>
-          ))}
+      {tickerAreas.length ? (
+        <div className="home-ticker border-b border-slate-300 bg-slate-100 py-4" aria-label="Areas represented by live RentNest listings">
+          <div className="home-ticker-track flex w-max">
+            {[...tickerAreas, ...tickerAreas].map((area, index) => (
+              <span className="flex items-center gap-7 px-7 font-mono text-xs text-slate-400 after:text-primary after:content-['·']" key={`${area}-${index}`}>{area}</span>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <section id="roles" className="mx-auto w-full max-w-[1180px] px-6 py-20 sm:px-8 lg:py-24">
         <div className="mb-14 max-w-2xl">
@@ -124,27 +200,50 @@ export default function LandingPage() {
 
       <section className="border-y border-slate-300 bg-slate-100">
         <div className="mx-auto grid w-full max-w-[1180px] sm:grid-cols-2 lg:grid-cols-4">
-          {[['2,400+', 'Verified rental homes'], ['12', 'Neighborhoods covered'], ['4 min', 'Average owner response'], ['98%', 'Would search again']].map(([number, label], index) => (
+          {marketplaceStatistics.map(([number, label], index) => (
             <div className={`border-slate-300 px-8 py-12 ${index > 0 ? 'border-t sm:border-l sm:border-t-0' : ''} ${index === 2 ? 'lg:border-t-0' : ''}`} key={label}>
               <b className="block font-serif text-4xl font-medium text-primary">{number}</b><span className="mt-1 block text-sm text-slate-500">{label}</span>
             </div>
           ))}
+          {!marketplaceStatistics.length ? (
+            <p className="px-8 py-12 text-sm text-slate-600 sm:col-span-2 lg:col-span-4">
+              Live marketplace statistics are temporarily unavailable.
+            </p>
+          ) : null}
         </div>
       </section>
 
       <section className="mx-auto max-w-3xl px-6 py-20 text-center sm:px-8 lg:py-24">
-        <blockquote className="font-serif text-2xl font-normal italic leading-relaxed text-slate-950 sm:text-3xl">I found a flat in Banani in four days without a single agent call. I actually knew what I was walking into before I saw it.</blockquote>
-        <p className="mt-7 text-sm text-slate-500"><b className="font-semibold text-slate-950">Nusrat J.</b> — moved in March, Banani</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Live catalogue insight</p>
+        {hasLiveStatistics ? (
+          <>
+            <h2 className="mt-4 font-serif text-3xl font-medium leading-relaxed text-slate-950 sm:text-4xl">
+              Current monthly rents range from {formatCurrency(statistics.lowestRent)} to {formatCurrency(statistics.highestRent)} across {formatNumber(statistics.areas.length)} represented areas.
+            </h2>
+            <p className="mt-7 text-sm text-slate-500">
+              Calculated from all {formatNumber(statistics.totalHomes)} public listings currently returned by the RentNest database.
+            </p>
+          </>
+        ) : (
+          <p className="mt-4 text-base leading-7 text-slate-600">
+            Live catalogue insights will return when the property service is available.
+          </p>
+        )}
       </section>
 
       <section id="cities" className="mx-auto w-full max-w-[1180px] px-6 py-20 sm:px-8 lg:py-24">
         <div className="mb-14 max-w-xl"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Featured areas</p><h2 className="mt-3 font-serif text-4xl font-medium leading-tight tracking-[-0.02em] text-slate-950 sm:text-5xl">Start where you already know you want to be.</h2></div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {areas.map((area) => (
+          {featuredAreas.map((area) => (
             <Link className={`relative flex h-64 items-end overflow-hidden rounded-2xl border border-slate-300 bg-gradient-to-br ${area.className} to-background p-6 text-white after:absolute after:inset-0 after:bg-gradient-to-t after:from-black/75 after:to-transparent`} href={`/properties?location=${area.name}&page=1`} key={area.name}>
-              <span className="relative z-10"><b className="block font-serif text-2xl font-medium">{area.name}</b><small className="font-mono text-xs text-white/80">{area.homes}</small></span>
+              <span className="relative z-10"><b className="block font-serif text-2xl font-medium">{area.name}</b><small className="font-mono text-xs text-white/80">{formatNumber(area.count)} {area.count === 1 ? "listing" : "listings"}</small></span>
             </Link>
           ))}
+          {!featuredAreas.length ? (
+            <p className="text-sm text-slate-600 sm:col-span-2 lg:col-span-4">
+              Featured areas will return when live listings are available.
+            </p>
+          ) : null}
         </div>
       </section>
 
